@@ -2,7 +2,7 @@
 layout: about
 title: about
 permalink: /
-subtitle: <a href='#'>Affiliations</a>. University of Amsterdam (UvA), Science park 904=
+subtitle: <a href='#'>Affiliations</a>. University of Amsterdam (UvA), Science park 904
 
 profile:
   align: right

@@ -5,4 +5,4 @@ inline: true
 related_posts: false
 ---
 
-Reveived my master degree from the Aristotle University of Thessaloniki (Auth). My master thesis was on machine learning methods for developing intelligent agents in strategy video game <em>StarCraft</em>.
+Reveived my master degree from the Aristotle University of Thessaloniki (Auth).
