@@ -2,7 +2,7 @@
 layout: about
 title: about
 permalink: /
-subtitle: <a href='#'>Affiliations</a>. University of Amsterdam (UvA), Science park 904
+subtitle: <a href='#'>Affiliations</a>. University of Amsterdam (UvA)
 
 profile:
   align: right
@@ -20,7 +20,7 @@ Since August 2020, I am working as a <em>junior lecturer</em> at the Artificial 
 
 I have acquired my Ph.D. from data science and knowledge engineering (DKE) at Maastricht University on cross-modal emotion recognition based on domain adaptation. My work utilized methods to bridge expressivity features from the audio and visual modalities and ways to elicit both in order to improve emotion recognition performance.
 
-Christos Athanasiadis was born in February 1988 in Drama, Greece. In 2010 he completed his bachelor degree in the Department of computer science in Aristotle University in Greece, where he also earned his master degree as well in the \textit{Digital Media, Computational Intelligence} program. In his master thesis, he studied machine learning methods for developing intelligent agents in strategy video game <em>StarCraft</em>.
+Christos Athanasiadis was born in February 1988 in Drama, Greece. In 2010 he completed his bachelor degree in the Department of computer science in Aristotle University in Greece, where he also earned his master degree as well in the <em>Digital Media, Computational Intelligence</em> program. In his master thesis, he studied machine learning methods for developing intelligent agents in strategy video game <em>StarCraft</em>.
 
 
 
