@@ -178,26 +178,18 @@
           <nav class="l-text figcaption">
           <h3>Contents</h3>
             <div><a href="#local-interpretable-model-agnostic-explanations">Local Interpretable Model-agnostic Explanations</a></div>
-            <div><a href="#history-of-text-to-video">History of Text-to-Video</a></div>
-            <div><a href="#text-to-image-generation">Text-to-Image Generation</a></div>
             <ul>
-              <li><a href="#what-is-latent-space">What is latent space?</a></li>
-              <li><a href="#how-does-stable-diffusion-work-in-latent-space">How does stable diffusion work in latent space?</a></li>
+              <li><a href="#interpretable-representations">Interpretable Representations</a></li>
+              <li><a href="#lime-approach-details">LIME approach details</a></li>
+              <li><a href="#code-implementation">Code implementation</a></li>
+              <li><a href="#lime-explanation">LIME explanation</a></li>
+              <li><a href="#creating-perturbations-of-image">Creating Perturbations of image</a></li>
               
             </ul>
-<div><a href="#text-to-video-generation">Text-to-Video Generation</a></div>
-            <ul>
-              <li><a href="#how-do-we-extend-text-to-image-to-text-to-video">How do we extend Text-to-Image to Text-to-Video?</a></li>
-              <li><a href="#spatial-and-temporal-super-resolution">Spatial and Temporal Super Resolution</a></li>
-              
-            </ul>
-<div><a href="#conclusions">Conclusions</a></div>
-            <ul>
-              <li><a href="#putting-together-all-the-building-blocks">Putting Together All The Building Blocks</a></li>
-              <li><a href="#limitations-of-text-to-video">Limitations of Text-to-Video</a></li>
-              
-            </ul>
-<div><a href="#related-works">Related Works</a></div>
+<div><a href="#results">Results</a></div>
+            <div><a href="#adversarial-attacks">Adversarial attacks</a></div>
+            <div><a href="#tosubmit">TOSUBMIT</a></div>
+            <div><a href="#conclusions">Conclusions</a></div>
             <div><a href="#references">References</a></div>
             
           </nav>
@@ -213,33 +205,6 @@
 
 <p>In this post, we will study how <mark style="background-color:LavenderBlush;">LIME</mark> (Local Interpretable Model-agnostic Explanations) ([1]) generates explanations for image classification tasks. The basic idea is to understand why a machine learning model predicts that an specific image belongs to a certain class (<em>labrador</em> our visual example). The LIME explainer is <em>model-agnostic</em> that means is not restricted to a specific model and can be used to explain any <mark>black-box</mark> classifier. So we dont need to have access to the details of our model (input, intermediate layers etc) to generate explanations. Moreover, the explainer is <em>local</em> meaning that it explains the prediction of the model in the neighborhood of the instance being explained. This technique lies in the PostHoc category of XAI methods, meaning that it explains the model after it has been trained. Briefly, this technique tried to learn a simple model (for isntance a linear classifier) that is interpretable by humans and approximates the predictions of the <em>black-box</em> model in the neighborhood of the instance being explained.</p>
 
-<!-- <figure>
-
-  <picture>
-    
-
-    <!-- Fallback to the original file -->
-<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>&lt;img 
-  src="/kristosh/assets/img/2022-12-01-LIME/LIME.png"
-  class="img-fluid"  
-  width="auto" 
-  height="auto" 
-   
-   
-   
-   
-   
-   
-  
-  onerror="this.onerror=null; $('.responsive-img-srcset').remove();"
-/&gt;
-</code></pre></div></div>
-
-<p>&lt;/picture&gt;</p>
-
-<p>&lt;/figure&gt;
- –&gt;</p>
-
 <h2 id="interpretable-representations">Interpretable Representations</h2>
 
 <p>An interpretable explanation in image classifier should use a representation that is understandable to humans, by explaining which parts of the input image influence the model decision. For example, pixel-based explanations are not very informative especially when we deal with huge images and therefore a better way to explain the model decision is to use <a href="https://infoscience.epfl.ch/record/149300" rel="external nofollow noopener" target="_blank">super-pixels</a>. Super-pixels are groups of pixels that share similar characteristics such as color and texture. Hence, a possible interpretable representation for image classification may be a binary vector indicating the <em>presence</em> or <em>absence</em> of a super-pixel. Thus, our explainer needs to find a way to attribute importance to each super-picel in the initial input image. Its important to note here, that the interpretable representations are meant to be just for the explainer while the <em>black-box</em> can still be trained using the original pixel-based representation.</p>
@@ -253,7 +218,7 @@ being explained (in our case a vector with all pixels), and we use $\mathbf{x}^{
 
 <p>Authors, then define as an explainer (or explanation model) $g \in G$, where $G$ is a class of potentially interpretable models, such as <em>linear models</em>, <em>decision trees</em> etc. To keep things simple, in this tutorial, we will consider just <em>linear classifiers</em>. As not every $g \in G$ may be simple enough to be interpretable thus we let $\Omega(g)$ be a measure of complexity (as opposed to interpretability) of the explanation $g \in G$. For example, for decision trees $\Omega(g)$ may be the depth of the tree, while for linear models, $\Omega(g)$ may be the number of non-zero weights. Authors define as $f : R^{d} \to R$ the <em>black-box</em> model that would like to explain. In classification, $f(\mathbf{x})$ is the probability (or a binary indicator) that $\mathbf{x}$ belongs to a certain class.</p>
 
-<p>They further use $\pi_{\mathbf{x}}(\mathbf{z})$ as a proximity measure between an instance $\mathbf{z}$ to $\mathbf{x}$, so as to define locality around $\mathbf{x}$. Finally, let $\mathcal{L}(f, g, \pi_{\mathbf{x}})$ be a measure of how unfaithful $g$ is in approximating $f$ in the locality defined by $\pi_{\mathbf{x}}$. In order to ensure both <em>interpretability</em> and <en>local fidelity&lt;/em&gt;, they must minimize $L(f, g, \pi_{x})$ while having $\Omega(g)$ be low enough to be interpretable by humans.</en></p>
+<p>They further use $\pi_{\mathbf{x}}(\mathbf{z})$ as a proximity measure between an instance $\mathbf{z}$ to $\mathbf{x}$, so as to define locality around $\mathbf{x}$. Finally, let $\mathcal{L}(f, g, \pi_{\mathbf{x}})$ be a measure of how unfaithful $g$ is in approximating $f$ in the locality defined by $\pi_{\mathbf{x}}$. In order to ensure both <em>interpretability</em> and <em>local fidelity</em>, they must minimize $L(f, g, \pi_{x})$ while having $\Omega(g)$ be low enough to be interpretable by humans.</p>
 
 <p>The explanation produced by LIME is obtained by the following:</p>
 
@@ -287,7 +252,7 @@ being explained (in our case a vector with all pixels), and we use $\mathbf{x}^{
 
 </figure>
 
-<p>The kernel is the distance between the instance being explained and the instance in the neighborhood. The neighborhood is generated by <mark>sampling</mark> instances around the instance being explained. The sampling is done by perturbing the instance being explained. For example, in the case of images, we can perturb the image by zeroing out some super-pixels. The perturbed instances are then fed to the <em>black-box</em> model and the output is used to train the explainer. The weights of the interpretable model are then used to explain the prediction of the <em>black-box</em> model. Finally, in the algorithm the <mark>K-lasso</mark> refers to the regulizarion that is introduced in a previous equation and relates with the term $\Omega(g)$.</p>
+<p>The kernel is the distance between the instance being explained and the instance in the neighborhood. The neighborhood is generated by <mark style="background-color:LightCyan;">sampling</mark> instances around the instance being explained. The sampling is done by perturbing the instance being explained. For example, in the case of images, we can perturb the image by zeroing out some super-pixels. The perturbed instances are then fed to the <em>black-box</em> model and the output is used to train the explainer. The weights of the interpretable model are then used to explain the prediction of the <em>black-box</em> model. Finally, in the algorithm the <mark style="background-color:Lavender;">K-lasso</mark> refers to the regulizarion that is introduced in a previous equation and relates with the term $\Omega(g)$.</p>
 
 <center>
 <video autoplay="" muted="" loop="" controls="" src="https://kristosh.github.io/kristosh//assets/video/2022-12-01-LIME/LIME.mp4" style="width:600px" type="video/mp4">
@@ -295,7 +260,7 @@ being explained (in our case a vector with all pixels), and we use $\mathbf{x}^{
 <figcaption>A demonstration of the whole LIME algorithm.</figcaption>
 </center>
 
-<p>The above video explain the whole LIME process. The initial surface represents the <mark>black-box</mark> classifier and the regions for the class of interest (e.g. basketball with the light-pink color). The dark-colored dot denotes the sample that we would like to explain and it is actually an image with the label <em> basketball</em>. The first step is to sample the neighborhood of the point $\mathbf{x}$ that we would like to explain. Several points are generated. The size of each generated sample and the trasparency relates with the distance from the initial point $\mathbf{x}$ which is calculated based using $\pi_{\mathbf{x}}(\mathbf{z})$. The next step is to apply the <mark>black-box</mark> classifier $f()$ to find the label for each generated point. Samples with red represetns class basketball while samples with purple represents class not basketball. The next step is to train the interpretable model $g()$ using the generated samples. The weights of the interpretable model are used to explain the prediction of the <mark>black-box</mark> classifier. The explanation is actually a linear classifier that separates the two classes. The weights of the linear classifier can be used as an explanation for the whole approach.</p>
+<p>The above video explain the whole LIME process. The initial surface represents the <mark style="background-color:Lavender;">black-box</mark> classifier and the regions for the class of interest (e.g. basketball with the light-pink color). The dark-colored dot denotes the sample that we would like to explain and it is actually an image with the label <em> basketball</em>. The first step is to sample the neighborhood of the point $\mathbf{x}$ that we would like to explain. Several points are generated. The size of each generated sample and the trasparency relates with the distance from the initial point $\mathbf{x}$ which is calculated based using $\pi_{\mathbf{x}}(\mathbf{z})$. The next step is to apply the <mark style="background-color:Lavender;">black-box</mark> classifier $f()$ to find the label for each generated point. Samples with red represetns class basketball while samples with purple represents class not basketball. The next step is to train the interpretable model $g()$ using the generated samples. The weights of the interpretable model are used to explain the prediction of the <mark style="background-color:Lavender;">black-box</mark> classifier. The explanation is actually a linear classifier that separates the two classes. The weights of the linear classifier can be used as an explanation for the whole approach.</p>
 
 <h2 id="code-implementation">Code implementation</h2>
 
@@ -336,13 +301,13 @@ being explained (in our case a vector with all pixels), and we use $\mathbf{x}^{
 <span class="c1"># set model to evaluation
 </span><span class="n">model</span><span class="p">.</span><span class="nf">eval</span><span class="p">()</span>
 </code></pre></div></div>
-
-<p>Load our test image and see how it looks. You can choose your own exaple.</p>
+<p>Ignore for now the warnings! This code should return the architecture of the VGG19 model. Of course, feel-free to choose the model of you choice the code should work with any model.
+Now lets load and process the image (for the VGG19 classifier) that we would like to test our <mark style="background-color:Lavender;">LIME</mark> explainer. You can freely choose your own image that you would like to explain.</p>
 
 <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">imread_img</span><span class="p">(</span><span class="n">file_name</span><span class="p">):</span>
   
   <span class="c1"># read the image and convert it - Set your pathto the image
-</span>  <span class="n">img</span> <span class="o">=</span> <span class="n">cv2</span><span class="p">.</span><span class="nf">imread</span><span class="p">(</span><span class="s">'elephant-zebra.png'</span><span class="p">)</span>
+</span>  <span class="n">img</span> <span class="o">=</span> <span class="n">cv2</span><span class="p">.</span><span class="nf">imread</span><span class="p">(</span><span class="s">'caretta.png'</span><span class="p">)</span>
   <span class="nf">if </span><span class="p">(</span><span class="nf">type</span><span class="p">(</span><span class="n">img</span><span class="p">)</span> <span class="ow">is</span> <span class="n">np</span><span class="p">.</span><span class="n">ndarray</span><span class="p">):</span>
     <span class="n">img</span> <span class="o">=</span> <span class="n">cv2</span><span class="p">.</span><span class="nf">resize</span><span class="p">(</span><span class="n">img</span><span class="p">,</span> <span class="p">(</span><span class="mi">224</span><span class="p">,</span> <span class="mi">224</span><span class="p">))</span>
     <span class="n">img</span> <span class="o">=</span> <span class="n">img</span><span class="p">.</span><span class="nf">astype</span><span class="p">(</span><span class="n">np</span><span class="p">.</span><span class="n">float32</span><span class="p">)</span>
@@ -383,7 +348,7 @@ being explained (in our case a vector with all pixels), and we use $\mathbf{x}^{
 </span>    <span class="k">return</span> <span class="n">obs_tensor</span>
 </code></pre></div></div>
 
-<p>Then, we check the prediction by using the VGG19 model that we loaded before.  You can check that the VGG network gives a correct prediction. E.g. 385 and 386 are ‘Indian Elephant’and ‘African Elephant’</p>
+<p>Then, we check the prediction by using the VGG19 model that we loaded before. You can check that the VGG network gives a correct prediction. E.g. 33 and 34 are ‘caretta-caretta’and ‘turtle’</p>
 
 <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">predict</span><span class="p">(</span><span class="nb">input</span><span class="p">,</span> <span class="n">model</span><span class="p">,</span> <span class="n">target_label_idx</span><span class="p">,</span> <span class="n">cuda</span><span class="p">):</span>
     <span class="c1"># Makes prediction after preprocessing image 
@@ -399,8 +364,6 @@ being explained (in our case a vector with all pixels), and we use $\mathbf{x}^{
 </span>    <span class="n">output</span> <span class="o">=</span> <span class="n">output</span><span class="p">.</span><span class="nf">gather</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">index</span><span class="p">)</span>           <span class="c1"># gather functionality of pytorch
 </span>    <span class="k">return</span> <span class="n">target_label_idx</span><span class="p">,</span> <span class="n">output</span> 
 
-<span class="c1"># test preprocessing
-</span>
 <span class="nb">input</span> <span class="o">=</span> <span class="nf">pre_processing</span><span class="p">(</span><span class="n">img</span><span class="p">,</span> <span class="n">cuda</span><span class="p">)</span>          <span class="c1"># preprocess: image (normalise, transpose, make tensor on cuda, requires_grad=True)
 </span><span class="nf">print </span><span class="p">(</span><span class="nb">input</span><span class="p">.</span><span class="n">shape</span><span class="p">)</span>
 <span class="n">label</span><span class="p">,</span> <span class="n">output</span> <span class="o">=</span> <span class="nf">predict</span><span class="p">(</span><span class="nb">input</span><span class="p">,</span> <span class="n">model</span><span class="p">,</span> <span class="bp">None</span><span class="p">,</span> <span class="n">cuda</span><span class="p">)</span>
@@ -427,30 +390,14 @@ being explained (in our case a vector with all pixels), and we use $\mathbf{x}^{
 </span>    <span class="k">return</span> <span class="nf">transf</span><span class="p">(</span><span class="n">img</span><span class="p">).</span><span class="nf">unsqueeze</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
 </code></pre></div></div>
 
+<p>The following code helps you to get the label of the prediction. The label is the index of the class in the ImageNet dataset. The index is used to get the class name from the json file. The json file is available in the repository.</p>
+
 <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">idx2label</span><span class="p">,</span> <span class="n">cls2label</span><span class="p">,</span> <span class="n">cls2idx</span> <span class="o">=</span> <span class="p">[],</span> <span class="p">{},</span> <span class="p">{}</span>
 <span class="k">with</span> <span class="nf">open</span><span class="p">(</span><span class="n">os</span><span class="p">.</span><span class="n">path</span><span class="p">.</span><span class="nf">abspath</span><span class="p">(</span><span class="s">'imagenet_class_index.json'</span><span class="p">),</span> <span class="s">'r'</span><span class="p">)</span> <span class="k">as</span> <span class="n">read_file</span><span class="p">:</span>
     <span class="n">class_idx</span> <span class="o">=</span> <span class="n">json</span><span class="p">.</span><span class="nf">load</span><span class="p">(</span><span class="n">read_file</span><span class="p">)</span>
     <span class="n">idx2label</span> <span class="o">=</span> <span class="p">[</span><span class="n">class_idx</span><span class="p">[</span><span class="nf">str</span><span class="p">(</span><span class="n">k</span><span class="p">)][</span><span class="mi">1</span><span class="p">]</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nf">range</span><span class="p">(</span><span class="nf">len</span><span class="p">(</span><span class="n">class_idx</span><span class="p">))]</span>
     <span class="n">cls2label</span> <span class="o">=</span> <span class="p">{</span><span class="n">class_idx</span><span class="p">[</span><span class="nf">str</span><span class="p">(</span><span class="n">k</span><span class="p">)][</span><span class="mi">0</span><span class="p">]:</span> <span class="n">class_idx</span><span class="p">[</span><span class="nf">str</span><span class="p">(</span><span class="n">k</span><span class="p">)][</span><span class="mi">1</span><span class="p">]</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nf">range</span><span class="p">(</span><span class="nf">len</span><span class="p">(</span><span class="n">class_idx</span><span class="p">))}</span>
     <span class="n">cls2idx</span> <span class="o">=</span> <span class="p">{</span><span class="n">class_idx</span><span class="p">[</span><span class="nf">str</span><span class="p">(</span><span class="n">k</span><span class="p">)][</span><span class="mi">0</span><span class="p">]:</span> <span class="n">k</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nf">range</span><span class="p">(</span><span class="nf">len</span><span class="p">(</span><span class="n">class_idx</span><span class="p">))}</span> 
-</code></pre></div></div>
-
-<p>Get the predicition for our image.</p>
-
-<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">get_image</span><span class="p">(</span><span class="n">path</span><span class="p">):</span>
-    <span class="k">with</span> <span class="nf">open</span><span class="p">(</span><span class="n">os</span><span class="p">.</span><span class="n">path</span><span class="p">.</span><span class="nf">abspath</span><span class="p">(</span><span class="n">path</span><span class="p">),</span> <span class="s">'rb'</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
-        <span class="k">with</span> <span class="n">Image</span><span class="p">.</span><span class="nf">open</span><span class="p">(</span><span class="n">f</span><span class="p">)</span> <span class="k">as</span> <span class="n">img</span><span class="p">:</span>
-            <span class="k">return</span> <span class="n">img</span><span class="p">.</span><span class="nf">convert</span><span class="p">(</span><span class="s">'RGB'</span><span class="p">)</span> 
-        
-<span class="n">img</span> <span class="o">=</span> <span class="nf">get_image</span><span class="p">(</span><span class="s">'elephant-zebra.png'</span><span class="p">)</span>
-<span class="n">img_t</span> <span class="o">=</span> <span class="nf">get_input_tensors</span><span class="p">(</span><span class="n">img</span><span class="p">)</span>
-<span class="n">model</span><span class="p">.</span><span class="nf">eval</span><span class="p">()</span>
-<span class="n">logits</span> <span class="o">=</span> <span class="nf">model</span><span class="p">(</span><span class="n">img_t</span><span class="p">)</span>
-
-
-<span class="n">probs</span> <span class="o">=</span> <span class="n">F</span><span class="p">.</span><span class="nf">softmax</span><span class="p">(</span><span class="n">logits</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
-<span class="n">probs5</span> <span class="o">=</span> <span class="n">probs</span><span class="p">.</span><span class="nf">topk</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span>
-<span class="nf">tuple</span><span class="p">((</span><span class="n">p</span><span class="p">,</span><span class="n">c</span><span class="p">,</span> <span class="n">idx2label</span><span class="p">[</span><span class="n">c</span><span class="p">])</span> <span class="k">for</span> <span class="n">p</span><span class="p">,</span> <span class="n">c</span> <span class="ow">in</span> <span class="nf">zip</span><span class="p">(</span><span class="n">probs5</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">].</span><span class="nf">detach</span><span class="p">().</span><span class="nf">numpy</span><span class="p">(),</span> <span class="n">probs5</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="mi">0</span><span class="p">].</span><span class="nf">detach</span><span class="p">().</span><span class="nf">numpy</span><span class="p">()))</span>
 </code></pre></div></div>
 
 <h2 id="lime-explanation">LIME explanation</h2>
@@ -593,6 +540,14 @@ being explained (in our case a vector with all pixels), and we use $\mathbf{x}^{
 <span class="n">img</span> <span class="o">=</span> <span class="n">img</span><span class="o">/</span><span class="mi">255</span>
 <span class="n">skimage</span><span class="p">.</span><span class="n">io</span><span class="p">.</span><span class="nf">imshow</span><span class="p">(</span><span class="nf">perturb_image</span><span class="p">(</span><span class="n">img</span> <span class="p">,</span><span class="n">mask</span><span class="p">,</span><span class="n">superpixels</span><span class="p">)</span> <span class="p">)</span>
 </code></pre></div></div>
+
+<h1 id="results">Results</h1>
+
+<h1 id="adversarial-attacks">Adversarial attacks</h1>
+
+<h1 id="tosubmit">TOSUBMIT</h1>
+
+<h1 id="conclusions">Conclusions</h1>
 
 <h1 id="references">References</h1>
 <p style="font-size: smaller"><a href="https://arxiv.org/pdf/1602.04938.pdf" rel="external nofollow noopener" target="_blank">[1] Ribeuro, M.T. et al. Why Should I Trust You? Explaining the Predictions of Any Classifier, 2016. SIGKDD.</a></p>
