@@ -430,18 +430,7 @@ Now lets load and process the image (for the VGG19 classifier) that we would lik
 <span class="n">plt</span><span class="p">.</span><span class="nf">show</span><span class="p">()</span>
 
 </code></pre></div></div>
-
-<figure>
-
-  <picture>
-    
-
-    <!-- Fallback to the original file -->
-    <img src="/kristosh/assets/img/2022-12-01-LIME/caretta_2.jpg" class="img-fluid" width="auto" height="auto" onerror="this.onerror=null; $('.responsive-img-srcset').remove();">
-
-  </picture>
-
-</figure>
+<p><img src="../../../../assets/img/2022-12-01-LIME/caretta_2.jpg" style="width:400px;height:400px;" class="center"></p>
 
 <h3 id="creating-random-perturbations">Creating random perturbations</h3>
 <p>In this example, 150 perturbations were used. However, for real life applications, a larger number of perturbations will produce more reliable explanations. Random zeros and ones are generated and shaped as a matrix with perturbations as rows and superpixels as columns. An example of a perturbation (the first one) is show below. Here, <code class="language-plaintext highlighter-rouge">1</code> represent that a superpixel is on and <code class="language-plaintext highlighter-rouge">0</code> represents it is off. Notice that the length of the shown vector corresponds to the number of superpixels in the image.</p>
@@ -468,17 +457,7 @@ Now lets load and process the image (for the VGG19 classifier) that we would lik
 <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">skimage</span><span class="p">.</span><span class="n">io</span><span class="p">.</span><span class="nf">imshow</span><span class="p">(</span><span class="nf">perturb_image</span><span class="p">(</span><span class="n">img</span><span class="o">/</span><span class="mi">2</span><span class="o">+</span><span class="mf">0.5</span><span class="p">,</span><span class="n">perturbations</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="n">superpixels</span><span class="p">))</span>
 </code></pre></div></div>
 
-<figure>
-
-  <picture>
-    
-
-    <!-- Fallback to the original file -->
-    <img src="/kristosh/assets/img/2022-12-01-LIME/caretta_3.jpg" class="img-fluid" width="auto" height="auto" onerror="this.onerror=null; $('.responsive-img-srcset').remove();">
-
-  </picture>
-
-</figure>
+<p><img src="../../../../assets/img/2022-12-01-LIME/caretta_3.jpg" style="width:400px;height:400px;" class="center"></p>
 
 <h3 id="step-2-use-ml-classifier-to-predict-classes-of-new-generated-images">Step 2: Use ML classifier to predict classes of new generated images</h3>
 <p>This is the most computationally expensive step in LIME because a prediction for each perturbed image is computed. From the shape of the predictions we can see for each of the perturbations we have the output probability for each of the 1000 classes in Inception V3.</p>
@@ -511,7 +490,7 @@ Now lets load and process the image (for the VGG19 classifier) that we would lik
 </span><span class="n">weights</span><span class="p">.</span><span class="n">shape</span>
 </code></pre></div></div>
 
-<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">img</span> <span class="o">=</span> <span class="nf">imread_img</span><span class="p">(</span><span class="s">'elephant-zebra.png'</span><span class="p">)</span>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">img</span> <span class="o">=</span> <span class="nf">imread_img</span><span class="p">(</span><span class="s">'caretta.jpg'</span><span class="p">)</span>
 
 <span class="nb">input</span> <span class="o">=</span> <span class="nf">pre_processing</span><span class="p">(</span><span class="n">img</span><span class="p">,</span> <span class="n">cuda</span><span class="p">)</span>          <span class="c1"># preprocess: image (normalise, transpose, make tensor on cuda, requires_grad=True)
 </span>
@@ -550,27 +529,17 @@ Now lets load and process the image (for the VGG19 classifier) that we would lik
 <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">mask</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="nf">zeros</span><span class="p">(</span><span class="n">num_superpixels</span><span class="p">)</span> 
 <span class="n">mask</span><span class="p">[</span><span class="n">top_features</span><span class="p">]</span><span class="o">=</span> <span class="bp">True</span> <span class="c1">#Activate top superpixels
 </span>
-<span class="n">img</span> <span class="o">=</span> <span class="nf">imread_img</span><span class="p">(</span><span class="s">'elephant-zebra.png'</span><span class="p">)</span>
+<span class="n">img</span> <span class="o">=</span> <span class="nf">imread_img</span><span class="p">(</span><span class="s">'caretta.jpg'</span><span class="p">)</span>
 
 <span class="n">img</span> <span class="o">=</span> <span class="n">img</span><span class="o">/</span><span class="mi">255</span>
 <span class="n">skimage</span><span class="p">.</span><span class="n">io</span><span class="p">.</span><span class="nf">imshow</span><span class="p">(</span><span class="nf">perturb_image</span><span class="p">(</span><span class="n">img</span> <span class="p">,</span><span class="n">mask</span><span class="p">,</span><span class="n">superpixels</span><span class="p">)</span> <span class="p">)</span>
 </code></pre></div></div>
 
-<figure>
-
-  <picture>
-    
-
-    <!-- Fallback to the original file -->
-    <img src="/kristosh/assets/img/2022-12-01-LIME/caretta_4.jpg" class="img-fluid" width="auto" height="auto" onerror="this.onerror=null; $('.responsive-img-srcset').remove();">
-
-  </picture>
-
-</figure>
+<p><img src="../../../../assets/img/2022-12-01-LIME/caretta_4.jpg" style="width:400px;height:400px;" class="center"></p>
 
 <h1 id="results">Results</h1>
 
-<h1 id="adversarial-attacks">Adversarial attacks</h1>
+<h1 id="you-should-not-trust-me">You should not trust me</h1>
 
 <h1 id="tosubmit">TOSUBMIT</h1>
 
