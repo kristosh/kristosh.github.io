@@ -1,4 +1,4 @@
 User-agent: *
 Disallow:
 
-Sitemap: https://kristosh.github.io/sitemap.xml
+Sitemap: https://kristosh.github.io/kristosh//sitemap.xml
