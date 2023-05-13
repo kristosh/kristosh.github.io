@@ -157,7 +157,7 @@ In this tutorial, tou will apply a few techniques for feature attribution:
 
 ## LIME
 
-[LIME tutorial](../../2022/LIME/)
+[LIME tutorial](../../2023/LIME/)
 
 ## Conclusion
 
