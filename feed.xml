@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" xml:lang="en"><generator uri="https://jekyllrb.com/" version="4.3.2">Jekyll</generator><link href="https://kristosh.github.io/kristosh/feed.xml" rel="self" type="application/atom+xml" /><link href="https://kristosh.github.io/kristosh/" rel="alternate" type="text/html" hreflang="en" /><updated>2023-05-13T16:36:27+00:00</updated><id>https://kristosh.github.io/kristosh/feed.xml</id><title type="html">blank</title><subtitle>A simple, whitespace theme for academics.
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" xml:lang="en"><generator uri="https://jekyllrb.com/" version="4.3.2">Jekyll</generator><link href="https://kristosh.github.io/kristosh/feed.xml" rel="self" type="application/atom+xml" /><link href="https://kristosh.github.io/kristosh/" rel="alternate" type="text/html" hreflang="en" /><updated>2023-05-13T16:43:24+00:00</updated><id>https://kristosh.github.io/kristosh/feed.xml</id><title type="html">blank</title><subtitle>A simple, whitespace theme for academics.
 </subtitle><entry><title type="html">Why should I trust you? LIME for image classification</title><link href="https://kristosh.github.io/kristosh/blog/2023/LIME/" rel="alternate" type="text/html" title="Why should I trust you? LIME for image classification" /><published>2023-05-13T00:00:00+00:00</published><updated>2023-05-13T00:00:00+00:00</updated><id>https://kristosh.github.io/kristosh/blog/2023/LIME</id><content type="html" xml:base="https://kristosh.github.io/kristosh/blog/2023/LIME/"><![CDATA[<h1 id="local-interpretable-model-agnostic-explanations">Local Interpretable Model-agnostic Explanations</h1>
 
 <center>
@@ -487,7 +487,7 @@ Now lets load and process the image (for the VGG19 classifier) that we would lik
 
 <h2 id="lime">LIME</h2>
 
-<p><a href="../../2022/LIME/">LIME tutorial</a></p>
+<p><a href="../../2023/LIME/">LIME tutorial</a></p>
 
 <h2 id="conclusion">Conclusion</h2>
 
