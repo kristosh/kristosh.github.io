@@ -1,370 +1,214 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" xml:lang="en"><generator uri="https://jekyllrb.com/" version="4.3.2">Jekyll</generator><link href="https://kristosh.github.io/kristosh/feed.xml" rel="self" type="application/atom+xml" /><link href="https://kristosh.github.io/kristosh/" rel="alternate" type="text/html" hreflang="en" /><updated>2023-05-13T16:18:48+00:00</updated><id>https://kristosh.github.io/kristosh/feed.xml</id><title type="html">blank</title><subtitle>A simple, whitespace theme for academics.
-</subtitle><entry><title type="html">Why should I trust you? LIME for image classification</title><link href="https://kristosh.github.io/kristosh/blog/2023/LIME/" rel="alternate" type="text/html" title="Why should I trust you? LIME for image classification" /><published>2023-05-13T00:00:00+00:00</published><updated>2023-05-13T00:00:00+00:00</updated><id>https://kristosh.github.io/kristosh/blog/2023/LIME</id><content type="html" xml:base="https://kristosh.github.io/kristosh/blog/2023/LIME/"><![CDATA[<h1 id="local-interpretable-model-agnostic-explanations">Local Interpretable Model-agnostic Explanations</h1>
-
-<center>
-<video autoplay="" muted="" loop="" controls="" src="https://kristosh.github.io/kristosh//assets/video/2023-05-13-LIME/labradors.mp4" style="width:600px" type="video/mp4">
-</video>
-<figcaption>A demonstration of the whole LIME algorithm.</figcaption>
-</center>
-
-<p>In this post, we will study how <mark style="background-color:LavenderBlush;">LIME</mark> (Local Interpretable Model-agnostic Explanations) ([1]) generates explanations for image classification tasks. The basic idea is to understand why a machine learning model predicts that an specific image belongs to a certain class (<em>labrador</em> our visual example). The LIME explainer is <em>model-agnostic</em> that means is not restricted to a specific model and can be used to explain any <mark>black-box</mark> classifier. So we dont need to have access to the details of our model (input, intermediate layers etc) to generate explanations. Moreover, the explainer is <em>local</em> meaning that it explains the prediction of the model in the neighborhood of the instance being explained. This technique lies in the PostHoc category of XAI methods, meaning that it explains the model after it has been trained. Briefly, this technique tried to learn a simple model (for isntance a linear classifier) that is interpretable by humans and approximates the predictions of the <em>black-box</em> model in the neighborhood of the instance being explained.</p>
-
-<h2 id="interpretable-representations">Interpretable Representations</h2>
-
-<p>An interpretable explanation in image classifier should use a representation that is understandable to humans, by explaining which parts of the input image influence the model decision. For example, pixel-based explanations are not very informative especially when we deal with huge images and therefore a better way to explain the model decision is to use <a href="https://infoscience.epfl.ch/record/149300">super-pixels</a>. Super-pixels are groups of pixels that share similar characteristics such as color and texture. Hence, a possible interpretable representation for image classification may be a binary vector indicating the <em>presence</em> or <em>absence</em> of a super-pixel. Thus, our explainer needs to find a way to attribute importance to each super-picel in the initial input image. Its important to note here, that the interpretable representations are meant to be just for the explainer while the <em>black-box</em> can still be trained using the original pixel-based representation.</p>
-
-<p><mark style="background-color:LightCyan;">LIME</mark> approach aims to just give an explanation why the classifier took a specific decision upon a specific input image. It does not aim to explain the whole model. Authors in the paper proposed a mechanism called <mark style="background-color:LightCyan;">SP-LIME</mark> that aims to explain the whole model. While we will not touch this method in this tutorial we encourage you to have a look at it in the original paper.</p>
-
-<h2 id="lime-approach-details">LIME approach details</h2>
-
-<p>To explain how LIME works we will need to introduce some terminology 😎. Hence, let $\mathbf{x} \in R^{d}$ denote the original vector representation of an instance
-being explained (in our case a vector with all pixels), and we use $\mathbf{x}^{‘} \in {0, 1}^{d}$ to denote a binary vector for its interpretable representation (super-pixels).</p>
-
-<p>Authors, then define as an explainer (or explanation model) $g \in G$, where $G$ is a class of potentially interpretable models, such as <em>linear models</em>, <em>decision trees</em> etc. To keep things simple, in this tutorial, we will consider just <em>linear classifiers</em>. As not every $g \in G$ may be simple enough to be interpretable thus we let $\Omega(g)$ be a measure of complexity (as opposed to interpretability) of the explanation $g \in G$. For example, for decision trees $\Omega(g)$ may be the depth of the tree, while for linear models, $\Omega(g)$ may be the number of non-zero weights. Authors define as $f : R^{d} \to R$ the <em>black-box</em> model that would like to explain. In classification, $f(\mathbf{x})$ is the probability (or a binary indicator) that $\mathbf{x}$ belongs to a certain class.</p>
-
-<p>They further use $\pi_{\mathbf{x}}(\mathbf{z})$ as a proximity measure between an instance $\mathbf{z}$ to $\mathbf{x}$, so as to define locality around $\mathbf{x}$. Finally, let $\mathcal{L}(f, g, \pi_{\mathbf{x}})$ be a measure of how unfaithful $g$ is in approximating $f$ in the locality defined by $\pi_{\mathbf{x}}$. In order to ensure both <em>interpretability</em> and <em>local fidelity</em>, they must minimize $L(f, g, \pi_{x})$ while having $\Omega(g)$ be low enough to be interpretable by humans.</p>
-
-<p>The explanation produced by LIME is obtained by the following:</p>
-
-\[\xi(\mathbf{x}) = \mathcal{L}(f, g, \pi_{\mathbf{x}}) + \Omega(g)\]
-
-<p>The above equation contains the tradeoff between <en>local fidelity&lt;/em&gt; that it is extrpressed by $L$ and <em>complexity</em> that it is expressed by $\Omega$.</en></p>
-
-<p>The first tem $\mathcal{L}(f, g, \pi_{\mathbf{x}})$ in the paper is represented by the weighted square loss:</p>
-
-\[\mathcal{L}(f, g, \pi_{\mathbf{x}}) = \sum_{\mathbf{z}, \mathbf{z}^{'}}\pi_{\mathbf{x}}(\mathbf{z})(f(\mathbf{z})- g(\mathbf{z}^{'}))^{2}\]
-
-<p>with $\pi_{\mathbf{x}}$ to be a kernel function that measures the proximity of $z$ to $x$:</p>
-
-\[\pi_{\mathbf{x}} =  \exp(-D(\mathbf{x},\mathbf{z})^{2}/\sigma*{2})\]
-
-<p>The idea is that tuning the weights $\mathbf{w}$ we can use them directly as a feature attribution to each super-pixel. The higher the weight that corresponds to a specific super-pixel the more important this super-pixel is for the prediction of the <em>black-box</em> model and the vice-versa.</p>
-
-<p>Another importance explanation is about the terms <em>faithfullness</em> and <em>local-fidelity</em> and they about how well our explainer $g$ can approximate the decision of the <em>black-box</em> model $f$ in the locality defined by $\pi_{\mathbf{x}}$.</p>
-
-<p>The whole LIME algorithm can be summarized as follows:</p>
-
-<figure>
-
-  <picture>
+<!DOCTYPE html>
+<!-- _layouts/distill.html --><html>
+  <head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">    <!-- Metadata, OpenGraph and Schema.org -->
     
 
-    <!-- Fallback to the original file -->
-    <img src="/kristosh/assets/img/2023-05-13-LIME/algorithm.png" class="img-fluid" width="auto" height="auto" onerror="this.onerror=null; $('.responsive-img-srcset').remove();" />
+    <!-- Standard metadata -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Gradient-based feature attribution for Vision | Christos  Athanasiadis</title>
+    <meta name="author" content="Christos  Athanasiadis">
+    <meta name="description" content="This page's main focus is to analyze a branch of explainable &amp; interpretable AI (XAI) called posthoc XAI. We will analyze theory, taxonomy, applications, shortcomings of posthoc XAI approaches and apply them on image classification using popular CNN architectures and explain their black box nature. Part of the assessemnet for this tutorial/workshop, will be some research questions that needs be answered by you. These questions can be found all over this blogspot using the &lt;mark&gt;TOSUBMIT&lt;/mark&gt; tag and will be summarized them at the end of the blogspot.">
+    <meta name="keywords" content="jekyll, jekyll-theme, academic-website, portfolio-website">
 
-  </picture>
 
-</figure>
+    <!-- Bootstrap & MDB -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha256-DF7Zhf293AJxJNTmh5zhoYYIMs2oXitRfBjY+9L//AY=" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/mdbootstrap@4.20.0/css/mdb.min.css" integrity="sha256-jpjYvU3G3N6nrrBwXJoVEYI/0zw8htfFnhT9ljN3JJw=" crossorigin="anonymous">
 
-<p>The kernel is the distance between the instance being explained and the instance in the neighborhood. The neighborhood is generated by <mark style="background-color:LightCyan;">sampling</mark> instances around the instance being explained. The sampling is done by perturbing the instance being explained. For example, in the case of images, we can perturb the image by zeroing out some super-pixels. The perturbed instances are then fed to the <em>black-box</em> model and the output is used to train the explainer. The weights of the interpretable model are then used to explain the prediction of the <em>black-box</em> model. Finally, in the algorithm the <mark style="background-color:Lavender;">K-lasso</mark> refers to the regulizarion that is introduced in a previous equation and relates with the term $\Omega(g)$.</p>
+    <!-- Bootstrap Table -->
+    <link defer rel="stylesheet" href="https://unpkg.com/bootstrap-table@1.21.3/dist/bootstrap-table.min.css">
 
-<center>
-<video autoplay="" muted="" loop="" controls="" src="https://kristosh.github.io/kristosh//assets/video/2023-05-13-LIME/LIME.mp4" style="width:600px" type="video/mp4">
-</video>
-<figcaption>A demonstration of the whole LIME algorithm.</figcaption>
-</center>
+    <!-- Fonts & Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.15.4/css/all.min.css" integrity="sha256-mUZM63G8m73Mcidfrv5E+Y61y7a12O5mW4ezU3bxqW4=" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/academicons@1.9.1/css/academicons.min.css" integrity="sha256-i1+4qU2G2860dGGIOJscdC30s9beBXjFfzjWLjBRsBg=" crossorigin="anonymous">
+    <link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700%7CRoboto+Slab:100,300,400,500,700%7CMaterial+Icons">
 
-<p>The above video explain the whole LIME process. The initial surface represents the <mark style="background-color:Lavender;">black-box</mark> classifier and the regions for the class of interest (e.g. basketball with the light-pink color). The dark-colored dot denotes the sample that we would like to explain and it is actually an image with the label <em> basketball</em>. The first step is to sample the neighborhood of the point $\mathbf{x}$ that we would like to explain. Several points are generated. The size of each generated sample and the trasparency relates with the distance from the initial point $\mathbf{x}$ which is calculated based using $\pi_{\mathbf{x}}(\mathbf{z})$. The next step is to apply the <mark style="background-color:Lavender;">black-box</mark> classifier $f()$ to find the label for each generated point. Samples with red represetns class basketball while samples with purple represents class not basketball. The next step is to train the interpretable model $g()$ using the generated samples. The weights of the interpretable model are used to explain the prediction of the <mark style="background-color:Lavender;">black-box</mark> classifier. The explanation is actually a linear classifier that separates the two classes. The weights of the linear classifier can be used as an explanation for the whole approach.</p>
+    <!-- Code Syntax Highlighting -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/jwarby/jekyll-pygments-themes@master/github.css" media="" id="highlight_theme_light">
 
-<h2 id="code-implementation">Code implementation</h2>
-
-<p>Firstly, we will need to import the required libraries. The code is written in Python 3.6.9 and PyTorch 1.7.0. The code is available in the following <a href="TBA">link</a></p>
-<h3 id="imports">Imports</h3>
-
-<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">import</span> <span class="n">matplotlib.pyplot</span> <span class="k">as</span> <span class="n">plt</span>
-<span class="kn">from</span> <span class="n">PIL</span> <span class="kn">import</span> <span class="n">Image</span>
-<span class="kn">import</span> <span class="n">torch.nn</span> <span class="k">as</span> <span class="n">nn</span>
-<span class="kn">import</span> <span class="n">numpy</span> <span class="k">as</span> <span class="n">np</span>
-<span class="kn">import</span> <span class="n">os</span><span class="p">,</span> <span class="n">json</span>
-<span class="kn">import</span> <span class="n">cv2</span>
-<span class="n">os</span><span class="p">.</span><span class="n">environ</span><span class="p">[</span><span class="s">'KMP_DUPLICATE_LIB_OK'</span><span class="p">]</span><span class="o">=</span><span class="s">'True'</span>
-
-<span class="kn">import</span> <span class="n">torch</span>
-<span class="kn">from</span> <span class="n">torchvision</span> <span class="kn">import</span> <span class="n">models</span><span class="p">,</span> <span class="n">transforms</span>
-<span class="kn">from</span> <span class="n">torch.autograd</span> <span class="kn">import</span> <span class="n">Variable</span>
-<span class="kn">import</span> <span class="n">torch.nn.functional</span> <span class="k">as</span> <span class="n">F</span>
-<span class="kn">import</span> <span class="n">copy</span>
-
-<span class="kn">import</span> <span class="n">sklearn</span>
-<span class="kn">import</span> <span class="n">sklearn.metrics</span>
-<span class="kn">from</span> <span class="n">sklearn.linear_model</span> <span class="kn">import</span> <span class="n">LinearRegression</span>
-</code></pre></div></div>
-
-<h3 id="initialization-of-a-vgg19-model">Initialization of a VGG19 model</h3>
-<p>A pre-trained VGG19 model is used to predict the class of the image. The output of the classification is a vector of 1000 proabilities of beloging to each class available in VGG19. The model is initialized and the weights are loaded. The model is set to evaluation mode. The model is set to run on GPU if available.</p>
-
-<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># load model
-# model_type = 'vgg19'
-</span><span class="n">model</span> <span class="o">=</span> <span class="n">models</span><span class="p">.</span><span class="nf">vgg19</span><span class="p">(</span><span class="n">pretrained</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
-
-<span class="c1"># run it on a GPU if available:
-</span><span class="n">cuda</span> <span class="o">=</span> <span class="n">torch</span><span class="p">.</span><span class="n">cuda</span><span class="p">.</span><span class="nf">is_available</span><span class="p">()</span>
-<span class="n">device</span> <span class="o">=</span> <span class="n">torch</span><span class="p">.</span><span class="nf">device</span><span class="p">(</span><span class="s">"cuda:0"</span> <span class="k">if</span> <span class="n">torch</span><span class="p">.</span><span class="n">cuda</span><span class="p">.</span><span class="nf">is_available</span><span class="p">()</span> <span class="k">else</span> <span class="s">"cpu"</span><span class="p">)</span>
-<span class="nf">print</span><span class="p">(</span><span class="s">'cuda:'</span><span class="p">,</span> <span class="n">cuda</span><span class="p">,</span> <span class="s">'device:'</span><span class="p">,</span> <span class="n">device</span><span class="p">)</span>
-<span class="n">model</span> <span class="o">=</span> <span class="n">model</span><span class="p">.</span><span class="nf">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
-<span class="c1"># set model to evaluation
-</span><span class="n">model</span><span class="p">.</span><span class="nf">eval</span><span class="p">()</span>
-</code></pre></div></div>
-<p>Ignore for now the warnings! This code should return the architecture of the VGG19 model. Of course, feel-free to choose the model of you choice the code should work with any model.
-Now lets load and process the image (for the VGG19 classifier) that we would like to test our <mark style="background-color:Lavender;">LIME</mark> explainer. You can freely choose your own image that you would like to explain.</p>
-
-<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">imread_img</span><span class="p">(</span><span class="n">file_name</span><span class="p">):</span>
-  
-  <span class="c1"># read the image and convert it - Set your pathto the image
-</span>  <span class="n">img</span> <span class="o">=</span> <span class="n">cv2</span><span class="p">.</span><span class="nf">imread</span><span class="p">(</span><span class="s">'caretta.png'</span><span class="p">)</span>
-  <span class="nf">if </span><span class="p">(</span><span class="nf">type</span><span class="p">(</span><span class="n">img</span><span class="p">)</span> <span class="ow">is</span> <span class="n">np</span><span class="p">.</span><span class="n">ndarray</span><span class="p">):</span>
-    <span class="n">img</span> <span class="o">=</span> <span class="n">cv2</span><span class="p">.</span><span class="nf">resize</span><span class="p">(</span><span class="n">img</span><span class="p">,</span> <span class="p">(</span><span class="mi">224</span><span class="p">,</span> <span class="mi">224</span><span class="p">))</span>
-    <span class="n">img</span> <span class="o">=</span> <span class="n">img</span><span class="p">.</span><span class="nf">astype</span><span class="p">(</span><span class="n">np</span><span class="p">.</span><span class="n">float32</span><span class="p">)</span>
-    <span class="n">img</span> <span class="o">=</span> <span class="n">img</span><span class="p">[:,</span> <span class="p">:,</span> <span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">)]</span>
-    <span class="nf">print</span><span class="p">(</span><span class="s">'img:'</span><span class="p">,</span> <span class="n">img</span><span class="p">.</span><span class="n">shape</span><span class="p">)</span>
-  <span class="k">else</span><span class="p">:</span>
-    <span class="nf">print</span><span class="p">(</span><span class="s">'image not found - set your path to the image'</span><span class="p">)</span>
-  
-  <span class="k">return</span> <span class="n">img</span>
-</code></pre></div></div>
-
-<h3 id="image-pre-processing">Image pre-processing</h3>
-
-<p>As usual, we will need to normalize our input image. The normalization is done using the mean and standard deviation of the ImageNet dataset. The image is also transposed to the correct tensor format:</p>
-
-<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">pre_processing</span><span class="p">(</span><span class="n">obs</span><span class="p">,</span> <span class="n">cuda</span><span class="p">):</span>
-    <span class="c1"># Students should transpose the image to the correct tensor format. 
-</span>    <span class="c1"># Students should ensure that gradient for input is calculated       
-</span>    <span class="c1"># set the GPU device
-</span>    <span class="k">if</span> <span class="n">cuda</span><span class="p">:</span>
-        <span class="n">torch_device</span> <span class="o">=</span> <span class="n">torch</span><span class="p">.</span><span class="nf">device</span><span class="p">(</span><span class="s">'cuda:0'</span><span class="p">)</span>
-    <span class="k">else</span><span class="p">:</span>
-        <span class="n">torch_device</span> <span class="o">=</span> <span class="n">torch</span><span class="p">.</span><span class="nf">device</span><span class="p">(</span><span class="s">'cpu'</span><span class="p">)</span>
-
-    <span class="c1"># normalise for ImageNet
-</span>    <span class="n">mean</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="nf">array</span><span class="p">([</span><span class="mf">0.485</span><span class="p">,</span> <span class="mf">0.456</span><span class="p">,</span> <span class="mf">0.406</span><span class="p">]).</span><span class="nf">reshape</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">])</span>
-    <span class="n">std</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="nf">array</span><span class="p">([</span><span class="mf">0.229</span><span class="p">,</span> <span class="mf">0.224</span><span class="p">,</span> <span class="mf">0.225</span><span class="p">]).</span><span class="nf">reshape</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">])</span>
-    <span class="n">obs</span> <span class="o">=</span> <span class="n">obs</span> <span class="o">/</span> <span class="mi">255</span>
-    <span class="n">obs</span> <span class="o">=</span> <span class="p">(</span><span class="n">obs</span> <span class="o">-</span> <span class="n">mean</span><span class="p">)</span> <span class="o">/</span> <span class="n">std</span>
-
-    <span class="c1"># make tensor format that keeps track of gradient
-</span>    <span class="c1"># BEGIN for students to do
-</span>    <span class="n">obs</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="nf">transpose</span><span class="p">(</span><span class="n">obs</span><span class="p">,</span> <span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>       
-    <span class="n">obs</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="nf">expand_dims</span><span class="p">(</span><span class="n">obs</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
-    <span class="n">obs</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="nf">array</span><span class="p">(</span><span class="n">obs</span><span class="p">)</span>
-    <span class="n">obs_tensor</span> <span class="o">=</span> <span class="n">torch</span><span class="p">.</span><span class="nf">tensor</span><span class="p">(</span><span class="n">obs</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">torch</span><span class="p">.</span><span class="n">float32</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">torch_device</span><span class="p">)</span>
-    <span class="c1"># END for students to do
-</span>    <span class="k">return</span> <span class="n">obs_tensor</span>
-</code></pre></div></div>
-
-<p>Then, we check the prediction by using the VGG19 model that we loaded before. You can check that the VGG network gives a correct prediction. E.g. 33 and 34 are ‘caretta-caretta’and ‘turtle’</p>
-
-<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">predict</span><span class="p">(</span><span class="nb">input</span><span class="p">,</span> <span class="n">model</span><span class="p">,</span> <span class="n">target_label_idx</span><span class="p">,</span> <span class="n">cuda</span><span class="p">):</span>
-    <span class="c1"># Makes prediction after preprocessing image 
-</span>    <span class="c1"># Note that output should be torch.tensor on cuda
-</span>    <span class="n">output</span> <span class="o">=</span> <span class="nf">model</span><span class="p">(</span><span class="nb">input</span><span class="p">)</span>                        
-    <span class="n">output</span> <span class="o">=</span> <span class="n">F</span><span class="p">.</span><span class="nf">softmax</span><span class="p">(</span><span class="n">output</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span> <span class="c1"># calc output from model 
-</span>    <span class="k">if</span> <span class="n">target_label_idx</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
-      <span class="n">target_label_idx</span> <span class="o">=</span> <span class="n">torch</span><span class="p">.</span><span class="nf">argmax</span><span class="p">(</span><span class="n">output</span><span class="p">,</span> <span class="mi">1</span><span class="p">).</span><span class="nf">item</span><span class="p">()</span>
-    <span class="n">index</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="nf">ones</span><span class="p">((</span><span class="n">output</span><span class="p">.</span><span class="nf">size</span><span class="p">()[</span><span class="mi">0</span><span class="p">],</span> <span class="mi">1</span><span class="p">))</span> <span class="o">*</span> <span class="n">target_label_idx</span>
-    <span class="n">index</span> <span class="o">=</span> <span class="n">torch</span><span class="p">.</span><span class="nf">tensor</span><span class="p">(</span><span class="n">index</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">torch</span><span class="p">.</span><span class="n">int64</span><span class="p">)</span> 
-    <span class="k">if</span> <span class="n">cuda</span><span class="p">:</span>
-      <span class="n">index</span> <span class="o">=</span> <span class="n">index</span><span class="p">.</span><span class="nf">cuda</span><span class="p">()</span>                     <span class="c1"># calc prediction
-</span>    <span class="n">output</span> <span class="o">=</span> <span class="n">output</span><span class="p">.</span><span class="nf">gather</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">index</span><span class="p">)</span>           <span class="c1"># gather functionality of pytorch
-</span>    <span class="k">return</span> <span class="n">target_label_idx</span><span class="p">,</span> <span class="n">output</span> 
-
-<span class="nb">input</span> <span class="o">=</span> <span class="nf">pre_processing</span><span class="p">(</span><span class="n">img</span><span class="p">,</span> <span class="n">cuda</span><span class="p">)</span>          <span class="c1"># preprocess: image (normalise, transpose, make tensor on cuda, requires_grad=True)
-</span><span class="nf">print </span><span class="p">(</span><span class="nb">input</span><span class="p">.</span><span class="n">shape</span><span class="p">)</span>
-<span class="n">label</span><span class="p">,</span> <span class="n">output</span> <span class="o">=</span> <span class="nf">predict</span><span class="p">(</span><span class="nb">input</span><span class="p">,</span> <span class="n">model</span><span class="p">,</span> <span class="bp">None</span><span class="p">,</span> <span class="n">cuda</span><span class="p">)</span>
-<span class="nf">print</span><span class="p">(</span><span class="s">'output:'</span><span class="p">,</span> <span class="n">output</span><span class="p">)</span>
-<span class="nf">print</span><span class="p">(</span><span class="s">'output label:'</span><span class="p">,</span> <span class="n">label</span><span class="p">)</span>
-</code></pre></div></div>
-
-<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># resize and take the center part of image to what our model expects
-</span><span class="k">def</span> <span class="nf">get_input_transform</span><span class="p">():</span>
-    <span class="n">normalize</span> <span class="o">=</span> <span class="n">transforms</span><span class="p">.</span><span class="nc">Normalize</span><span class="p">(</span><span class="n">mean</span><span class="o">=</span><span class="p">[</span><span class="mf">0.485</span><span class="p">,</span> <span class="mf">0.456</span><span class="p">,</span> <span class="mf">0.406</span><span class="p">],</span>
-                                    <span class="n">std</span><span class="o">=</span><span class="p">[</span><span class="mf">0.229</span><span class="p">,</span> <span class="mf">0.224</span><span class="p">,</span> <span class="mf">0.225</span><span class="p">])</span>       
-    <span class="n">transf</span> <span class="o">=</span> <span class="n">transforms</span><span class="p">.</span><span class="nc">Compose</span><span class="p">([</span>
-        <span class="n">transforms</span><span class="p">.</span><span class="nc">Resize</span><span class="p">((</span><span class="mi">256</span><span class="p">,</span> <span class="mi">256</span><span class="p">)),</span>
-        <span class="n">transforms</span><span class="p">.</span><span class="nc">CenterCrop</span><span class="p">(</span><span class="mi">224</span><span class="p">),</span>
-        <span class="n">transforms</span><span class="p">.</span><span class="nc">ToTensor</span><span class="p">(),</span>
-        <span class="n">normalize</span>
-    <span class="p">])</span>    
-
-    <span class="k">return</span> <span class="n">transf</span>
-
-<span class="k">def</span> <span class="nf">get_input_tensors</span><span class="p">(</span><span class="n">img</span><span class="p">):</span>
-    <span class="n">transf</span> <span class="o">=</span> <span class="nf">get_input_transform</span><span class="p">()</span>
-    <span class="c1"># unsqeeze converts single image to batch of 1
-</span>    <span class="k">return</span> <span class="nf">transf</span><span class="p">(</span><span class="n">img</span><span class="p">).</span><span class="nf">unsqueeze</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
-</code></pre></div></div>
-
-<p>The following code helps you to get the label of the prediction. The label is the index of the class in the ImageNet dataset. The index is used to get the class name from the json file. The json file is available in the repository.</p>
-
-<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">idx2label</span><span class="p">,</span> <span class="n">cls2label</span><span class="p">,</span> <span class="n">cls2idx</span> <span class="o">=</span> <span class="p">[],</span> <span class="p">{},</span> <span class="p">{}</span>
-<span class="k">with</span> <span class="nf">open</span><span class="p">(</span><span class="n">os</span><span class="p">.</span><span class="n">path</span><span class="p">.</span><span class="nf">abspath</span><span class="p">(</span><span class="s">'imagenet_class_index.json'</span><span class="p">),</span> <span class="s">'r'</span><span class="p">)</span> <span class="k">as</span> <span class="n">read_file</span><span class="p">:</span>
-    <span class="n">class_idx</span> <span class="o">=</span> <span class="n">json</span><span class="p">.</span><span class="nf">load</span><span class="p">(</span><span class="n">read_file</span><span class="p">)</span>
-    <span class="n">idx2label</span> <span class="o">=</span> <span class="p">[</span><span class="n">class_idx</span><span class="p">[</span><span class="nf">str</span><span class="p">(</span><span class="n">k</span><span class="p">)][</span><span class="mi">1</span><span class="p">]</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nf">range</span><span class="p">(</span><span class="nf">len</span><span class="p">(</span><span class="n">class_idx</span><span class="p">))]</span>
-    <span class="n">cls2label</span> <span class="o">=</span> <span class="p">{</span><span class="n">class_idx</span><span class="p">[</span><span class="nf">str</span><span class="p">(</span><span class="n">k</span><span class="p">)][</span><span class="mi">0</span><span class="p">]:</span> <span class="n">class_idx</span><span class="p">[</span><span class="nf">str</span><span class="p">(</span><span class="n">k</span><span class="p">)][</span><span class="mi">1</span><span class="p">]</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nf">range</span><span class="p">(</span><span class="nf">len</span><span class="p">(</span><span class="n">class_idx</span><span class="p">))}</span>
-    <span class="n">cls2idx</span> <span class="o">=</span> <span class="p">{</span><span class="n">class_idx</span><span class="p">[</span><span class="nf">str</span><span class="p">(</span><span class="n">k</span><span class="p">)][</span><span class="mi">0</span><span class="p">]:</span> <span class="n">k</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nf">range</span><span class="p">(</span><span class="nf">len</span><span class="p">(</span><span class="n">class_idx</span><span class="p">))}</span> 
-</code></pre></div></div>
-
-<h2 id="lime-explanation">LIME explanation</h2>
-<p>The following figure illustrates the basic idea behind LIME. The figure shows with light pink and blue areas which are the decision boundaries for the classifier (for the VGG19 pre-trained model on ImageNet for instance). <mark style="background-color:Lavender;">LIME</mark> is able to provide explanations for the predictions of an individual instance (the one with the dark red dot). These explanations are created by generating a new dataset of perturbations around the instance to be explained (in our image are depicted with dot circles around the initial instance).</p>
-
-<p>Then, we apply our <mark style="background-color:Lavender;">black-box</mark> model $g()$ and we can extract the label for all the pertubations (and can be seen which red that denotes turtle and purple that denotes non-turtle). The <em>importance</em> of each perturbation is determined by measuring its distance from the original instance to be explained. These distances are converted to weights by mapping the distances to a zero-one scale using a kernel function (see color scale for the weights). All this information: the new generated dataset, its class predictions and its weights are used to fit a simpler model, such as a linear model (gray line), that can be interpreted. The coefficients for the case of a linear model, are then extracted and used as the explanation for the prediction of the instance to be explained. The higher the coefficient, the more important the feature is for the prediction.</p>
-
-<figure>
-
-  <picture>
     
 
-    <!-- Fallback to the original file -->
-    <img src="/kristosh/assets/img/2023-05-13-LIME/LIME.png" class="img-fluid" width="auto" height="auto" onerror="this.onerror=null; $('.responsive-img-srcset').remove();" />
+    <!-- Styles -->
+    
+    <link rel="shortcut icon" href="data:image/svg+xml,&lt;svg%20xmlns=%22http://www.w3.org/2000/svg%22%20viewBox=%220%200%20100%20100%22&gt;&lt;text%20y=%22.9em%22%20font-size=%2290%22&gt;%F0%9F%98%8E&lt;/text&gt;&lt;/svg&gt;">
+    
+    <link rel="stylesheet" href="/kristosh/assets/css/main.css">
+    <link rel="canonical" href="https://kristosh.github.io/kristosh/blog/2023/gradient_based_feature_attribution/">
 
-  </picture>
+    <!-- Dark Mode -->
+    
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/jwarby/jekyll-pygments-themes@master/native.css" media="none" id="highlight_theme_dark">
 
-</figure>
+    <script src="/kristosh/assets/js/theme.js"></script>
+    <script src="/kristosh/assets/js/dark_mode.js"></script>
+    
 
-<h2 id="creating-perturbations-of-image">Creating Perturbations of image</h2>
 
-<p>For the case of image explanations, perturbations will be generated by turning on and off some of the superpixels in the image.</p>
+    <!-- jQuery -->
+  <script src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
 
-<h4 id="extract-super-pixels-from-image">Extract super-pixels from image</h4>
-<p>Superpixels are generated using the quickshift segmentation algorithm. It can be noted that for the given image, <mark style="background-color:Lavender;">68</mark> superpixels were generated. That of course will change if you will update the <mark style="background-color:Lavender;">quickshift</mark> parameters (<mark style="background-color:Lavender;">kernel_size</mark> and <mark style="background-color:Lavender;">max_dist</mark>). The generated superpixels are shown in the image below.</p>
+    <!-- MathJax -->
+  <script type="text/javascript">
+    window.MathJax = {
+      tex: {
+        tags: 'ams'
+      }
+    };
+  </script>
+  <script defer type="text/javascript" id="MathJax-script" src="https://cdn.jsdelivr.net/npm/mathjax@3.2.0/es5/tex-mml-chtml.js"></script>
+  <script defer src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
 
-<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">import</span> <span class="n">skimage.io</span> 
-<span class="kn">import</span> <span class="n">skimage.segmentation</span>
+    <!-- Distill js -->
+    <script src="/kristosh/assets/js/distillpub/template.v2.js"></script>
+    <script src="/kristosh/assets/js/distillpub/transforms.v2.js"></script>
+    <script src="/kristosh/assets/js/distillpub/overrides.js"></script>
+    
+    <!-- Page/Post style -->
+    <style type="text/css">
+      .fake-img {
+  background: #bbb;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  box-shadow: 0 0px 4px rgba(0, 0, 0, 0.1);
+  margin-bottom: 12px;
+} .fake-img p {
+  font-family: monospace;
+  color: white;
+  text-align: left;
+  margin: 12px 0;
+  text-align: center;
+  font-size: 16px;
+}
 
-<span class="n">superpixels</span> <span class="o">=</span> <span class="n">skimage</span><span class="p">.</span><span class="n">segmentation</span><span class="p">.</span><span class="nf">quickshift</span><span class="p">(</span><span class="n">img</span><span class="o">/</span><span class="mi">255</span><span class="p">,</span> <span class="n">kernel_size</span><span class="o">=</span><span class="mi">6</span><span class="p">,</span> <span class="n">max_dist</span><span class="o">=</span><span class="mi">200</span><span class="p">,</span> <span class="n">ratio</span><span class="o">=</span><span class="mf">0.2</span><span class="p">)</span>
-<span class="n">num_superpixels</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="nf">unique</span><span class="p">(</span><span class="n">superpixels</span><span class="p">).</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-<span class="n">num_superpixels</span>
+    </style>
+  </head>
 
-<span class="n">imgplot</span> <span class="o">=</span> <span class="n">plt</span><span class="p">.</span><span class="nf">imshow</span><span class="p">(</span><span class="n">skimage</span><span class="p">.</span><span class="n">segmentation</span><span class="p">.</span><span class="nf">mark_boundaries</span><span class="p">(</span><span class="n">img</span><span class="o">/</span><span class="mi">255</span><span class="p">,</span> <span class="n">superpixels</span><span class="p">))</span>
-<span class="n">plt</span><span class="p">.</span><span class="nf">axis</span><span class="p">(</span><span class="s">'off'</span><span class="p">)</span>
-<span class="n">plt</span><span class="p">.</span><span class="nf">show</span><span class="p">()</span>
+  <body>
+<d-front-matter>
+    <script async type="text/json">{
+      "title": "Gradient-based feature attribution for Vision",
+      "description": "This page's main focus is to analyze a branch of explainable & interpretable AI (XAI) called posthoc XAI. We will analyze theory, taxonomy, applications, shortcomings of posthoc XAI approaches and apply them on image classification using popular CNN architectures and explain their black box nature. Part of the assessemnet for this tutorial/workshop, will be some research questions that needs be answered by you. These questions can be found all over this blogspot using the <mark>TOSUBMIT</mark> tag and will be summarized them at the end of the blogspot.",
+      "published": "May 13, 2023",
+      "authors": [
+        {
+          "author": "Christos Athanasiadis",
+          "authorURL": "https://www.linkedin.com/in/christos-athanasiadis-a3b51035/",
+          "affiliations": [
+            {
+              "name": "UvA, Interpretability and Explainability in AI",
+              "url": ""
+            }
+          ]
+        },
+        {
+          "author": "Peter Heemskerk",
+          "authorURL": "",
+          "affiliations": [
+            {
+              "name": "UvA, Interpretability and Explainability in AI",
+              "url": ""
+            }
+          ]
+        }
+        
+      ],
+      "katex": {
+        "delimiters": [
+          {
+            "left": "$",
+            "right": "$",
+            "display": false
+          },
+          {
+            "left": "$$",
+            "right": "$$",
+            "display": true
+          }
+        ]
+      }
+    }</script>
+  </d-front-matter>
 
-</code></pre></div></div>
-<p><img src="../../../../assets/img/2023-05-13-LIME/caretta_2.jpg" style="width:400px;height:400px;" class="center" /></p>
-
-<h3 id="creating-random-perturbations">Creating random perturbations</h3>
-<p>In this example, 150 perturbations were used. However, for real life applications, a larger number of perturbations will produce more reliable explanations. Random zeros and ones are generated and shaped as a matrix with perturbations as rows and superpixels as columns. An example of a perturbation (the first one) is show below. Here, <code class="language-plaintext highlighter-rouge">1</code> represent that a superpixel is on and <code class="language-plaintext highlighter-rouge">0</code> represents it is off. Notice that the length of the shown vector corresponds to the number of superpixels in the image.</p>
-
-<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">num_perturb</span> <span class="o">=</span> <span class="mi">150</span>
-<span class="n">perturbations</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">random</span><span class="p">.</span><span class="nf">binomial</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="n">num_perturb</span><span class="p">,</span> <span class="n">num_superpixels</span><span class="p">))</span>
-<span class="n">perturbations</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="c1">#Show example of perturbation
-</span>
-</code></pre></div></div>
-<p>The following function <code class="language-plaintext highlighter-rouge">perturb_image</code> perturbs the given image (<code class="language-plaintext highlighter-rouge">img</code>) based on a perturbation vector (<code class="language-plaintext highlighter-rouge">perturbation</code>) and predefined superpixels (<code class="language-plaintext highlighter-rouge">segments</code>).</p>
-
-<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">perturb_image</span><span class="p">(</span><span class="n">img</span><span class="p">,</span><span class="n">perturbation</span><span class="p">,</span><span class="n">segments</span><span class="p">):</span>
-  <span class="n">active_pixels</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="nf">where</span><span class="p">(</span><span class="n">perturbation</span> <span class="o">==</span> <span class="mi">1</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
-  <span class="n">mask</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="nf">zeros</span><span class="p">(</span><span class="n">segments</span><span class="p">.</span><span class="n">shape</span><span class="p">)</span>
-  <span class="k">for</span> <span class="n">active</span> <span class="ow">in</span> <span class="n">active_pixels</span><span class="p">:</span>
-      <span class="n">mask</span><span class="p">[</span><span class="n">segments</span> <span class="o">==</span> <span class="n">active</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span> 
-  <span class="n">perturbed_image</span> <span class="o">=</span> <span class="n">copy</span><span class="p">.</span><span class="nf">deepcopy</span><span class="p">(</span><span class="n">img</span><span class="p">)</span>
-  <span class="n">perturbed_image</span> <span class="o">=</span> <span class="n">perturbed_image</span><span class="o">*</span><span class="n">mask</span><span class="p">[:,:,</span><span class="n">np</span><span class="p">.</span><span class="n">newaxis</span><span class="p">]</span>
-  <span class="k">return</span> <span class="n">perturbed_image</span>
-</code></pre></div></div>
-
-<p>Let’s use the previous function to see what a perturbed image would look like:</p>
-
-<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">skimage</span><span class="p">.</span><span class="n">io</span><span class="p">.</span><span class="nf">imshow</span><span class="p">(</span><span class="nf">perturb_image</span><span class="p">(</span><span class="n">img</span><span class="o">/</span><span class="mi">2</span><span class="o">+</span><span class="mf">0.5</span><span class="p">,</span><span class="n">perturbations</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="n">superpixels</span><span class="p">))</span>
-</code></pre></div></div>
-
-<p><img src="../../../../assets/img/2023-05-13-LIME/caretta_3.jpg" style="width:400px;height:400px;" class="center" /></p>
-
-<h3 id="step-2-use-ml-classifier-to-predict-classes-of-new-generated-images">Step 2: Use ML classifier to predict classes of new generated images</h3>
-<p>This is the most computationally expensive step in LIME because a prediction for each perturbed image is computed. From the shape of the predictions we can see for each of the perturbations we have the output probability for each of the 1000 classes in Inception V3.</p>
-
-<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">predictions</span> <span class="o">=</span> <span class="p">[]</span>
-<span class="k">for</span> <span class="n">pert</span> <span class="ow">in</span> <span class="n">perturbations</span><span class="p">:</span>
-  <span class="n">perturbed_img</span> <span class="o">=</span> <span class="nf">perturb_image</span><span class="p">(</span><span class="n">img</span><span class="p">,</span><span class="n">pert</span><span class="p">,</span><span class="n">superpixels</span><span class="p">)</span>
-  <span class="nb">input</span> <span class="o">=</span> <span class="nf">pre_processing</span><span class="p">(</span><span class="n">perturbed_img</span><span class="p">,</span> <span class="n">cuda</span><span class="p">)</span>   
-  <span class="c1"># preprocess: image (normalise, transpose, make tensor on cuda, requires_grad=True)
-</span>  <span class="n">output</span><span class="p">,</span> <span class="n">label</span> <span class="o">=</span> <span class="nf">predict</span><span class="p">(</span><span class="nb">input</span><span class="p">,</span> <span class="n">model</span><span class="p">,</span> <span class="bp">None</span><span class="p">,</span> <span class="n">cuda</span><span class="p">)</span>
   
-  <span class="n">output</span> <span class="o">=</span> <span class="nf">model</span><span class="p">(</span><span class="nb">input</span><span class="p">)</span>                        
-  <span class="n">output</span> <span class="o">=</span> <span class="n">F</span><span class="p">.</span><span class="nf">softmax</span><span class="p">(</span><span class="n">output</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
-  <span class="nf">print </span><span class="p">(</span><span class="n">output</span><span class="p">.</span><span class="n">shape</span><span class="p">)</span>
-  <span class="n">target_label_idx</span> <span class="o">=</span> <span class="n">torch</span><span class="p">.</span><span class="nf">argmax</span><span class="p">(</span><span class="n">output</span><span class="p">,</span> <span class="mi">1</span><span class="p">).</span><span class="nf">item</span><span class="p">()</span>
-  
-  <span class="n">predictions</span><span class="p">.</span><span class="nf">append</span><span class="p">(</span><span class="n">output</span><span class="p">.</span><span class="nf">detach</span><span class="p">().</span><span class="nf">numpy</span><span class="p">())</span>
 
-<span class="n">predictions</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="nf">array</span><span class="p">(</span><span class="n">predictions</span><span class="p">)</span>
-<span class="n">predictions</span><span class="p">.</span><span class="n">shape</span>
-</code></pre></div></div>
+    <!-- Header -->
+    <header>
 
-<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">original_image</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="nf">ones</span><span class="p">(</span><span class="n">num_superpixels</span><span class="p">)[</span><span class="n">np</span><span class="p">.</span><span class="n">newaxis</span><span class="p">,:]</span> <span class="c1">#Perturbation with all superpixels enabled 
-</span><span class="n">distances</span> <span class="o">=</span> <span class="n">sklearn</span><span class="p">.</span><span class="n">metrics</span><span class="p">.</span><span class="nf">pairwise_distances</span><span class="p">(</span><span class="n">perturbations</span><span class="p">,</span><span class="n">original_image</span><span class="p">,</span> <span class="n">metric</span><span class="o">=</span><span class="s">'cosine'</span><span class="p">).</span><span class="nf">ravel</span><span class="p">()</span>
-<span class="n">distances</span><span class="p">.</span><span class="n">shape</span>
-</code></pre></div></div>
+      <!-- Nav Bar -->
+      <nav id="navbar" class="navbar navbar-light navbar-expand-sm fixed-top">
+        <div class="container">
+          <a class="navbar-brand title font-weight-lighter" href="/kristosh//"><span class="font-weight-bold">Christos </span>Athanasiadis</a>
+          <!-- Navbar Toggle -->
+          <button class="navbar-toggler collapsed ml-auto" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar top-bar"></span>
+            <span class="icon-bar middle-bar"></span>
+            <span class="icon-bar bottom-bar"></span>
+          </button>
 
-<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">kernel_width</span> <span class="o">=</span> <span class="mf">0.25</span>	
-<span class="n">weights</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="nf">sqrt</span><span class="p">(</span><span class="n">np</span><span class="p">.</span><span class="nf">exp</span><span class="p">(</span><span class="o">-</span><span class="p">(</span><span class="n">distances</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span><span class="o">/</span><span class="n">kernel_width</span><span class="o">**</span><span class="mi">2</span><span class="p">))</span> <span class="c1">#Kernel function 
-</span><span class="n">weights</span><span class="p">.</span><span class="n">shape</span>
-</code></pre></div></div>
+          <div class="collapse navbar-collapse text-right" id="navbarNav">
+            <ul class="navbar-nav ml-auto flex-nowrap">
 
-<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">img</span> <span class="o">=</span> <span class="nf">imread_img</span><span class="p">(</span><span class="s">'caretta.jpg'</span><span class="p">)</span>
+              <!-- About -->
+              <li class="nav-item ">
+                <a class="nav-link" href="/kristosh/">about</a>
+              </li>
+              
+              <!-- Blog -->
+              <li class="nav-item active">
+                <a class="nav-link" href="/kristosh/blog/">blog<span class="sr-only">(current)</span></a>
+              </li>
 
-<span class="nb">input</span> <span class="o">=</span> <span class="nf">pre_processing</span><span class="p">(</span><span class="n">img</span><span class="p">,</span> <span class="n">cuda</span><span class="p">)</span>          <span class="c1"># preprocess: image (normalise, transpose, make tensor on cuda, requires_grad=True)
-</span>
-<span class="n">out</span> <span class="o">=</span> <span class="nf">model</span><span class="p">(</span><span class="nb">input</span><span class="p">)</span>     
-<span class="nf">print </span><span class="p">(</span><span class="n">out</span><span class="p">.</span><span class="n">shape</span><span class="p">)</span>                
-<span class="n">out</span> <span class="o">=</span> <span class="n">F</span><span class="p">.</span><span class="nf">softmax</span><span class="p">(</span><span class="n">out</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>    
+              <!-- Other pages -->
 
-<span class="n">out</span><span class="p">,</span> <span class="n">indices</span><span class="o">=</span> <span class="n">torch</span><span class="p">.</span><span class="nf">sort</span><span class="p">(</span><span class="n">out</span><span class="p">,</span> <span class="n">descending</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+              <!-- Toogle theme mode -->
+              <li class="toggle-container">
+                <button id="light-toggle" title="Change theme">
+                  <i class="fas fa-moon"></i>
+                  <i class="fas fa-sun"></i>
+                </button>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </nav>
 
-<span class="n">top_values</span> <span class="o">=</span> <span class="n">out</span><span class="p">[:,</span> <span class="p">:</span><span class="mi">5</span><span class="p">]</span> <span class="c1"># Keep the first 5 values from each row
-</span><span class="n">top_indices</span> <span class="o">=</span> <span class="n">indices</span><span class="p">[:,</span> <span class="p">:</span><span class="mi">5</span><span class="p">]</span>   <span class="c1"># Keep the corresponding indices
-</span>
-<span class="n">top5</span> <span class="o">=</span> <span class="n">torch</span><span class="p">.</span><span class="nf">topk</span><span class="p">(</span><span class="n">out</span><span class="p">,</span> <span class="n">k</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>
+      <!-- Scrolling Progress Bar -->
+      <progress id="progress" value="0">
+        <div class="progress-container">
+          <span class="progress-bar"></span>
+        </div>
+      </progress>
+    </header>
 
-<span class="n">topk_values</span> <span class="o">=</span> <span class="n">top_values</span><span class="p">.</span><span class="nf">detach</span><span class="p">().</span><span class="nf">numpy</span><span class="p">()</span>
-<span class="n">topk_indices</span> <span class="o">=</span>  <span class="n">top_indices</span><span class="p">.</span><span class="nf">detach</span><span class="p">().</span><span class="nf">numpy</span><span class="p">()</span>
 
-<span class="nf">print</span><span class="p">(</span><span class="n">topk_values</span><span class="p">)</span>
-<span class="nf">print</span><span class="p">(</span><span class="n">topk_indices</span><span class="p">)</span>
-</code></pre></div></div>
+    <!-- Content -->
+    <div class="post distill">
 
-<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">simpler_model</span> <span class="o">=</span> <span class="nc">LinearRegression</span><span class="p">()</span>
-<span class="c1"># print (topk_indices[0][0])
-# print (perturbations.shape)
-# print (predictions[:,:,topk_indices[0][0]])
-</span><span class="n">simpler_model</span><span class="p">.</span><span class="nf">fit</span><span class="p">(</span><span class="n">X</span><span class="o">=</span><span class="n">perturbations</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="n">predictions</span><span class="p">[:,:,</span><span class="n">topk_indices</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]],</span> <span class="n">sample_weight</span><span class="o">=</span><span class="n">weights</span><span class="p">)</span>
-<span class="n">coeff</span> <span class="o">=</span> <span class="n">simpler_model</span><span class="p">.</span><span class="n">coef_</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-<span class="n">coeff</span>
-</code></pre></div></div>
+      <d-title>
+        <h1>Gradient-based feature attribution for Vision</h1>
+        <p>This page's main focus is to analyze a branch of explainable &amp; interpretable AI (XAI) called posthoc XAI. We will analyze theory, taxonomy, applications, shortcomings of posthoc XAI approaches and apply them on image classification using popular CNN architectures and explain their black box nature. Part of the assessemnet for this tutorial/workshop, will be some research questions that needs be answered by you. These questions can be found all over this blogspot using the <mark>TOSUBMIT</mark> tag and will be summarized them at the end of the blogspot.</p>
+      </d-title>
 
-<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">num_top_features</span> <span class="o">=</span> <span class="mi">4</span>
-<span class="n">top_features</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="nf">argsort</span><span class="p">(</span><span class="n">coeff</span><span class="p">)[</span><span class="o">-</span><span class="n">num_top_features</span><span class="p">:]</span> 
-<span class="n">top_features</span>
-</code></pre></div></div>
+      <d-byline></d-byline>
 
-<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">mask</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="nf">zeros</span><span class="p">(</span><span class="n">num_superpixels</span><span class="p">)</span> 
-<span class="n">mask</span><span class="p">[</span><span class="n">top_features</span><span class="p">]</span><span class="o">=</span> <span class="bp">True</span> <span class="c1">#Activate top superpixels
-</span>
-<span class="n">img</span> <span class="o">=</span> <span class="nf">imread_img</span><span class="p">(</span><span class="s">'caretta.jpg'</span><span class="p">)</span>
+      <d-article>
+        <d-contents>
+          <nav class="l-text figcaption">
+          <h3>Contents</h3>
+            <div><a href="#introduction">Introduction</a></div>
+            <div><a href="#introduction-to-xai">Introduction to XAI</a></div>
+            <div><a href="#gradient-based-methods">Gradient-based methods</a></div>
+            <div><a href="#conclusion">Conclusion</a></div>
+            
+          </nav>
+        </d-contents>
 
-<span class="n">img</span> <span class="o">=</span> <span class="n">img</span><span class="o">/</span><span class="mi">255</span>
-<span class="n">skimage</span><span class="p">.</span><span class="n">io</span><span class="p">.</span><span class="nf">imshow</span><span class="p">(</span><span class="nf">perturb_image</span><span class="p">(</span><span class="n">img</span> <span class="p">,</span><span class="n">mask</span><span class="p">,</span><span class="n">superpixels</span><span class="p">)</span> <span class="p">)</span>
-</code></pre></div></div>
+        <h1 id="gradient-based-feature-attribution-for-vision">Gradient-based feature attribution for Vision</h1>
 
-<p><img src="../../../../assets/img/2023-05-13-LIME/caretta_4.jpg" style="width:400px;height:400px;" class="center" /></p>
-
-<h1 id="results">Results</h1>
-
-<h1 id="you-should-not-trust-me">You should not trust me</h1>
-
-<h1 id="tosubmit">TOSUBMIT</h1>
-
-<h1 id="conclusions">Conclusions</h1>
-
-<h1 id="references">References</h1>
-<p style="font-size: smaller"><a href="https://arxiv.org/pdf/1602.04938.pdf">[1] Ribeuro, M.T. et al. Why Should I Trust You? Explaining the Predictions of Any Classifier, 2016. SIGKDD.</a></p>
-
-<p style="font-size: smaller"><a href="https://arxiv.org/pdf/2205.11487">[2] Saharia, C. et al. Photorealistic Text-to-Image Diffusion Models with Deep Language Understanding, 2022. <em>arXiv Preprint</em>.</a></p>
-
-<p style="font-size: smaller"><a href="https://arxiv.org/pdf/2209.14792">[3] Singer, U. et al. Make-a-Video: Text-to-Video Generation Without Text-Video Data, 2022. <em>arXiv Preprint</em>.</a></p>
-
-<p style="font-size: smaller"><a href="https://arxiv.org/pdf/2210.02303">[4] Ho, J. et al. Imagen Video: High Definition Video Generation with Diffusion Models, 2022. <em>arXiv Preprint</em>.</a></p>]]></content><author><name>Christos Athanasiadis</name></author><summary type="html"><![CDATA[This page's goal is to present a PostHoc feature attribution XAI methodology called LIME (Local Interpretable Model-agnostic Explanations) and how it can be used to explain image classification tasks. You will be guided through the code and the results of the LIME algorithm. Part of the assessemnet for this workshop, will be some research questions that needs be answered by you. These questions can be found all over this blogspot using the TOSUBMIT tag and will be summarized them at the end of the blogspot.]]></summary></entry><entry><title type="html">Gradient-based feature attribution for Vision</title><link href="https://kristosh.github.io/kristosh/blog/2023/gradient_based_feature_attribution/" rel="alternate" type="text/html" title="Gradient-based feature attribution for Vision" /><published>2023-05-13T00:00:00+00:00</published><updated>2023-05-13T00:00:00+00:00</updated><id>https://kristosh.github.io/kristosh/blog/2023/gradient_based_feature_attribution</id><content type="html" xml:base="https://kristosh.github.io/kristosh/blog/2023/gradient_based_feature_attribution/"><![CDATA[<h1 id="gradient-based-feature-attribution-for-vision">Gradient-based feature attribution for Vision</h1>
-
-<p>Before starting with the explanation of the gradient-based methodologies, we provide some useful code for all the necessarry packages loacing a pre-trained VGG model (in Imagenet) but also code to load a image for a local directory in PyTorch. You can access the code of this tutorial in the following <a href="https://colab.research.google.com/drive/1zWmtpOTXfxv1Hxwl7G5heU73vz90iNhl?usp=sharing">google colab link</a>.</p>
+<p>Before starting with the explanation of the gradient-based methodologies, we provide some useful code for all the necessarry packages loacing a pre-trained VGG model (in Imagenet) but also code to load a image for a local directory in PyTorch. You can access the code of this tutorial in the following <a href="https://colab.research.google.com/drive/1zWmtpOTXfxv1Hxwl7G5heU73vz90iNhl?usp=sharing" rel="external nofollow noopener" target="_blank">google colab link</a>.</p>
 
 <p>The packages that you will need to import are the following ones:</p>
 <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># set-up environment
@@ -558,9 +402,12 @@ Now lets load and process the image (for the VGG19 classifier) that we would lik
 <p>The recipe for this approach is as follows:</p>
 
 <ul>
-  <li><strong>Perform a forward pass</strong> of the image ($\mathbf{x}_0$) of interest using the network $\mathcal{F}(\mathbf{x}_0)$.</li>
-  <li><strong>Compute the gradient</strong> of class score of interest with respect to the input image ($\mathbf{x}_0$): $g(\mathbf{x}_0) = \frac{\partial \mathcal{F}}{\partial \mathbf{x}_0} $.</li>
-  <li><strong>Visualize the gradients</strong>: You can either show the absolute values or highlight negative and positive contributions separately.</li>
+  <li>
+<strong>Perform a forward pass</strong> of the image ($\mathbf{x}_0$) of interest using the network $\mathcal{F}(\mathbf{x}_0)$.</li>
+  <li>
+<strong>Compute the gradient</strong> of class score of interest with respect to the input image ($\mathbf{x}_0$): $g(\mathbf{x}_0) = \frac{\partial \mathcal{F}}{\partial \mathbf{x}_0} $.</li>
+  <li>
+<strong>Visualize the gradients</strong>: You can either show the absolute values or highlight negative and positive contributions separately.</li>
 </ul>
 
 <h3 id="the-instructions-for-the-pytorch-code">The instructions for the PyTorch code:</h3>
@@ -899,10 +746,13 @@ gradients = np.transpose(gradients[0], (1, 2, 0))
 
 <p>Recipe for calculating the IG in our example:</p>
 <ul>
-  <li><strong>Choose a baseline image</strong>. You can make use of a black/white or an white noise image.</li>
-  <li><strong>Build a series of inputs</strong>, each input consist of the baseline plus an additional fraction of the input-image. The final input is the baseline plus the full image. Choose your fraction at 20.</li>
+  <li>
+<strong>Choose a baseline image</strong>. You can make use of a black/white or an white noise image.</li>
+  <li>
+<strong>Build a series of inputs</strong>, each input consist of the baseline plus an additional fraction of the input-image. The final input is the baseline plus the full image. Choose your fraction at 20.</li>
   <li>For each of these inputs, <strong>calculate the gradients of the input</strong> w.r.t. the prediction (using methods under 2 above). Take the average of all these gradients.</li>
-  <li><strong>Calculate the difference of image and baseline</strong>: I-B. And calculate Integrated Gradient = (I-B)*average of gradients.</li>
+  <li>
+<strong>Calculate the difference of image and baseline</strong>: I-B. And calculate Integrated Gradient = (I-B)*average of gradients.</li>
   <li>If you have chosen for another baseline, e.g. for a uniform random generated baseline, then perform this procedure for multiple samples.</li>
 </ul>
 
@@ -991,146 +841,110 @@ plot_gradients(img, int_gradients_randombl, 'Image and Integrated Gradients with
   </li>
 </ul>
 
-<p>Given the growth of pre-trained language models, it is only a matter of time before we see many more innovative ideas come around in this field. Language, after all, is a powerful tool to incorporate structural biases into RL pipelines. Additionally, language opens up the possibility of easier interfaces between humans and RL agents, thus, allowing more human-in-the-loop methods to be applied to RL. Finally, the symbolic nature of natural language allows better interpretability in the learned policies, while potentially making them more explainable. Thus, I see this as a very promising direction of future research</p>]]></content><author><name>Christos Athanasiadis</name></author><summary type="html"><![CDATA[This page's main focus is to analyze a branch of explainable & interpretable AI (XAI) called posthoc XAI. We will analyze theory, taxonomy, applications, shortcomings of posthoc XAI approaches and apply them on image classification using popular CNN architectures and explain their black box nature. Part of the assessemnet for this tutorial/workshop, will be some research questions that needs be answered by you. These questions can be found all over this blogspot using the TOSUBMIT tag and will be summarized them at the end of the blogspot.]]></summary></entry><entry><title type="html">Posthoc explainability in AI</title><link href="https://kristosh.github.io/kristosh/blog/2023/Posthoc-XAI/" rel="alternate" type="text/html" title="Posthoc explainability in AI" /><published>2023-02-11T00:00:00+00:00</published><updated>2023-02-11T00:00:00+00:00</updated><id>https://kristosh.github.io/kristosh/blog/2023/Posthoc-XAI</id><content type="html" xml:base="https://kristosh.github.io/kristosh/blog/2023/Posthoc-XAI/"><![CDATA[<h2 id="introduction">Introduction</h2>
+<p>Given the growth of pre-trained language models, it is only a matter of time before we see many more innovative ideas come around in this field. Language, after all, is a powerful tool to incorporate structural biases into RL pipelines. Additionally, language opens up the possibility of easier interfaces between humans and RL agents, thus, allowing more human-in-the-loop methods to be applied to RL. Finally, the symbolic nature of natural language allows better interpretability in the learned policies, while potentially making them more explainable. Thus, I see this as a very promising direction of future research</p>
 
-<p>This workshop’s core focus is to analyze a branch of explainable &amp; interpretable AI (XAI) called posthoc XAI. We will analyze theory, taxonomy, applications, shortcomings of posthoc XAI approaches and apply them on image classification using popular CNN architectures and explain their <em>black box</em> nature. Part of the assessemnet for this tutorial/workshop, will be some research questions that needs be answered by you. These questions can be found all over this notebook and will be summarized them at the end.</p>
+      </d-article>
 
-<p>The learning objectives (ILOs) for this tutorial can be listed as follows:</p>
-<ul>
-  <li><em>Learning basic terminology for XAI and introduced to one possible taxonomy</em>,</li>
-  <li><em>Getting familiar with several Posthoc techniques for XAI (by a thorough list of references)</em>,</li>
-  <li><em>Test &amp; compare these approaches using CNN classifier</em>,</li>
-  <li><em>Investigate and discover potential shortcoming of these techniques</em>,</li>
-  <li><em>Discovering means for mitigating problems in XAI methods</em>.</li>
-</ul>
+      <d-appendix>
+        <d-footnote-list></d-footnote-list>
+        <d-citation-list></d-citation-list>
+      </d-appendix>
 
-<font color="red"><b>TOSUBMIT</b></font>
-<p>Please submit answers on the questions marked “ToSubmit” in one workshop-report, together with your answers to the ToSubmit questions in the Lab 1 notebook. Use a single pdf with max. of 2 pages. Please submit as required via canvas/assignments. Include your name + student number. This report will be graded.</p>
+      <d-bibliography src="/kristosh/assets/bibliography/2023-02-11-Posthoc-XAI.bib"></d-bibliography>
+</div>
 
-<font color="red"><b>TODO</b></font>
-<p>The code below is ready to run for the largest part. In order to ensure that you do an effort to understand the code we do ask you to finalize a few parts of the code, usually just one or a few lines of code are necessary. You do not have to submit the code.</p>
+    <!-- Footer -->    
+    <footer class="fixed-bottom">
+      <div class="container mt-0">
+        © Copyright 2023 Christos  Athanasiadis. Powered by <a href="https://jekyllrb.com/" target="_blank" rel="external nofollow noopener">Jekyll</a> with <a href="https://github.com/alshedivat/al-folio" rel="external nofollow noopener" target="_blank">al-folio</a> theme. Hosted by <a href="https://pages.github.com/" target="_blank" rel="external nofollow noopener">GitHub Pages</a>. Photos from <a href="https://unsplash.com" target="_blank" rel="external nofollow noopener">Unsplash</a>.
 
-<h2 id="introduction-to-xai">Introduction to XAI</h2>
+      </div>
+    </footer>
 
-<p>A ill-famed shortcoming in Deep Learning models is their <em>black-box</em> or <em>opaque</em> nature. Reasoning on their behavior, decisions and predictions is an fundamental task when developers debugging their models but also when AI users assessing the level of <em>trustworthiness</em> that they have on these models. It is really fundamental, especially when one is planning to take actions using these systems, or when deploying AI in high-stake real-world applications (such as law, finance, tumor analysis etc.). Understanding of the inner <em>black-box</em> mechanisms also provides insights into the model, which can be used to transform an <em>untrustworthy</em> model or prediction into a <em>trustworthy</em> one. Finally, GDPR regulations require DL models to be transparent for reasons of fairness.</p>
+    <!-- Bootsrap & MDB scripts -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.1/dist/js/bootstrap.bundle.min.js" integrity="sha256-fgLAgv7fyCGopR/gBNq2iW3ZKIdqIcyshnUULC4vex8=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mdbootstrap@4.20.0/js/mdb.min.js" integrity="sha256-NdbiivsvWt7VYCt6hYNT3h/th9vSTL4EDWeGs5SN3DA=" crossorigin="anonymous"></script>
 
-<h3 id="trust-ai">Trust AI</h3>
-
-<p>There is a widespread research in what it means a user to trust AI models and how explainability &amp; interpretability can help mitigating opaqueness in AI. For simplicity reasons, we will employ here a really an basic definition: <em>trusting an AI algorithm means to be in a shape to anticipate its outcome and verify its performance (contractual trust)</em>.The following paper provide some good analysis on this aspect [Formalizing Trust in Artificial Intelligence: Prerequisites, Causes and Goals of Human Trust in AI]. If users do not trust a model or a prediction, they will probably not use it.</p>
-
-<p>We can seperate the notation of trust into two parts:</p>
-<ul>
-  <li>Trusting a prediction, i.e. whether a user trusts an individual prediction (the output of the model given a particular input) sufficiently to take some action based on it.</li>
-  <li>Trusting a model, i.e. whether the user trusts a model to behave in reasonable ways if deployed (for the whole input space).</li>
-</ul>
-
-<h3 id="interpretability-accuracy-trade-off">Interpretability accuracy trade-off</h3>
-
-<p>With the increasing popularity of AI the introduced approaches methodologies became more efficient but at the same time, increased their complexity. Think as an example the simple rule-based approaches in taking decisions. While they offer a really easy way to be explained, however, oftently, they lack of good accuracy in real-world problems. As it is apparent by the figure, there is a tradeoff between the achieved accuracy and the interpretability of the well-known machine learning approaches.</p>
-
-<figure>
-
-  <picture>
+    
     
 
-    <!-- Fallback to the original file -->
-    <img src="/kristosh/assets/img/2023-02-11-Posthoc-XAI/tradeoff.png" class="img-fluid" width="auto" height="auto" onerror="this.onerror=null; $('.responsive-img-srcset').remove();" />
+<!-- Scrolling Progress Bar -->
+<script type="text/javascript">
+  /*
+   * This JavaScript code has been adapted from the article 
+   * https://css-tricks.com/reading-position-indicator/ authored by Pankaj Parashar, 
+   * published on the website https://css-tricks.com on the 7th of May, 2014.
+   * Couple of changes were made to the original code to make it compatible 
+   * with the `al-foio` theme.
+   */
+  const progressBar = $("#progress");
+  /*
+   * We set up the bar after all elements are done loading.
+   * In some cases, if the images in the page are larger than the intended
+   * size they'll have on the page, they'll be resized via CSS to accomodate
+   * the desired size. This mistake, however, breaks the computations as the
+   * scroll size is computed as soon as the elements finish loading.
+   * To account for this, a minimal delay was introduced before computing the
+   * values.
+   */
+  window.onload = function () {
+    setTimeout(progressBarSetup, 50);
+  };
+  /*
+   * We set up the bar according to the browser.
+   * If the browser supports the progress element we use that.
+   * Otherwise, we resize the bar thru CSS styling
+   */
+  function progressBarSetup() {
+    if ("max" in document.createElement("progress")) {
+      initializeProgressElement();
+      $(document).on("scroll", function() {
+        progressBar.attr({ value: getCurrentScrollPosition() });
+      });
+      $(window).on("resize", initializeProgressElement);
+    } else {
+      resizeProgressBar();
+      $(document).on("scroll", resizeProgressBar);
+      $(window).on("resize", resizeProgressBar);
+    }
+  }
+  /*
+   * The vertical scroll position is the same as the number of pixels that
+   * are hidden from view above the scrollable area. Thus, a value > 0 is
+   * how much the user has scrolled from the top
+   */
+  function getCurrentScrollPosition() {
+    return $(window).scrollTop();
+  }
 
-  </picture>
+  function initializeProgressElement() {
+    let navbarHeight = $("#navbar").outerHeight(true);
+    $("body").css({ "padding-top": navbarHeight });
+    $("progress-container").css({ "padding-top": navbarHeight });
+    progressBar.css({ top: navbarHeight });
+    progressBar.attr({
+      max: getDistanceToScroll(),
+      value: getCurrentScrollPosition(),
+    });
+  }
+  /*
+   * The offset between the html document height and the browser viewport
+   * height will be greater than zero if vertical scroll is possible.
+   * This is the distance the user can scroll
+   */
+  function getDistanceToScroll() {
+    return $(document).height() - $(window).height();
+  }
 
-</figure>
+  function resizeProgressBar() {
+    progressBar.css({ width: getWidthPercentage() + "%" });
+  }
+  // The scroll ratio equals the percentage to resize the bar
+  function getWidthPercentage() {
+    return (getCurrentScrollPosition() / getDistanceToScroll()) * 100;
+  }
+</script>
 
-<h3 id="explainability--interpretability">Explainability &amp; interpretability</h3>
-
-<p>By explaining a <em>prediction</em>, we define the visual artifacts that provide qualitative understanding of the relationship between the instance’s components (e.g. words in text, patches in an image) and the model’s prediction. We argue that explaining predictions is an important aspect in getting humans to trust and use machine learning effectively, if the explanations are faithful and intelligible. <em>To increase the trust in predictions and models Explainable and Interpretable AI (XAI) came at the rescue</em>.</p>
-
-<p>At this point, I would like to adotp a way to distinguish the following two terms: <em>interpretability</em> and <em>explaibility</em> using Ajay Thampi’s Interpretable AI book (https://www.manning.com/books/interpretable-ai):</p>
-
-<ul>
-  <li><em>Interpretability</em>: It is the degree to which we can consistently estimate what a model will predict given an input, understand how the model came up with the prediction, understand how the prediction changes with changes in the input or algorithmic parameters and finally understand when the model has made a mistake. Interpretability is mostly discernible by experts who are either building, deploying or using the AI system and these techniques are building blocks that will help you get to explainability.</li>
-  <li><em>Explainability:</em> Goes beyond interpretability in that it helps us understand in a human-readable form how and why a model came up with a prediction. It explains the internal mechanics of the system in human terms with the intent to reach a much wider audience. Explainability requires interpretability as building blocks and also looks to other fields and areas such as Human-Computer Interaction (HCI), law and ethics.</li>
-</ul>
-
-<h3 id="mitigating-algorithmic-bias-using-xai">Mitigating algorithmic bias using XAI</h3>
-
-<p>Interpretability is a useful debugging tool for detecting bias in machine learning models. It might happen that the machine learning model you have trained for automatic approval or rejection of credit applications discriminates against a minority that has been historically disenfranchised. Your main goal is to grant loans only to people who will eventually repay them. The incompleteness of the problem formulation in this case lies in the fact that you not only want to minimize loan defaults, but are also obliged not to discriminate on the basis of certain demographics. This is an additional constraint that is part of your problem formulation (granting loans in a low-risk and compliant way) that is not covered by the loss function the machine learning model was optimized for.</p>
-
-<p>Explainability techniques could help identify whether the factors considered in a decision reflect bias and could enable more accountability than in human decision making, which typically cannot be subjected to such rigorous probing.</p>
-
-<ul>
-  <li>Bias in online recruitment tools</li>
-  <li>Bias in word associations</li>
-  <li>Bias in online ads</li>
-  <li>Bias in facial recognition technology</li>
-  <li>Bias in criminal justice algorithms</li>
-</ul>
-
-<h3 id="taxonomy-of-xai-techniques">Taxonomy of XAI techniques</h3>
-
-<p>In the following picture you can find a possible way to categorize XAI methods:</p>
-
-<figure>
-
-  <picture>
-    
-
-    <!-- Fallback to the original file -->
-    <img src="/kristosh/assets/img/2023-02-11-Posthoc-XAI/XAI_categories.png" class="img-fluid" width="auto" height="auto" onerror="this.onerror=null; $('.responsive-img-srcset').remove();" />
-
-  </picture>
-
-</figure>
-
-<p>Firstly, XAI methods can be categorized into model-based and posthoc approaches. The former is trying to render the model itself interpretable and thus explain its behavior in clear and easy manner. While the later category, after having generate a classificaiton model that behaves as a black box and its too complicate to be inherently explain, aims at explaning the bevavior of the model after the training procedure.</p>
-
-<p>The posthoc methods could be also divided between global and local methods. The global methods trying to explain the model around a specifc input sample while the global techniques are trying to do that on a global scale.</p>
-
-<p>Another way to distinguinsh XAI models is between Model-specific or model-agnostic? Model-specific interpretation tools are limited to specific model classes. The interpretation of regression weights in a linear model is a model-specific interpretation, since – by definition – the interpretation of intrinsically interpretable models is always model-specific. Tools that only work for the interpretation of e.g. neural networks are model-specific. Model-agnostic tools can be used on any machine learning model and are applied after the model has been trained (post hoc). These agnostic methods usually work by analyzing feature input and output pairs. By definition, these methods cannot have access to model internals such as weights or structural information.</p>
-
-<p>Local or global? Does the interpretation method explain an individual prediction or the entire model behavior? Or is the scope somewhere in between? Read more about the scope criterion in the next section.</p>
-
-<p>In this tutorial we will focus in several posthoc explanation and its subcategories for vision. We can categorize posthoc methods in three basic categories:</p>
-<ul>
-  <li><em>Gradient based methods</em> Many methods compute the gradient of the prediction (or classification score) with respect to the input features. The gradient-based methods (of which there are many) mostly differ in how the gradient is computed. Since in these methods we need to calcualte the gradient of the models, thus, we need to have access to the models themselves, therefore, model-specific techniques.</li>
-  <li>Surrogate methods.</li>
-  <li>Perturbation-based methods.</li>
-  <li><em>Feature of pixel attribution methods</em> highlight the features or pixels that were relevant for a certain image classification by a neural network.</li>
-</ul>
-
-<p>In this tutorial, tou will apply a few techniques for feature attribution: 
-<strong>Feature attribution</strong></p>
-<ul>
-  <li><strong>Leave one out (LOO)</strong></li>
-  <li><strong>LIME</strong> method</li>
-  <li><strong>XAI counterfactuals</strong></li>
-  <li><strong>SHAP</strong>
-<strong>Gradient-based:</strong></li>
-  <li><strong>Saliency mapping</strong>: use gradients to understand what image pixels are most important for classification</li>
-  <li><strong>Integrated gradients</strong> for the same purpose</li>
-  <li><strong>GradCam</strong> to understand what areas of the image are important for classification.</li>
-</ul>
-
-<h2 id="gradient-based-methods">Gradient-based methods</h2>
-
-<p><a href="../../2023/gradient_based_feature_attribution/">LIME tutorial</a></p>
-
-<h2 id="lime">LIME</h2>
-
-<p><a href="../../2022/LIME/">LIME tutorial</a></p>
-
-<h2 id="conclusion">Conclusion</h2>
-
-<p>In this post, we have seen two ways of using language for RL. There have been a lot of other ways recently in this direction. Some examples of these are</p>
-
-<ul>
-  <li>
-    <d-cite key="lampinen-icml22a"></d-cite>
-    <p>augment policy networks with the auxiliary target of generating explanations and use this to learn the relational and causal structure of the world</p>
-  </li>
-  <li>
-    <d-cite key="kumar-neurips22a"></d-cite>
-    <p>use language to model compositional task distributions and induce human-centric priors into RL agents.</p>
-  </li>
-</ul>
-
-<p>Given the growth of pre-trained language models, it is only a matter of time before we see many more innovative ideas come around in this field. Language, after all, is a powerful tool to incorporate structural biases into RL pipelines. Additionally, language opens up the possibility of easier interfaces between humans and RL agents, thus, allowing more human-in-the-loop methods to be applied to RL. Finally, the symbolic nature of natural language allows better interpretability in the learned policies, while potentially making them more explainable. Thus, I see this as a very promising direction of future research</p>]]></content><author><name>Christos Athanasiadis</name></author><summary type="html"><![CDATA[This page's main focus is to analyze a branch of explainable & interpretable AI (XAI) called posthoc XAI. We will analyze theory, taxonomy, applications, shortcomings of posthoc XAI approaches and apply them on image classification using popular CNN architectures and explain their black box nature. Part of the assessemnet for this tutorial/workshop, will be some research questions that needs be answered by you. These questions can be found all over this blogspot using the TOSUBMIT tag and will be summarized them at the end of the blogspot.]]></summary></entry><entry><title type="html">Displaying External Posts on Your al-folio Blog</title><link href="https://kristosh.github.io/kristosh/blog/2022/displaying-external-posts-on-your-al-folio-blog/" rel="alternate" type="text/html" title="Displaying External Posts on Your al-folio Blog" /><published>2022-04-23T23:20:09+00:00</published><updated>2022-04-23T23:20:09+00:00</updated><id>https://kristosh.github.io/kristosh/blog/2022/displaying-external-posts-on-your-al-folio-blog</id><content type="html" xml:base="https://kristosh.github.io/kristosh/blog/2022/displaying-external-posts-on-your-al-folio-blog/"><![CDATA[]]></content><author><name></name></author></entry></feed>
+  
+</body>
+</html>
