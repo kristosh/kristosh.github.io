@@ -1,5 +1,5 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" xml:lang="en"><generator uri="https://jekyllrb.com/" version="4.3.2">Jekyll</generator><link href="https://kristosh.github.io/kristosh/feed.xml" rel="self" type="application/atom+xml" /><link href="https://kristosh.github.io/kristosh/" rel="alternate" type="text/html" hreflang="en" /><updated>2023-05-12T18:05:18+00:00</updated><id>https://kristosh.github.io/kristosh/feed.xml</id><title type="html">blank</title><subtitle>A simple, whitespace theme for academics.
-</subtitle><entry><title type="html">Posthoc explainability in AI</title><link href="https://kristosh.github.io/kristosh/blog/2023/Posthoc-XAI/" rel="alternate" type="text/html" title="Posthoc explainability in AI" /><published>2023-02-11T00:00:00+00:00</published><updated>2023-02-11T00:00:00+00:00</updated><id>https://kristosh.github.io/kristosh/blog/2023/Posthoc-XAI</id><content type="html" xml:base="https://kristosh.github.io/kristosh/blog/2023/Posthoc-XAI/"><![CDATA[<h2 id="introduction">Introduction</h2>
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" xml:lang="en"><generator uri="https://jekyllrb.com/" version="4.3.2">Jekyll</generator><link href="https://kristosh.github.io/feed.xml" rel="self" type="application/atom+xml" /><link href="https://kristosh.github.io/" rel="alternate" type="text/html" hreflang="en" /><updated>2023-05-13T15:44:27+00:00</updated><id>https://kristosh.github.io/feed.xml</id><title type="html">blank</title><subtitle>A simple, whitespace theme for academics.
+</subtitle><entry><title type="html">Posthoc explainability in AI</title><link href="https://kristosh.github.io/blog/2023/Posthoc-XAI/" rel="alternate" type="text/html" title="Posthoc explainability in AI" /><published>2023-02-11T00:00:00+00:00</published><updated>2023-02-11T00:00:00+00:00</updated><id>https://kristosh.github.io/blog/2023/Posthoc-XAI</id><content type="html" xml:base="https://kristosh.github.io/blog/2023/Posthoc-XAI/"><![CDATA[<h2 id="introduction">Introduction</h2>
 
 <p>This workshop’s core focus is to analyze a branch of explainable &amp; interpretable AI (XAI) called posthoc XAI. We will analyze theory, taxonomy, applications, shortcomings of posthoc XAI approaches and apply them on image classification using popular CNN architectures and explain their <em>black box</em> nature. Part of the assessemnet for this tutorial/workshop, will be some research questions that needs be answered by you. These questions can be found all over this notebook and will be summarized them at the end.</p>
 
@@ -42,7 +42,7 @@
     
 
     <!-- Fallback to the original file -->
-    <img src="/kristosh/assets/img/2023-02-11-Posthoc-XAI/tradeoff.png" class="img-fluid" width="auto" height="auto" onerror="this.onerror=null; $('.responsive-img-srcset').remove();" />
+    <img src="/assets/img/2023-02-11-Posthoc-XAI/tradeoff.png" class="img-fluid" width="auto" height="auto" onerror="this.onerror=null; $('.responsive-img-srcset').remove();" />
 
   </picture>
 
@@ -83,7 +83,7 @@
     
 
     <!-- Fallback to the original file -->
-    <img src="/kristosh/assets/img/2023-02-11-Posthoc-XAI/XAI_categories.png" class="img-fluid" width="auto" height="auto" onerror="this.onerror=null; $('.responsive-img-srcset').remove();" />
+    <img src="/assets/img/2023-02-11-Posthoc-XAI/XAI_categories.png" class="img-fluid" width="auto" height="auto" onerror="this.onerror=null; $('.responsive-img-srcset').remove();" />
 
   </picture>
 
@@ -747,10 +747,10 @@ plot_gradients(img, int_gradients_randombl, 'Image and Integrated Gradients with
   </li>
 </ul>
 
-<p>Given the growth of pre-trained language models, it is only a matter of time before we see many more innovative ideas come around in this field. Language, after all, is a powerful tool to incorporate structural biases into RL pipelines. Additionally, language opens up the possibility of easier interfaces between humans and RL agents, thus, allowing more human-in-the-loop methods to be applied to RL. Finally, the symbolic nature of natural language allows better interpretability in the learned policies, while potentially making them more explainable. Thus, I see this as a very promising direction of future research</p>]]></content><author><name>Christos Athanasiadis</name></author><summary type="html"><![CDATA[This page's main focus is to analyze a branch of explainable & interpretable AI (XAI) called posthoc XAI. We will analyze theory, taxonomy, applications, shortcomings of posthoc XAI approaches and apply them on image classification using popular CNN architectures and explain their black box nature. Part of the assessemnet for this tutorial/workshop, will be some research questions that needs be answered by you. These questions can be found all over this blogspot using the TOSUBMIT tag and will be summarized them at the end of the blogspot.]]></summary></entry><entry><title type="html">Why should I trust you? LIME for image classification</title><link href="https://kristosh.github.io/kristosh/blog/2022/LIME/" rel="alternate" type="text/html" title="Why should I trust you? LIME for image classification" /><published>2022-12-01T00:00:00+00:00</published><updated>2022-12-01T00:00:00+00:00</updated><id>https://kristosh.github.io/kristosh/blog/2022/LIME</id><content type="html" xml:base="https://kristosh.github.io/kristosh/blog/2022/LIME/"><![CDATA[<h1 id="local-interpretable-model-agnostic-explanations">Local Interpretable Model-agnostic Explanations</h1>
+<p>Given the growth of pre-trained language models, it is only a matter of time before we see many more innovative ideas come around in this field. Language, after all, is a powerful tool to incorporate structural biases into RL pipelines. Additionally, language opens up the possibility of easier interfaces between humans and RL agents, thus, allowing more human-in-the-loop methods to be applied to RL. Finally, the symbolic nature of natural language allows better interpretability in the learned policies, while potentially making them more explainable. Thus, I see this as a very promising direction of future research</p>]]></content><author><name>Christos Athanasiadis</name></author><summary type="html"><![CDATA[This page's main focus is to analyze a branch of explainable & interpretable AI (XAI) called posthoc XAI. We will analyze theory, taxonomy, applications, shortcomings of posthoc XAI approaches and apply them on image classification using popular CNN architectures and explain their black box nature. Part of the assessemnet for this tutorial/workshop, will be some research questions that needs be answered by you. These questions can be found all over this blogspot using the TOSUBMIT tag and will be summarized them at the end of the blogspot.]]></summary></entry><entry><title type="html">Why should I trust you? LIME for image classification</title><link href="https://kristosh.github.io/blog/2022/LIME/" rel="alternate" type="text/html" title="Why should I trust you? LIME for image classification" /><published>2022-12-01T00:00:00+00:00</published><updated>2022-12-01T00:00:00+00:00</updated><id>https://kristosh.github.io/blog/2022/LIME</id><content type="html" xml:base="https://kristosh.github.io/blog/2022/LIME/"><![CDATA[<h1 id="local-interpretable-model-agnostic-explanations">Local Interpretable Model-agnostic Explanations</h1>
 
 <center>
-<video autoplay="" muted="" loop="" controls="" src="https://kristosh.github.io/kristosh//assets/video/2022-12-01-LIME/labradors.mp4" style="width:600px" type="video/mp4">
+<video autoplay="" muted="" loop="" controls="" src="https://kristosh.github.io/assets/video/2022-12-01-LIME/labradors.mp4" style="width:600px" type="video/mp4">
 </video>
 <figcaption>A demonstration of the whole LIME algorithm.</figcaption>
 </center>
@@ -798,7 +798,7 @@ being explained (in our case a vector with all pixels), and we use $\mathbf{x}^{
     
 
     <!-- Fallback to the original file -->
-    <img src="/kristosh/assets/img/2022-12-01-LIME/algorithm.png" class="img-fluid" width="auto" height="auto" onerror="this.onerror=null; $('.responsive-img-srcset').remove();" />
+    <img src="/assets/img/2022-12-01-LIME/algorithm.png" class="img-fluid" width="auto" height="auto" onerror="this.onerror=null; $('.responsive-img-srcset').remove();" />
 
   </picture>
 
@@ -807,7 +807,7 @@ being explained (in our case a vector with all pixels), and we use $\mathbf{x}^{
 <p>The kernel is the distance between the instance being explained and the instance in the neighborhood. The neighborhood is generated by <mark style="background-color:LightCyan;">sampling</mark> instances around the instance being explained. The sampling is done by perturbing the instance being explained. For example, in the case of images, we can perturb the image by zeroing out some super-pixels. The perturbed instances are then fed to the <em>black-box</em> model and the output is used to train the explainer. The weights of the interpretable model are then used to explain the prediction of the <em>black-box</em> model. Finally, in the algorithm the <mark style="background-color:Lavender;">K-lasso</mark> refers to the regulizarion that is introduced in a previous equation and relates with the term $\Omega(g)$.</p>
 
 <center>
-<video autoplay="" muted="" loop="" controls="" src="https://kristosh.github.io/kristosh//assets/video/2022-12-01-LIME/LIME.mp4" style="width:600px" type="video/mp4">
+<video autoplay="" muted="" loop="" controls="" src="https://kristosh.github.io/assets/video/2022-12-01-LIME/LIME.mp4" style="width:600px" type="video/mp4">
 </video>
 <figcaption>A demonstration of the whole LIME algorithm.</figcaption>
 </center>
@@ -963,7 +963,7 @@ Now lets load and process the image (for the VGG19 classifier) that we would lik
     
 
     <!-- Fallback to the original file -->
-    <img src="/kristosh/assets/img/2022-12-01-LIME/LIME.png" class="img-fluid" width="auto" height="auto" onerror="this.onerror=null; $('.responsive-img-srcset').remove();" />
+    <img src="/assets/img/2022-12-01-LIME/LIME.png" class="img-fluid" width="auto" height="auto" onerror="this.onerror=null; $('.responsive-img-srcset').remove();" />
 
   </picture>
 
@@ -1110,4 +1110,4 @@ Now lets load and process the image (for the VGG19 classifier) that we would lik
 
 <p style="font-size: smaller"><a href="https://arxiv.org/pdf/2209.14792">[3] Singer, U. et al. Make-a-Video: Text-to-Video Generation Without Text-Video Data, 2022. <em>arXiv Preprint</em>.</a></p>
 
-<p style="font-size: smaller"><a href="https://arxiv.org/pdf/2210.02303">[4] Ho, J. et al. Imagen Video: High Definition Video Generation with Diffusion Models, 2022. <em>arXiv Preprint</em>.</a></p>]]></content><author><name>Christos Athanasiadis</name></author><summary type="html"><![CDATA[This page's goal is to present a PostHoc feature attribution XAI methodology called LIME (Local Interpretable Model-agnostic Explanations) and how it can be used to explain image classification tasks. You will be guided through the code and the results of the LIME algorithm. Part of the assessemnet for this workshop, will be some research questions that needs be answered by you. These questions can be found all over this blogspot using the TOSUBMIT tag and will be summarized them at the end of the blogspot.]]></summary></entry><entry><title type="html">Displaying External Posts on Your al-folio Blog</title><link href="https://kristosh.github.io/kristosh/blog/2022/displaying-external-posts-on-your-al-folio-blog/" rel="alternate" type="text/html" title="Displaying External Posts on Your al-folio Blog" /><published>2022-04-23T23:20:09+00:00</published><updated>2022-04-23T23:20:09+00:00</updated><id>https://kristosh.github.io/kristosh/blog/2022/displaying-external-posts-on-your-al-folio-blog</id><content type="html" xml:base="https://kristosh.github.io/kristosh/blog/2022/displaying-external-posts-on-your-al-folio-blog/"><![CDATA[]]></content><author><name></name></author></entry></feed>
+<p style="font-size: smaller"><a href="https://arxiv.org/pdf/2210.02303">[4] Ho, J. et al. Imagen Video: High Definition Video Generation with Diffusion Models, 2022. <em>arXiv Preprint</em>.</a></p>]]></content><author><name>Christos Athanasiadis</name></author><summary type="html"><![CDATA[This page's goal is to present a PostHoc feature attribution XAI methodology called LIME (Local Interpretable Model-agnostic Explanations) and how it can be used to explain image classification tasks. You will be guided through the code and the results of the LIME algorithm. Part of the assessemnet for this workshop, will be some research questions that needs be answered by you. These questions can be found all over this blogspot using the TOSUBMIT tag and will be summarized them at the end of the blogspot.]]></summary></entry><entry><title type="html">Displaying External Posts on Your al-folio Blog</title><link href="https://kristosh.github.io/blog/2022/displaying-external-posts-on-your-al-folio-blog/" rel="alternate" type="text/html" title="Displaying External Posts on Your al-folio Blog" /><published>2022-04-23T23:20:09+00:00</published><updated>2022-04-23T23:20:09+00:00</updated><id>https://kristosh.github.io/blog/2022/displaying-external-posts-on-your-al-folio-blog</id><content type="html" xml:base="https://kristosh.github.io/blog/2022/displaying-external-posts-on-your-al-folio-blog/"><![CDATA[]]></content><author><name></name></author></entry></feed>
