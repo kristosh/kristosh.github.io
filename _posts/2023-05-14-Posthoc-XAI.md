@@ -3,7 +3,7 @@ layout: distill
 title: Posthoc explainability in AI
 description: This page's main focus is to analyze a branch of explainable & interpretable AI (XAI) called posthoc XAI. We will analyze theory, taxonomy, applications, shortcomings of posthoc XAI approaches and apply them on image classification using popular CNN architectures and explain their black box nature. Part of the assessemnet for this tutorial/workshop, will be some research questions that needs be answered by you. These questions can be found all over this blogspot using the <mark>TOSUBMIT</mark> tag and will be summarized them at the end of the blogspot.
   
-date: 2023-02-11
+date: 2023-05-14
 htmlwidgets: true
 
 ## anonymize when submitting 
@@ -29,7 +29,7 @@ authors:
 #       name: IAS, Princeton 
 
 # must be the exact same name as your blogpost
-bibliography: 2023-02-11-Posthoc-XAI.bib  
+bibliography: 2023-05-14-Posthoc-XAI.bib  
 
 # Add a table of contents to your post.
 #   - make sure that TOC names match the actual section names
@@ -94,7 +94,7 @@ We can seperate the notation of trust into two parts:
 
 With the increasing popularity of AI the introduced approaches methodologies became more efficient but at the same time, increased their complexity. Think as an example the simple rule-based approaches in taking decisions. While they offer a really easy way to be explained, however, oftently, they lack of good accuracy in real-world problems. As it is apparent by the figure, there is a tradeoff between the achieved accuracy and the interpretability of the well-known machine learning approaches.
 
-{% include figure.html path="assets/img/2023-02-11-Posthoc-XAI/tradeoff.png" class="img-fluid" %}
+{% include figure.html path="assets/img/2023-05-14-Posthoc-XAI/tradeoff.png" class="img-fluid" %}
 
 
 ### Explainability & interpretability
@@ -122,7 +122,7 @@ Explainability techniques could help identify whether the factors considered in 
 
 In the following picture you can find a possible way to categorize XAI methods:
 
-{% include figure.html path="assets/img/2023-02-11-Posthoc-XAI/XAI_categories.png" class="img-fluid" %}
+{% include figure.html path="assets/img/2023-05-14-Posthoc-XAI/XAI_categories.png" class="img-fluid" %}
 
 
 Firstly, XAI methods can be categorized into model-based and posthoc approaches. The former is trying to render the model itself interpretable and thus explain its behavior in clear and easy manner. While the later category, after having generate a classificaiton model that behaves as a black box and its too complicate to be inherently explain, aims at explaning the bevavior of the model after the training procedure.
