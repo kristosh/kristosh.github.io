@@ -24,7 +24,7 @@
     <!-- Fonts & Icons -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.15.4/css/all.min.css" integrity="sha256-mUZM63G8m73Mcidfrv5E+Y61y7a12O5mW4ezU3bxqW4=" crossorigin="anonymous">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/academicons@1.9.1/css/academicons.min.css" integrity="sha256-i1+4qU2G2860dGGIOJscdC30s9beBXjFfzjWLjBRsBg=" crossorigin="anonymous">
-    <link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700%7CRoboto+Slab:100,300,400,500,700%7CMaterial+Icons">
+    <link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700|Roboto+Slab:100,300,400,500,700|Material+Icons">
 
     <!-- Code Syntax Highlighting -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/jwarby/jekyll-pygments-themes@master/github.css" media="" id="highlight_theme_light">
@@ -162,6 +162,12 @@
               </li>
 
               <!-- Other pages -->
+              <li class="nav-item ">
+                <a class="nav-link" href="/kristosh/publications/">publications</a>
+              </li>
+              <li class="nav-item ">
+                <a class="nav-link" href="/kristosh/cv/">cv</a>
+              </li>
 
               <!-- Toogle theme mode -->
               <li class="toggle-container">
@@ -221,7 +227,7 @@
 <span class="kn">import</span> <span class="n">os</span>  <span class="c1"># necessary
 </span><span class="kn">import</span> <span class="n">matplotlib.pyplot</span> <span class="k">as</span> <span class="n">plt</span>
 <span class="c1">#from google.colab.patches import cv2_imshow   # specific for colab
-</span><span class="n">os</span><span class="p">.</span><span class="n">environ</span><span class="p">[</span><span class="s">'KMP_DUPLICATE_LIB_OK'</span><span class="p">]</span><span class="o">=</span><span class="s">'True'</span>
+</span><span class="n">os</span><span class="p">.</span><span class="n">environ</span><span class="p">[</span><span class="sh">'</span><span class="s">KMP_DUPLICATE_LIB_OK</span><span class="sh">'</span><span class="p">]</span><span class="o">=</span><span class="sh">'</span><span class="s">True</span><span class="sh">'</span>
 </code></pre></div></div>
 
 <h3 id="load-a-pretrained-model">Load a pretrained model</h3>
@@ -247,8 +253,8 @@
 
 <span class="c1"># run it on a GPU if available:
 </span><span class="n">cuda</span> <span class="o">=</span> <span class="n">torch</span><span class="p">.</span><span class="n">cuda</span><span class="p">.</span><span class="nf">is_available</span><span class="p">()</span>
-<span class="n">device</span> <span class="o">=</span> <span class="n">torch</span><span class="p">.</span><span class="nf">device</span><span class="p">(</span><span class="s">"cuda:0"</span> <span class="k">if</span> <span class="n">torch</span><span class="p">.</span><span class="n">cuda</span><span class="p">.</span><span class="nf">is_available</span><span class="p">()</span> <span class="k">else</span> <span class="s">"cpu"</span><span class="p">)</span>
-<span class="nf">print</span><span class="p">(</span><span class="s">'cuda:'</span><span class="p">,</span> <span class="n">cuda</span><span class="p">,</span> <span class="s">'device:'</span><span class="p">,</span> <span class="n">device</span><span class="p">)</span>
+<span class="n">device</span> <span class="o">=</span> <span class="n">torch</span><span class="p">.</span><span class="nf">device</span><span class="p">(</span><span class="sh">"</span><span class="s">cuda:0</span><span class="sh">"</span> <span class="k">if</span> <span class="n">torch</span><span class="p">.</span><span class="n">cuda</span><span class="p">.</span><span class="nf">is_available</span><span class="p">()</span> <span class="k">else</span> <span class="sh">"</span><span class="s">cpu</span><span class="sh">"</span><span class="p">)</span>
+<span class="nf">print</span><span class="p">(</span><span class="sh">'</span><span class="s">cuda:</span><span class="sh">'</span><span class="p">,</span> <span class="n">cuda</span><span class="p">,</span> <span class="sh">'</span><span class="s">device:</span><span class="sh">'</span><span class="p">,</span> <span class="n">device</span><span class="p">)</span>
 <span class="n">model</span> <span class="o">=</span> <span class="n">model</span><span class="p">.</span><span class="nf">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
 
 <span class="c1"># set model to evaluation
@@ -282,7 +288,7 @@
     <span class="p">(</span><span class="mi">20</span><span class="p">):</span> <span class="nc">ReLU</span><span class="p">(</span><span class="n">inplace</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
     <span class="p">(</span><span class="mi">21</span><span class="p">):</span> <span class="nc">Conv2d</span><span class="p">(</span><span class="mi">512</span><span class="p">,</span> <span class="mi">512</span><span class="p">,</span> <span class="n">kernel_size</span><span class="o">=</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">),</span> <span class="n">stride</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="n">padding</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
     <span class="p">(</span><span class="mi">22</span><span class="p">):</span> <span class="nc">ReLU</span><span class="p">(</span><span class="n">inplace</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
-<span class="p">...</span>
+<span class="bp">...</span>
     <span class="p">(</span><span class="mi">4</span><span class="p">):</span> <span class="nc">ReLU</span><span class="p">(</span><span class="n">inplace</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
     <span class="p">(</span><span class="mi">5</span><span class="p">):</span> <span class="nc">Dropout</span><span class="p">(</span><span class="n">p</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
     <span class="p">(</span><span class="mi">6</span><span class="p">):</span> <span class="nc">Linear</span><span class="p">(</span><span class="n">in_features</span><span class="o">=</span><span class="mi">4096</span><span class="p">,</span> <span class="n">out_features</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span> <span class="n">bias</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
@@ -301,9 +307,9 @@
 </span>    <span class="c1"># Students should ensure that gradient for input is calculated       
 </span>    <span class="c1"># set the GPU device
 </span>    <span class="k">if</span> <span class="n">cuda</span><span class="p">:</span>
-        <span class="n">torch_device</span> <span class="o">=</span> <span class="n">torch</span><span class="p">.</span><span class="nf">device</span><span class="p">(</span><span class="s">'cuda:0'</span><span class="p">)</span>
+        <span class="n">torch_device</span> <span class="o">=</span> <span class="n">torch</span><span class="p">.</span><span class="nf">device</span><span class="p">(</span><span class="sh">'</span><span class="s">cuda:0</span><span class="sh">'</span><span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
-        <span class="n">torch_device</span> <span class="o">=</span> <span class="n">torch</span><span class="p">.</span><span class="nf">device</span><span class="p">(</span><span class="s">'cpu'</span><span class="p">)</span>
+        <span class="n">torch_device</span> <span class="o">=</span> <span class="n">torch</span><span class="p">.</span><span class="nf">device</span><span class="p">(</span><span class="sh">'</span><span class="s">cpu</span><span class="sh">'</span><span class="p">)</span>
 
     <span class="c1"># normalise for ImageNet
 </span>    <span class="n">mean</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="nf">array</span><span class="p">([</span><span class="mf">0.485</span><span class="p">,</span> <span class="mf">0.456</span><span class="p">,</span> <span class="mf">0.406</span><span class="p">]).</span><span class="nf">reshape</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">])</span>
@@ -327,7 +333,7 @@
 </span><span class="kn">from</span> <span class="n">matplotlib</span> <span class="kn">import</span> <span class="n">pyplot</span> <span class="k">as</span> <span class="n">plt</span>
 
 <span class="c1"># read the image and convert it - Set your pathto the image
-</span><span class="n">img</span> <span class="o">=</span> <span class="n">cv2</span><span class="p">.</span><span class="nf">imread</span><span class="p">(</span><span class="s">'elephant-zebra.png'</span><span class="p">)</span>
+</span><span class="n">img</span> <span class="o">=</span> <span class="n">cv2</span><span class="p">.</span><span class="nf">imread</span><span class="p">(</span><span class="sh">'</span><span class="s">elephant-zebra.png</span><span class="sh">'</span><span class="p">)</span>
 <span class="c1">#img = cv2.imread(datafiles+ 'R.png')
 #img = cv2.imread(datafiles+ 'elephant/Elephant2.jpeg')
 # img = cv2.imread(datafiles+ 'shark/Shark1.jpeg')
@@ -335,15 +341,15 @@
   <span class="n">img</span> <span class="o">=</span> <span class="n">cv2</span><span class="p">.</span><span class="nf">resize</span><span class="p">(</span><span class="n">img</span><span class="p">,</span> <span class="p">(</span><span class="mi">224</span><span class="p">,</span> <span class="mi">224</span><span class="p">))</span>
   <span class="n">img</span> <span class="o">=</span> <span class="n">img</span><span class="p">.</span><span class="nf">astype</span><span class="p">(</span><span class="n">np</span><span class="p">.</span><span class="n">float32</span><span class="p">)</span>
   <span class="n">img</span> <span class="o">=</span> <span class="n">img</span><span class="p">[:,</span> <span class="p">:,</span> <span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">)]</span>
-  <span class="nf">print</span><span class="p">(</span><span class="s">'img:'</span><span class="p">,</span> <span class="n">img</span><span class="p">.</span><span class="n">shape</span><span class="p">)</span>
+  <span class="nf">print</span><span class="p">(</span><span class="sh">'</span><span class="s">img:</span><span class="sh">'</span><span class="p">,</span> <span class="n">img</span><span class="p">.</span><span class="n">shape</span><span class="p">)</span>
 
 
 <span class="k">else</span><span class="p">:</span>
-  <span class="nf">print</span><span class="p">(</span><span class="s">'image not found - set your path to the image'</span><span class="p">)</span>
+  <span class="nf">print</span><span class="p">(</span><span class="sh">'</span><span class="s">image not found - set your path to the image</span><span class="sh">'</span><span class="p">)</span>
 </code></pre></div></div>
 
 <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
-<span class="n">fig</span> <span class="o">=</span> <span class="n">plt</span><span class="p">.</span><span class="nf">figure</span><span class="p">(</span><span class="n">frameon</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">facecolor</span><span class="o">=</span><span class="s">'white'</span><span class="p">)</span>
+<span class="n">fig</span> <span class="o">=</span> <span class="n">plt</span><span class="p">.</span><span class="nf">figure</span><span class="p">(</span><span class="n">frameon</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">facecolor</span><span class="o">=</span><span class="sh">'</span><span class="s">white</span><span class="sh">'</span><span class="p">)</span>
 <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="p">.</span><span class="nc">Axes</span><span class="p">(</span><span class="n">fig</span><span class="p">,</span> <span class="p">[</span><span class="mf">0.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">,</span> <span class="mf">1.</span><span class="p">,</span> <span class="mf">1.</span><span class="p">])</span>
 <span class="n">ax</span><span class="p">.</span><span class="nf">set_axis_off</span><span class="p">()</span>
 <span class="n">fig</span><span class="p">.</span><span class="nf">add_axes</span><span class="p">(</span><span class="n">ax</span><span class="p">)</span>
@@ -373,7 +379,7 @@
 # you can check that the VGG network gives a correct prediction. E.g. 385 and 386 are 'Indian Elephant'and 'African Elephant'
 </span><span class="nb">input</span> <span class="o">=</span> <span class="nf">pre_processing</span><span class="p">(</span><span class="n">img</span><span class="p">,</span> <span class="n">cuda</span><span class="p">)</span>          <span class="c1"># preprocess: image (normalise, transpose, make tensor on cuda, requires_grad=True)
 </span><span class="n">output</span> <span class="o">=</span> <span class="nf">predict</span><span class="p">(</span><span class="nb">input</span><span class="p">,</span> <span class="n">model</span><span class="p">,</span> <span class="bp">None</span><span class="p">,</span> <span class="n">cuda</span><span class="p">)</span>
-<span class="nf">print</span><span class="p">(</span><span class="s">'output:'</span><span class="p">,</span> <span class="n">output</span><span class="p">)</span>
+<span class="nf">print</span><span class="p">(</span><span class="sh">'</span><span class="s">output:</span><span class="sh">'</span><span class="p">,</span> <span class="n">output</span><span class="p">)</span>
 </code></pre></div></div>
 
 <p><strong>TODO 1</strong></p>
@@ -387,10 +393,10 @@
 <p>The following snippets might be useful:</p>
 
 <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="err">!</span><span class="n">wget</span> <span class="n">https</span><span class="p">:</span><span class="o">//</span><span class="n">raw</span><span class="p">.</span><span class="n">githubusercontent</span><span class="p">.</span><span class="n">com</span><span class="o">/</span><span class="n">pytorch</span><span class="o">/</span><span class="n">hub</span><span class="o">/</span><span class="n">master</span><span class="o">/</span><span class="n">imagenet_classes</span><span class="p">.</span><span class="n">txt</span>
-<span class="k">with</span> <span class="nf">open</span><span class="p">(</span><span class="s">"imagenet_classes.txt"</span><span class="p">,</span> <span class="s">"r"</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+<span class="k">with</span> <span class="nf">open</span><span class="p">(</span><span class="sh">"</span><span class="s">imagenet_classes.txt</span><span class="sh">"</span><span class="p">,</span> <span class="sh">"</span><span class="s">r</span><span class="sh">"</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
     <span class="n">categories</span> <span class="o">=</span> <span class="p">[</span><span class="n">s</span><span class="p">.</span><span class="nf">strip</span><span class="p">()</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">f</span><span class="p">.</span><span class="nf">readlines</span><span class="p">()]</span>
 <span class="nf">print</span><span class="p">(</span><span class="n">categories</span><span class="p">[</span><span class="mi">385</span><span class="p">])</span>
-<span class="n">categories</span><span class="p">.</span><span class="nf">index</span><span class="p">(</span><span class="s">'Indian elephant'</span><span class="p">)</span>
+<span class="n">categories</span><span class="p">.</span><span class="nf">index</span><span class="p">(</span><span class="sh">'</span><span class="s">Indian elephant</span><span class="sh">'</span><span class="p">)</span>
 </code></pre></div></div>
 
 <h3 id="compute-the-gradient-with-respect-to-the-input-pixels">Compute the gradient with respect to the input pixels</h3>
@@ -453,7 +459,7 @@
 #            target_label_idx = torch.argmax(output, 1).item()
 </span>
 <span class="c1"># Please note that the dimensions of gradients are same as dimensions of input
-</span><span class="nf">print</span><span class="p">(</span><span class="s">'gradients'</span><span class="p">,</span> <span class="n">gradients</span><span class="p">.</span><span class="n">shape</span><span class="p">)</span> 
+</span><span class="nf">print</span><span class="p">(</span><span class="sh">'</span><span class="s">gradients</span><span class="sh">'</span><span class="p">,</span> <span class="n">gradients</span><span class="p">.</span><span class="n">shape</span><span class="p">)</span> 
 <span class="c1"># Please note that gradients are positive and negative values
 </span><span class="nf">print</span><span class="p">(</span><span class="n">gradients</span><span class="p">[:</span><span class="mi">3</span><span class="p">,</span> <span class="p">:</span><span class="mi">3</span><span class="p">,</span> <span class="mi">0</span><span class="p">])</span>
 </code></pre></div></div>
@@ -487,14 +493,14 @@
 </span>  <span class="c1"># Visualize the image and the saliency map
 </span>  <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="p">.</span><span class="nf">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
   <span class="n">ax</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="nf">imshow</span><span class="p">(</span><span class="n">img</span><span class="o">/</span><span class="mi">255</span><span class="p">)</span>
-  <span class="n">ax</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="nf">axis</span><span class="p">(</span><span class="s">'off'</span><span class="p">)</span>
-  <span class="n">ax</span><span class="p">[</span><span class="mi">1</span><span class="p">].</span><span class="nf">imshow</span><span class="p">(</span><span class="n">saliency</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="s">'hot'</span><span class="p">)</span>
-  <span class="n">ax</span><span class="p">[</span><span class="mi">1</span><span class="p">].</span><span class="nf">axis</span><span class="p">(</span><span class="s">'off'</span><span class="p">)</span>
+  <span class="n">ax</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="nf">axis</span><span class="p">(</span><span class="sh">'</span><span class="s">off</span><span class="sh">'</span><span class="p">)</span>
+  <span class="n">ax</span><span class="p">[</span><span class="mi">1</span><span class="p">].</span><span class="nf">imshow</span><span class="p">(</span><span class="n">saliency</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="sh">'</span><span class="s">hot</span><span class="sh">'</span><span class="p">)</span>
+  <span class="n">ax</span><span class="p">[</span><span class="mi">1</span><span class="p">].</span><span class="nf">axis</span><span class="p">(</span><span class="sh">'</span><span class="s">off</span><span class="sh">'</span><span class="p">)</span>
   <span class="n">plt</span><span class="p">.</span><span class="nf">tight_layout</span><span class="p">()</span>
   <span class="n">fig</span><span class="p">.</span><span class="nf">suptitle</span><span class="p">(</span><span class="n">title</span><span class="p">)</span>
   <span class="n">plt</span><span class="p">.</span><span class="nf">show</span><span class="p">()</span>
 
-<span class="nf">plot_gradients</span><span class="p">(</span><span class="n">img</span><span class="p">,</span> <span class="n">gradients</span><span class="p">,</span> <span class="s">'The Image and Its Saliency Map'</span><span class="p">)</span>
+<span class="nf">plot_gradients</span><span class="p">(</span><span class="n">img</span><span class="p">,</span> <span class="n">gradients</span><span class="p">,</span> <span class="sh">'</span><span class="s">The Image and Its Saliency Map</span><span class="sh">'</span><span class="p">)</span>
 
 </code></pre></div></div>
 
@@ -632,7 +638,7 @@
         <span class="k">return</span> <span class="n">self</span><span class="p">.</span><span class="nf">features_conv</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>    
 
 <span class="n">vgg</span> <span class="o">=</span> <span class="nc">VGG</span><span class="p">(</span><span class="n">model</span><span class="p">)</span>
-<span class="nf">print</span><span class="p">(</span><span class="s">'cuda:'</span><span class="p">,</span> <span class="n">cuda</span><span class="p">,</span> <span class="s">'device:'</span><span class="p">,</span> <span class="n">device</span><span class="p">)</span>
+<span class="nf">print</span><span class="p">(</span><span class="sh">'</span><span class="s">cuda:</span><span class="sh">'</span><span class="p">,</span> <span class="n">cuda</span><span class="p">,</span> <span class="sh">'</span><span class="s">device:</span><span class="sh">'</span><span class="p">,</span> <span class="n">device</span><span class="p">)</span>
 <span class="n">vgg</span> <span class="o">=</span> <span class="n">vgg</span><span class="p">.</span><span class="nf">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
 <span class="n">vgg</span><span class="p">.</span><span class="nf">eval</span><span class="p">()</span>
 </code></pre></div></div>
@@ -658,11 +664,11 @@
 
 <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># pull the gradients out of the model
 </span><span class="n">gradients</span> <span class="o">=</span> <span class="n">vgg</span><span class="p">.</span><span class="nf">get_activations_gradient</span><span class="p">()</span>
-<span class="nf">print</span><span class="p">(</span><span class="s">'gradients:'</span><span class="p">,</span> <span class="n">gradients</span><span class="p">.</span><span class="n">shape</span><span class="p">)</span>
+<span class="nf">print</span><span class="p">(</span><span class="sh">'</span><span class="s">gradients:</span><span class="sh">'</span><span class="p">,</span> <span class="n">gradients</span><span class="p">.</span><span class="n">shape</span><span class="p">)</span>
 
 <span class="c1"># pool the gradients across the channels
 </span><span class="n">pooled_gradients</span> <span class="o">=</span> <span class="n">torch</span><span class="p">.</span><span class="nf">mean</span><span class="p">(</span><span class="n">gradients</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">])</span>
-<span class="nf">print</span><span class="p">(</span><span class="s">'pooled gradients:'</span><span class="p">,</span> <span class="n">pooled_gradients</span><span class="p">.</span><span class="n">shape</span><span class="p">)</span>
+<span class="nf">print</span><span class="p">(</span><span class="sh">'</span><span class="s">pooled gradients:</span><span class="sh">'</span><span class="p">,</span> <span class="n">pooled_gradients</span><span class="p">.</span><span class="n">shape</span><span class="p">)</span>
 
 <span class="c1"># get the activations of the last convolutional layer
 </span><span class="n">activations</span> <span class="o">=</span> <span class="n">vgg</span><span class="p">.</span><span class="nf">get_activations</span><span class="p">(</span><span class="nb">input</span><span class="p">).</span><span class="nf">detach</span><span class="p">()</span>
@@ -683,7 +689,7 @@
 </span><span class="n">heatmap</span> <span class="o">/=</span> <span class="n">torch</span><span class="p">.</span><span class="nf">max</span><span class="p">(</span><span class="n">heatmap</span><span class="p">)</span>
 <span class="c1"># END students TODO
 </span>
-<span class="nf">print</span><span class="p">(</span><span class="s">'heatmap:'</span><span class="p">,</span> <span class="n">heatmap</span><span class="p">.</span><span class="n">shape</span><span class="p">)</span>
+<span class="nf">print</span><span class="p">(</span><span class="sh">'</span><span class="s">heatmap:</span><span class="sh">'</span><span class="p">,</span> <span class="n">heatmap</span><span class="p">.</span><span class="n">shape</span><span class="p">)</span>
 
 <span class="c1"># draw the heatmap
 </span><span class="n">heatmap</span> <span class="o">=</span> <span class="n">heatmap</span><span class="p">.</span><span class="nf">cpu</span><span class="p">().</span><span class="nf">numpy</span><span class="p">().</span><span class="nf">squeeze</span><span class="p">()</span>
@@ -706,7 +712,7 @@ gradients = np.transpose(gradients[0], (1, 2, 0))
 <p>Now we have the heatmap, we can overlay it on the original image.</p>
 
 <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># draw the image
-</span><span class="nf">print</span><span class="p">(</span><span class="s">'img:'</span><span class="p">,</span> <span class="n">img</span><span class="p">.</span><span class="n">shape</span><span class="p">)</span>
+</span><span class="nf">print</span><span class="p">(</span><span class="sh">'</span><span class="s">img:</span><span class="sh">'</span><span class="p">,</span> <span class="n">img</span><span class="p">.</span><span class="n">shape</span><span class="p">)</span>
 <span class="n">plt</span><span class="p">.</span><span class="nf">matshow</span><span class="p">(</span><span class="n">img</span><span class="o">/</span><span class="mi">255</span><span class="p">)</span>
 </code></pre></div></div>
 
@@ -787,7 +793,7 @@ gradients = np.transpose(gradients[0], (1, 2, 0))
     <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nf">range</span><span class="p">(</span><span class="n">num_random_trials</span><span class="p">):</span>
         <span class="n">integrated_grad</span> <span class="o">=</span> <span class="nf">integrated_gradients</span><span class="p">(</span><span class="n">inputs</span><span class="p">,</span> <span class="n">model</span><span class="p">,</span> <span class="n">target_label_idx</span><span class="p">,</span> <span class="n">baseline</span><span class="o">=</span><span class="n">random_baseline</span><span class="p">,</span> <span class="n">steps</span><span class="o">=</span><span class="n">steps</span><span class="p">,</span> <span class="n">cuda</span><span class="o">=</span><span class="n">cuda</span><span class="p">)</span>
         <span class="n">all_intgrads</span><span class="p">.</span><span class="nf">append</span><span class="p">(</span><span class="n">integrated_grad</span><span class="p">)</span>
-        <span class="nf">print</span><span class="p">(</span><span class="s">'the trial number is: {}'</span><span class="p">.</span><span class="nf">format</span><span class="p">(</span><span class="n">i</span><span class="p">))</span>
+        <span class="nf">print</span><span class="p">(</span><span class="sh">'</span><span class="s">the trial number is: {}</span><span class="sh">'</span><span class="p">.</span><span class="nf">format</span><span class="p">(</span><span class="n">i</span><span class="p">))</span>
     <span class="n">avg_intgrads</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="nf">average</span><span class="p">(</span><span class="n">np</span><span class="p">.</span><span class="nf">array</span><span class="p">(</span><span class="n">all_intgrads</span><span class="p">),</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
     <span class="c1"># END students TODO
 </span>    <span class="k">return</span> <span class="n">avg_intgrads</span>

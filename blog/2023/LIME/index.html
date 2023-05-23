@@ -24,7 +24,7 @@
     <!-- Fonts & Icons -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.15.4/css/all.min.css" integrity="sha256-mUZM63G8m73Mcidfrv5E+Y61y7a12O5mW4ezU3bxqW4=" crossorigin="anonymous">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/academicons@1.9.1/css/academicons.min.css" integrity="sha256-i1+4qU2G2860dGGIOJscdC30s9beBXjFfzjWLjBRsBg=" crossorigin="anonymous">
-    <link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700%7CRoboto+Slab:100,300,400,500,700%7CMaterial+Icons">
+    <link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700|Roboto+Slab:100,300,400,500,700|Material+Icons">
 
     <!-- Code Syntax Highlighting -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/jwarby/jekyll-pygments-themes@master/github.css" media="" id="highlight_theme_light">
@@ -135,6 +135,12 @@
               </li>
 
               <!-- Other pages -->
+              <li class="nav-item ">
+                <a class="nav-link" href="/kristosh/publications/">publications</a>
+              </li>
+              <li class="nav-item ">
+                <a class="nav-link" href="/kristosh/cv/">cv</a>
+              </li>
 
               <!-- Toogle theme mode -->
               <li class="toggle-container">
@@ -267,7 +273,7 @@ being explained (in our case a vector with all pixels), and we use $\mathbf{x}^{
 <span class="kn">import</span> <span class="n">numpy</span> <span class="k">as</span> <span class="n">np</span>
 <span class="kn">import</span> <span class="n">os</span><span class="p">,</span> <span class="n">json</span>
 <span class="kn">import</span> <span class="n">cv2</span>
-<span class="n">os</span><span class="p">.</span><span class="n">environ</span><span class="p">[</span><span class="s">'KMP_DUPLICATE_LIB_OK'</span><span class="p">]</span><span class="o">=</span><span class="s">'True'</span>
+<span class="n">os</span><span class="p">.</span><span class="n">environ</span><span class="p">[</span><span class="sh">'</span><span class="s">KMP_DUPLICATE_LIB_OK</span><span class="sh">'</span><span class="p">]</span><span class="o">=</span><span class="sh">'</span><span class="s">True</span><span class="sh">'</span>
 
 <span class="kn">import</span> <span class="n">torch</span>
 <span class="kn">from</span> <span class="n">torchvision</span> <span class="kn">import</span> <span class="n">models</span><span class="p">,</span> <span class="n">transforms</span>
@@ -289,8 +295,8 @@ being explained (in our case a vector with all pixels), and we use $\mathbf{x}^{
 
 <span class="c1"># run it on a GPU if available:
 </span><span class="n">cuda</span> <span class="o">=</span> <span class="n">torch</span><span class="p">.</span><span class="n">cuda</span><span class="p">.</span><span class="nf">is_available</span><span class="p">()</span>
-<span class="n">device</span> <span class="o">=</span> <span class="n">torch</span><span class="p">.</span><span class="nf">device</span><span class="p">(</span><span class="s">"cuda:0"</span> <span class="k">if</span> <span class="n">torch</span><span class="p">.</span><span class="n">cuda</span><span class="p">.</span><span class="nf">is_available</span><span class="p">()</span> <span class="k">else</span> <span class="s">"cpu"</span><span class="p">)</span>
-<span class="nf">print</span><span class="p">(</span><span class="s">'cuda:'</span><span class="p">,</span> <span class="n">cuda</span><span class="p">,</span> <span class="s">'device:'</span><span class="p">,</span> <span class="n">device</span><span class="p">)</span>
+<span class="n">device</span> <span class="o">=</span> <span class="n">torch</span><span class="p">.</span><span class="nf">device</span><span class="p">(</span><span class="sh">"</span><span class="s">cuda:0</span><span class="sh">"</span> <span class="k">if</span> <span class="n">torch</span><span class="p">.</span><span class="n">cuda</span><span class="p">.</span><span class="nf">is_available</span><span class="p">()</span> <span class="k">else</span> <span class="sh">"</span><span class="s">cpu</span><span class="sh">"</span><span class="p">)</span>
+<span class="nf">print</span><span class="p">(</span><span class="sh">'</span><span class="s">cuda:</span><span class="sh">'</span><span class="p">,</span> <span class="n">cuda</span><span class="p">,</span> <span class="sh">'</span><span class="s">device:</span><span class="sh">'</span><span class="p">,</span> <span class="n">device</span><span class="p">)</span>
 <span class="n">model</span> <span class="o">=</span> <span class="n">model</span><span class="p">.</span><span class="nf">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
 <span class="c1"># set model to evaluation
 </span><span class="n">model</span><span class="p">.</span><span class="nf">eval</span><span class="p">()</span>
@@ -301,14 +307,14 @@ Now lets load and process the image (for the VGG19 classifier) that we would lik
 <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">imread_img</span><span class="p">(</span><span class="n">file_name</span><span class="p">):</span>
   
   <span class="c1"># read the image and convert it - Set your pathto the image
-</span>  <span class="n">img</span> <span class="o">=</span> <span class="n">cv2</span><span class="p">.</span><span class="nf">imread</span><span class="p">(</span><span class="s">'caretta.png'</span><span class="p">)</span>
+</span>  <span class="n">img</span> <span class="o">=</span> <span class="n">cv2</span><span class="p">.</span><span class="nf">imread</span><span class="p">(</span><span class="sh">'</span><span class="s">caretta.png</span><span class="sh">'</span><span class="p">)</span>
   <span class="nf">if </span><span class="p">(</span><span class="nf">type</span><span class="p">(</span><span class="n">img</span><span class="p">)</span> <span class="ow">is</span> <span class="n">np</span><span class="p">.</span><span class="n">ndarray</span><span class="p">):</span>
     <span class="n">img</span> <span class="o">=</span> <span class="n">cv2</span><span class="p">.</span><span class="nf">resize</span><span class="p">(</span><span class="n">img</span><span class="p">,</span> <span class="p">(</span><span class="mi">224</span><span class="p">,</span> <span class="mi">224</span><span class="p">))</span>
     <span class="n">img</span> <span class="o">=</span> <span class="n">img</span><span class="p">.</span><span class="nf">astype</span><span class="p">(</span><span class="n">np</span><span class="p">.</span><span class="n">float32</span><span class="p">)</span>
     <span class="n">img</span> <span class="o">=</span> <span class="n">img</span><span class="p">[:,</span> <span class="p">:,</span> <span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">)]</span>
-    <span class="nf">print</span><span class="p">(</span><span class="s">'img:'</span><span class="p">,</span> <span class="n">img</span><span class="p">.</span><span class="n">shape</span><span class="p">)</span>
+    <span class="nf">print</span><span class="p">(</span><span class="sh">'</span><span class="s">img:</span><span class="sh">'</span><span class="p">,</span> <span class="n">img</span><span class="p">.</span><span class="n">shape</span><span class="p">)</span>
   <span class="k">else</span><span class="p">:</span>
-    <span class="nf">print</span><span class="p">(</span><span class="s">'image not found - set your path to the image'</span><span class="p">)</span>
+    <span class="nf">print</span><span class="p">(</span><span class="sh">'</span><span class="s">image not found - set your path to the image</span><span class="sh">'</span><span class="p">)</span>
   
   <span class="k">return</span> <span class="n">img</span>
 </code></pre></div></div>
@@ -322,9 +328,9 @@ Now lets load and process the image (for the VGG19 classifier) that we would lik
 </span>    <span class="c1"># Students should ensure that gradient for input is calculated       
 </span>    <span class="c1"># set the GPU device
 </span>    <span class="k">if</span> <span class="n">cuda</span><span class="p">:</span>
-        <span class="n">torch_device</span> <span class="o">=</span> <span class="n">torch</span><span class="p">.</span><span class="nf">device</span><span class="p">(</span><span class="s">'cuda:0'</span><span class="p">)</span>
+        <span class="n">torch_device</span> <span class="o">=</span> <span class="n">torch</span><span class="p">.</span><span class="nf">device</span><span class="p">(</span><span class="sh">'</span><span class="s">cuda:0</span><span class="sh">'</span><span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
-        <span class="n">torch_device</span> <span class="o">=</span> <span class="n">torch</span><span class="p">.</span><span class="nf">device</span><span class="p">(</span><span class="s">'cpu'</span><span class="p">)</span>
+        <span class="n">torch_device</span> <span class="o">=</span> <span class="n">torch</span><span class="p">.</span><span class="nf">device</span><span class="p">(</span><span class="sh">'</span><span class="s">cpu</span><span class="sh">'</span><span class="p">)</span>
 
     <span class="c1"># normalise for ImageNet
 </span>    <span class="n">mean</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="nf">array</span><span class="p">([</span><span class="mf">0.485</span><span class="p">,</span> <span class="mf">0.456</span><span class="p">,</span> <span class="mf">0.406</span><span class="p">]).</span><span class="nf">reshape</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">])</span>
@@ -361,8 +367,8 @@ Now lets load and process the image (for the VGG19 classifier) that we would lik
 <span class="nb">input</span> <span class="o">=</span> <span class="nf">pre_processing</span><span class="p">(</span><span class="n">img</span><span class="p">,</span> <span class="n">cuda</span><span class="p">)</span>          <span class="c1"># preprocess: image (normalise, transpose, make tensor on cuda, requires_grad=True)
 </span><span class="nf">print </span><span class="p">(</span><span class="nb">input</span><span class="p">.</span><span class="n">shape</span><span class="p">)</span>
 <span class="n">label</span><span class="p">,</span> <span class="n">output</span> <span class="o">=</span> <span class="nf">predict</span><span class="p">(</span><span class="nb">input</span><span class="p">,</span> <span class="n">model</span><span class="p">,</span> <span class="bp">None</span><span class="p">,</span> <span class="n">cuda</span><span class="p">)</span>
-<span class="nf">print</span><span class="p">(</span><span class="s">'output:'</span><span class="p">,</span> <span class="n">output</span><span class="p">)</span>
-<span class="nf">print</span><span class="p">(</span><span class="s">'output label:'</span><span class="p">,</span> <span class="n">label</span><span class="p">)</span>
+<span class="nf">print</span><span class="p">(</span><span class="sh">'</span><span class="s">output:</span><span class="sh">'</span><span class="p">,</span> <span class="n">output</span><span class="p">)</span>
+<span class="nf">print</span><span class="p">(</span><span class="sh">'</span><span class="s">output label:</span><span class="sh">'</span><span class="p">,</span> <span class="n">label</span><span class="p">)</span>
 </code></pre></div></div>
 
 <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># resize and take the center part of image to what our model expects
@@ -387,7 +393,7 @@ Now lets load and process the image (for the VGG19 classifier) that we would lik
 <p>The following code helps you to get the label of the prediction. The label is the index of the class in the ImageNet dataset. The index is used to get the class name from the json file. The json file is available in the repository.</p>
 
 <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">idx2label</span><span class="p">,</span> <span class="n">cls2label</span><span class="p">,</span> <span class="n">cls2idx</span> <span class="o">=</span> <span class="p">[],</span> <span class="p">{},</span> <span class="p">{}</span>
-<span class="k">with</span> <span class="nf">open</span><span class="p">(</span><span class="n">os</span><span class="p">.</span><span class="n">path</span><span class="p">.</span><span class="nf">abspath</span><span class="p">(</span><span class="s">'imagenet_class_index.json'</span><span class="p">),</span> <span class="s">'r'</span><span class="p">)</span> <span class="k">as</span> <span class="n">read_file</span><span class="p">:</span>
+<span class="k">with</span> <span class="nf">open</span><span class="p">(</span><span class="n">os</span><span class="p">.</span><span class="n">path</span><span class="p">.</span><span class="nf">abspath</span><span class="p">(</span><span class="sh">'</span><span class="s">imagenet_class_index.json</span><span class="sh">'</span><span class="p">),</span> <span class="sh">'</span><span class="s">r</span><span class="sh">'</span><span class="p">)</span> <span class="k">as</span> <span class="n">read_file</span><span class="p">:</span>
     <span class="n">class_idx</span> <span class="o">=</span> <span class="n">json</span><span class="p">.</span><span class="nf">load</span><span class="p">(</span><span class="n">read_file</span><span class="p">)</span>
     <span class="n">idx2label</span> <span class="o">=</span> <span class="p">[</span><span class="n">class_idx</span><span class="p">[</span><span class="nf">str</span><span class="p">(</span><span class="n">k</span><span class="p">)][</span><span class="mi">1</span><span class="p">]</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nf">range</span><span class="p">(</span><span class="nf">len</span><span class="p">(</span><span class="n">class_idx</span><span class="p">))]</span>
     <span class="n">cls2label</span> <span class="o">=</span> <span class="p">{</span><span class="n">class_idx</span><span class="p">[</span><span class="nf">str</span><span class="p">(</span><span class="n">k</span><span class="p">)][</span><span class="mi">0</span><span class="p">]:</span> <span class="n">class_idx</span><span class="p">[</span><span class="nf">str</span><span class="p">(</span><span class="n">k</span><span class="p">)][</span><span class="mi">1</span><span class="p">]</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nf">range</span><span class="p">(</span><span class="nf">len</span><span class="p">(</span><span class="n">class_idx</span><span class="p">))}</span>
@@ -426,7 +432,7 @@ Now lets load and process the image (for the VGG19 classifier) that we would lik
 <span class="n">num_superpixels</span>
 
 <span class="n">imgplot</span> <span class="o">=</span> <span class="n">plt</span><span class="p">.</span><span class="nf">imshow</span><span class="p">(</span><span class="n">skimage</span><span class="p">.</span><span class="n">segmentation</span><span class="p">.</span><span class="nf">mark_boundaries</span><span class="p">(</span><span class="n">img</span><span class="o">/</span><span class="mi">255</span><span class="p">,</span> <span class="n">superpixels</span><span class="p">))</span>
-<span class="n">plt</span><span class="p">.</span><span class="nf">axis</span><span class="p">(</span><span class="s">'off'</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="nf">axis</span><span class="p">(</span><span class="sh">'</span><span class="s">off</span><span class="sh">'</span><span class="p">)</span>
 <span class="n">plt</span><span class="p">.</span><span class="nf">show</span><span class="p">()</span>
 
 </code></pre></div></div>
@@ -481,7 +487,7 @@ Now lets load and process the image (for the VGG19 classifier) that we would lik
 </code></pre></div></div>
 
 <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">original_image</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="nf">ones</span><span class="p">(</span><span class="n">num_superpixels</span><span class="p">)[</span><span class="n">np</span><span class="p">.</span><span class="n">newaxis</span><span class="p">,:]</span> <span class="c1">#Perturbation with all superpixels enabled 
-</span><span class="n">distances</span> <span class="o">=</span> <span class="n">sklearn</span><span class="p">.</span><span class="n">metrics</span><span class="p">.</span><span class="nf">pairwise_distances</span><span class="p">(</span><span class="n">perturbations</span><span class="p">,</span><span class="n">original_image</span><span class="p">,</span> <span class="n">metric</span><span class="o">=</span><span class="s">'cosine'</span><span class="p">).</span><span class="nf">ravel</span><span class="p">()</span>
+</span><span class="n">distances</span> <span class="o">=</span> <span class="n">sklearn</span><span class="p">.</span><span class="n">metrics</span><span class="p">.</span><span class="nf">pairwise_distances</span><span class="p">(</span><span class="n">perturbations</span><span class="p">,</span><span class="n">original_image</span><span class="p">,</span> <span class="n">metric</span><span class="o">=</span><span class="sh">'</span><span class="s">cosine</span><span class="sh">'</span><span class="p">).</span><span class="nf">ravel</span><span class="p">()</span>
 <span class="n">distances</span><span class="p">.</span><span class="n">shape</span>
 </code></pre></div></div>
 
@@ -490,7 +496,7 @@ Now lets load and process the image (for the VGG19 classifier) that we would lik
 </span><span class="n">weights</span><span class="p">.</span><span class="n">shape</span>
 </code></pre></div></div>
 
-<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">img</span> <span class="o">=</span> <span class="nf">imread_img</span><span class="p">(</span><span class="s">'caretta.jpg'</span><span class="p">)</span>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">img</span> <span class="o">=</span> <span class="nf">imread_img</span><span class="p">(</span><span class="sh">'</span><span class="s">caretta.jpg</span><span class="sh">'</span><span class="p">)</span>
 
 <span class="nb">input</span> <span class="o">=</span> <span class="nf">pre_processing</span><span class="p">(</span><span class="n">img</span><span class="p">,</span> <span class="n">cuda</span><span class="p">)</span>          <span class="c1"># preprocess: image (normalise, transpose, make tensor on cuda, requires_grad=True)
 </span>
@@ -529,7 +535,7 @@ Now lets load and process the image (for the VGG19 classifier) that we would lik
 <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">mask</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="nf">zeros</span><span class="p">(</span><span class="n">num_superpixels</span><span class="p">)</span> 
 <span class="n">mask</span><span class="p">[</span><span class="n">top_features</span><span class="p">]</span><span class="o">=</span> <span class="bp">True</span> <span class="c1">#Activate top superpixels
 </span>
-<span class="n">img</span> <span class="o">=</span> <span class="nf">imread_img</span><span class="p">(</span><span class="s">'caretta.jpg'</span><span class="p">)</span>
+<span class="n">img</span> <span class="o">=</span> <span class="nf">imread_img</span><span class="p">(</span><span class="sh">'</span><span class="s">caretta.jpg</span><span class="sh">'</span><span class="p">)</span>
 
 <span class="n">img</span> <span class="o">=</span> <span class="n">img</span><span class="o">/</span><span class="mi">255</span>
 <span class="n">skimage</span><span class="p">.</span><span class="n">io</span><span class="p">.</span><span class="nf">imshow</span><span class="p">(</span><span class="nf">perturb_image</span><span class="p">(</span><span class="n">img</span> <span class="p">,</span><span class="n">mask</span><span class="p">,</span><span class="n">superpixels</span><span class="p">)</span> <span class="p">)</span>
@@ -537,7 +543,13 @@ Now lets load and process the image (for the VGG19 classifier) that we would lik
 
 <p><img src="../../../../assets/img/2023-05-13-LIME/caretta_4.jpg" style="width:400px;height:400px;" class="center"></p>
 
-<h1 id="results">Results</h1>
+<h1 id="working-with-an-example-from-the-paper">Working with an example from the paper</h1>
+<p>In this part of the tutorial we will make use of a classifier that is trained to classify images of wolves and huskeys. The classifier is a black-box so we do not have access to it. We have zero knolwedge of the training dataset but also of the classifier’s architecture. We will use LIME to explain the classifier’s predictions and try to understand what the classifier has learned. 
+We will need to explain the behaviour of the classifier using images from huskeys of wolves. You can download images online and use them for this tutorial.</p>
+
+<p>Firstly, we will load the classifier and the images we want to explain.</p>
+
+<p>```python</p>
 
 <h1 id="you-should-not-trust-me">You should not trust me</h1>
 
