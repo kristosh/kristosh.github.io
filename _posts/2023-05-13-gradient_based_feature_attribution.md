@@ -11,11 +11,15 @@ authors:
   - name: Christos Athanasiadis
     url: "https://www.linkedin.com/in/christos-athanasiadis-a3b51035/"
     affiliations:
-      name: UvA, Interpretability and Explainability in AI
+      name: UvA, XAI course
   - name: Peter Heemskerk 
     url: ""
     affiliations:
-      name: UvA, Interpretability and Explainability in AI
+      name: UvA, XAI course
+  - name: Jelle Zuidema 
+    url: ""
+    affiliations:
+      name: UvA, XAI course
 
 
 # must be the exact same name as your blogpost
@@ -666,15 +670,10 @@ plot_gradients(img, int_gradients_randombl, 'Image and Integrated Gradients with
 Include in your  Workshop-0 report two images  with results applying  integrated gradients illustrating the strongest differences you have found (i.e., manipulating target categories, baselines, number of samples, or number of steps along the integration path). Include a brief caption that describes the experiment and your interpretation.
 
 
-## LIME
+<!-- ## LIME
 
-[LIME tutorial](../../2022/LIME/)
+[LIME tutorial](../../2022/LIME/) -->
 
 ## Conclusion
 
-In this post, we have seen two ways of using language for RL. There have been a lot of other ways recently in this direction. Some examples of these are
-
-- <d-cite key="lampinen-icml22a"></d-cite> augment policy networks with the auxiliary target of generating explanations and use this to learn the relational and causal structure of the world
-- <d-cite key="kumar-neurips22a"></d-cite> use language to model compositional task distributions and induce human-centric priors into RL agents.
-
-Given the growth of pre-trained language models, it is only a matter of time before we see many more innovative ideas come around in this field. Language, after all, is a powerful tool to incorporate structural biases into RL pipelines. Additionally, language opens up the possibility of easier interfaces between humans and RL agents, thus, allowing more human-in-the-loop methods to be applied to RL. Finally, the symbolic nature of natural language allows better interpretability in the learned policies, while potentially making them more explainable. Thus, I see this as a very promising direction of future research
+In this post, ...
