@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" xml:lang="en"><generator uri="https://jekyllrb.com/" version="4.3.2">Jekyll</generator><link href="https://kristosh.github.io/kristosh/feed.xml" rel="self" type="application/atom+xml" /><link href="https://kristosh.github.io/kristosh/" rel="alternate" type="text/html" hreflang="en" /><updated>2023-05-31T14:36:50+00:00</updated><id>https://kristosh.github.io/kristosh/feed.xml</id><title type="html">blank</title><subtitle>A simple, whitespace theme for academics.
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" xml:lang="en"><generator uri="https://jekyllrb.com/" version="4.3.2">Jekyll</generator><link href="https://kristosh.github.io/kristosh/feed.xml" rel="self" type="application/atom+xml" /><link href="https://kristosh.github.io/kristosh/" rel="alternate" type="text/html" hreflang="en" /><updated>2023-06-01T10:17:20+00:00</updated><id>https://kristosh.github.io/kristosh/feed.xml</id><title type="html">blank</title><subtitle>A simple, whitespace theme for academics.
 </subtitle><entry><title type="html">Why should I trust you? LIME for image classification</title><link href="https://kristosh.github.io/kristosh/blog/2023/LIME/" rel="alternate" type="text/html" title="Why should I trust you? LIME for image classification" /><published>2023-05-13T00:00:00+00:00</published><updated>2023-05-13T00:00:00+00:00</updated><id>https://kristosh.github.io/kristosh/blog/2023/LIME</id><content type="html" xml:base="https://kristosh.github.io/kristosh/blog/2023/LIME/"><![CDATA[<h1 id="local-interpretable-model-agnostic-explanations">Local Interpretable Model-agnostic Explanations</h1>
 
 <center>
@@ -422,15 +422,32 @@ Now let’s load and process the image (for the VGG19 classifier) that we would 
 
 <h1 id="you-should-not-trust-me-tosubmit">You should not trust me! TOSUBMIT</h1>
 
-<p>This part of the tutorial is about the assignment that you will need to submit. The goal is to understand the limitations of LIME and how we can take advantage of them to perform adversarial attacks.</p>
-
-<p>The main focus is to understand the way that LIME generates samples (the perturbations and the distribution of the perturbations in comparison with the real data).</p>
-
-<p>The whole process is described in the following paper [4]. You can find a detailed also explanation in the following video:</p>
+<p>Now you feel like a <em>hacker</em> and you would like to fool LIME explanations by constructing adversarial classifiers. To do that we will follow the process that is described in the following paper [4]. You can find a detailed also explanation in the following video:</p>
 
 <p><a href="https://www.youtube.com/watch?v=qCYAKmFFpbs&amp;ab_channel=MLExplained-AggregateIntellect-AI.SCIENCE" title="You should not trust me!"><img src="../../../assets/img/2023-05-13-LIME/fooling_LIME.PNG" alt="You should not trust me!" /></a></p>
 
+<p>This part of the tutorial is the home assignment you need to <mark>TOSUBMIT</mark>. The goal is to understand the limitations of LIME and how we can take advantage of them to perform adversarial attacks. The main focus is to understand the way that LIME generates samples (the perturbations and the distribution of the perturbations in comparison with the real data).</p>
+
+<p>The setup is the following:</p>
+
+<p>As an adversary hacker, you are intending to
+deploy the biased classifier $f$ for making a <em>critical decision</em> (e.g., confusing huskies with wolves 😱) in the real world. The adversary must provide black
+box access to customers and examiners, who may use post hoc
+explanation techniques to better understand $f$ and determine if $f$ is
+ready to be used in the real world. If customers and regulators detect
+that $f$ is biased, they are not likely to approve it for deployment.
+The goal of the adversary is to fool post hoc explanation techniques
+and hide the underlying biases of $f$.</p>
+
+<p>In this assignment, you should create a scaffolded classifier $e$ that behaves exactly like $f$ when making predictions on instances sampled from $X_{dist}$, but will not reveal the underlying biases of $f$ when probed with leading post hoc explanation techniques such as LIME.</p>
+
+<p>To do that you will need to follow the steps of the suggested paper. You need to find ways to differentiate the real data from the generated data and based on that create the scaffolded classifier $e$ that will fool LIME.</p>
+
+<p>For this assignment, you will need to submit your code and a report of 2 pages where you analyze your findings!</p>
+
 <h1 id="conclusions">Conclusions</h1>
+
+<p>In this tutorial, we have analyzed LIME a posthoc XAI technique. An explanation of how this technique works but also step-by-step the code to implement it. We have also seen how we can use LIME to explain image-classifiers but also how to identify the bias in a classifier.</p>
 
 <h1 id="references">References</h1>
 <p style="font-size: smaller"><a href="https://arxiv.org/pdf/1602.04938.pdf">[1] Ribeuro, M.T. et al. Why Should I Trust You? Explaining the Predictions of Any Classifier, 2016. SIGKDD.</a></p>
