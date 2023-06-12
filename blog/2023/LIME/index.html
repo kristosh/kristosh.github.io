@@ -135,12 +135,6 @@
               </li>
 
               <!-- Other pages -->
-              <li class="nav-item ">
-                <a class="nav-link" href="/kristosh/publications/">publications</a>
-              </li>
-              <li class="nav-item ">
-                <a class="nav-link" href="/kristosh/cv/">cv</a>
-              </li>
 
               <!-- Toogle theme mode -->
               <li class="toggle-container">
@@ -198,51 +192,146 @@
         <h1 id="local-interpretable-model-agnostic-explanations">Local Interpretable Model-agnostic Explanations</h1>
 
 <center>
-<video autoplay="" muted="" loop="" controls="" src="https://kristosh.github.io/kristosh//assets/video/2023-05-13-LIME/labradors.mp4" style="width:600px" type="video/mp4">
+<video autoplay="" muted="" loop="" controls="" src="https://kristosh.github.io/kristosh//assets/video/2023-05-13-LIME/caretta.mp4" style="width:600px" type="video/mp4">
 </video>
 <figcaption>A demonstration of the whole LIME algorithm.</figcaption>
 </center>
 
-<p>In this post, we will study how <mark style="background-color:LavenderBlush;">LIME</mark> (Local Interpretable Model-agnostic Explanations) ([1]) generates explanations for image classification tasks. The basic idea is to understand why a machine learning model predicts that a specific image belongs to a certain class (<em>labrador</em> our visual example). Briefly, this technique constructs a <em>new</em> simple model (for instance a <mark style="background-color:LavenderBlush;"><em>linear classifier</em></mark>) that is interpretable by humans and approximates the predictions of the <em>black-box</em> model in the neighborhood around the instance that needs to be explained (<em>local faithfulness </em>).</p>
+<p>In this post, we will study how
+<mark style="background-color:LavenderBlush;">LIME</mark> (Local
+Interpretable Model-agnostic Explanations) ([1]) generates
+explanations for image classification tasks. The basic idea is to
+understand why a machine learning model predicts that a specific image
+belongs to a certain class (<em>caretta</em> our visual example).
+Briefly, this technique constructs a <em>new</em> simple model (for
+example a <mark style="background-color:LavenderBlush;"><em>linear
+classifier</em></mark>) which is easy to be interpreted by humans and at the same time approximates
+the predictions of the <em>black-box</em> model in the neighborhood
+around the instance that needs to be explained (<em>local faithfulness
+</em>).</p>
 
-<p>The LIME explainer is <em>model-agnostic</em> which means is not restricted to a specific model and can be used to explain any <mark>black-box</mark> classifier. So we don’t need to have access to the details of our model (input, intermediate layers etc) to generate explanations. Moreover, the explainer is <em>local</em> meaning that it explains the prediction of the model in the neighborhood of the instance being explained. This technique lies in the PostHoc category of XAI methods, meaning that it explains the model after it has been trained.</p>
+<p>The <mark style="background-color:LavenderBlush;">LIME</mark> explainer is <em>model-agnostic</em> which means is not
+restricted to a specific model and can be used to explain any
+<mark>black-box</mark> classifier. So we don’t need to have access to
+the details of our model (input, intermediate layers etc) to generate
+explanations. Moreover, the explainer is <em>local</em> meaning that it
+explains the prediction of the model in the neighborhood of the instance
+being explained. This technique lies in the PostHoc category of XAI
+methods, meaning that it explains the model after it has been trained.</p>
 
 <h2 id="interpretable-representations">Interpretable Representations</h2>
 
-<p>An interpretable explanation in an image classifier explainer should use a representation that is understandable to humans, by explaining which parts of the input image influence the model decision. For instance, the pixel-based representations are not very informative especially when we deal with huge images and therefore a better way to explain the model decision is to use <a href="https://infoscience.epfl.ch/record/149300" rel="external nofollow noopener" target="_blank">super-pixels</a>. Super-pixels are groups of pixels that share similar characteristics such as color and texture. Hence, a possible interpretable representation for image classification may be a binary vector indicating the <em>presence</em> or <em>absence</em> of a super-pixel.</p>
+<p>An interpretable explanation in an image classifier explainer should use
+a representation that is understandable to humans, by explaining which
+parts of the input image influence the model decision. For instance, the
+pixel-based representations are not very informative especially when we
+deal with huge images and therefore a better way to explain the model
+decision is to use
+<a href="https://infoscience.epfl.ch/record/149300" rel="external nofollow noopener" target="_blank">super-pixels</a> ([3]). Super-pixels
+are groups of pixels that share similar characteristics such as color
+and texture. Hence, a possible interpretable representation for image
+classification may be a binary vector indicating the <em>presence</em>
+or <em>absence</em> of a super-pixel.</p>
 
-<p>Thus, our explainer needs to find a way to attribute importance to each super-pixel in the initial input image. It’s important to note here, that the interpretable representations are meant to be just for the explainer while the <em>black-box</em> can still be trained using the original pixel-based representations.</p>
+<p>Thus, our explainer needs to find a way to attribute importance to each
+super-pixel in the initial input image. It’s important to note here,
+that the interpretable representations are meant to be just for the
+<mark style="background-color:LightCyan;">LIME</mark> explainer while the <em>black-box</em> can still be trained using the
+original pixel-based representations.</p>
 
-<p><mark style="background-color:LightCyan;">LIME</mark> approach aims to just explain why the classifier took a specific decision upon a specific input image. It does not aim to explain the whole model. Authors, in the paper, proposed a mechanism called <mark style="background-color:LightCyan;">SP-LIME</mark> that aims to explain the whole model. While we will not touch this method in this tutorial we encourage you to have a look at it in the original paper.</p>
+<p><mark style="background-color:LightCyan;">LIME</mark> approach aims to
+just explain why the classifier took a specific decision upon a specific
+input image. It does not aim to explain the whole model. Authors, in the
+paper, proposed a mechanism called
+<mark style="background-color:LightCyan;">SP-LIME</mark> that aims to
+explain the whole model. While we will not touch this method in this
+tutorial we encourage you to have a look at it in the original paper.An interpretable explanation in an image classifier explainer should use
+a representation that is understandable to humans, by explaining which
+parts of the input image influence the model decision. For instance, the
+pixel-based representations are not very informative especially when we
+deal with huge images and therefore a better way to explain the model
+decision is to use
+<a href="https://infoscience.epfl.ch/record/149300" rel="external nofollow noopener" target="_blank">super-pixels</a> ([3]). Super-pixels
+are groups of pixels that share similar characteristics such as color
+and texture. Hence, a possible interpretable representation for image
+classification may be a binary vector indicating the <em>presence</em>
+or <em>absence</em> of a super-pixel.</p>
+
+<p>Thus, our explainer needs to find a way to attribute importance to each
+super-pixel in the initial input image. It’s important to note here,
+that the interpretable representations are meant to be just for the
+<mark style="background-color:LightCyan;">LIME</mark> explainer while the <em>black-box</em> can still be trained using the
+original pixel-based representations.</p>
+
+<p><mark style="background-color:LightCyan;">LIME</mark> approach aims to
+just explain why the classifier took a specific decision upon a specific
+input image. It does not aim to explain the whole model. Authors, in the
+paper, proposed a mechanism called
+<mark style="background-color:LightCyan;">SP-LIME</mark> that aims to
+explain the whole model. While we will not touch this method in this
+tutorial we encourage you to have a look at it in the original paper.</p>
 
 <h2 id="lime-approach-details">LIME approach details</h2>
 
-<p>To explain how LIME works in detail we should introduce some terminology 😎. Hence, let $\mathbf{x} \in R^{d}$ denote the original vector representation of an instance
-being explained (in our case a vector with all pixels), and we use $\mathbf{x}^{\prime} \in (0, 1)^d$ to denote a binary vector for its interpretable representation (super-pixels).</p>
+<p>To explain how <mark style="background-color:LavenderBlush;">LIME</mark> works in detail we should introduce some definitions and maths
+😎.</p>
 
-<p>The explainer is defined as (or explanation model) $g \in G$, where $G$ is a class of potentially interpretable models, such as <em>linear models</em>, <em>decision trees</em> etc. To keep things simple, in this tutorial, we will consider just <em>linear classifiers</em>. As not every $g \in G$ may be simple enough to be interpretable $\Omega(g)$ is defined as a measure of complexity (in juxtaposition with the interpretability) of the explanation $g \in G$. For example, for decision trees $\Omega(g)$ may be the depth of the tree, while for linear models, $\Omega(g)$ may be the number of non-zero weights. We define as $f: R^{d} \to R$ the <em>black-box</em> model that we would like to explain. In classification, $f(\mathbf{x})$ is the probability (or a binary indicator) that $\mathbf{x}$ belongs to a certain class.</p>
+<p>Hence, let $\mathbf{x} \in R^{d}$ denote the original vector
+representation of an instance being explained (in our case a vector with
+all pixels in the image), and we use $\mathbf{x}^{\prime} \in {0, 1}^d$ to denote a
+binary vector for its interpretable representation (super-pixels).</p>
 
-<p>We further use $\pi_{\mathbf{x}}(\mathbf{z})$ as a proximity measure between an instance $\mathbf{z}$ to $\mathbf{x}$, so as to define locality around $\mathbf{x}$. Finally, let $\mathcal{L}(f, g, \pi_{\mathbf{x}})$ be a measure of how unfaithful $g$ is in approximating $f$ in the locality defined by $\pi_{\mathbf{x}}$. To ensure both <em>interpretability</em> and <em>local fidelity</em>, they must minimize $L(f, g, \pi_{x})$ while having $\Omega(g)$ be as low as possible. This will keep the complexity of the explanation low while maintaining the fidelity of the explanation high.</p>
+<p>The <mark style="background-color:LavenderBlush;">LIME</mark> explainer is defined as (or explanation model) $g \in G$, where $G$
+is a class of potentially interpretable models, such as <em>linear
+models</em>, <em>decision trees</em> etc. To keep things simple, in this
+tutorial, we will consider just <em>linear classifiers</em>. As not
+every $g \in G$ may be simple enough to be interpretable $\Omega(g)$ is
+defined as a measure of complexity (in juxtaposition with the
+interpretability) of the explanation $g \in G$. For example, for
+decision trees $\Omega(g)$ may be the depth of the tree, while for
+linear models, $\Omega(g)$ may be the number of non-zero weights. We
+define as $f: R^{d} \to R$ the <em>black-box</em> model that we would
+like to explain. In classification, $f(\mathbf{x})$ is the probability
+(or a binary indicator) that $\mathbf{x}$ belongs to a certain class.</p>
 
-<p>The explanation produced by LIME is obtained by the following equation:</p>
+<p>We further use $\pi_{\mathbf{x}}(\mathbf{z})$ as a proximity measure
+between an instance $\mathbf{z}$ to $\mathbf{x}$, so as to define
+locality around $\mathbf{x}$. Finally, let
+$\mathcal{L}(f, g, \pi_{\mathbf{x}})$ be a measure of how unfaithful $g$
+is in approximating $f$ in the locality defined by $\pi_{\mathbf{x}}$.
+To ensure both <em>interpretability</em> and <em>local fidelity</em>,
+they must minimize $L(f, g, \pi_{x})$ while having $\Omega(g)$ be as low
+as possible. This will keep the complexity of the explanation low while
+maintaining the fidelity of the explanation high.</p>
+
+<p>Hence, the loss function for the <mark style="background-color:LavenderBlush;">LIME</mark> explainer is the following equation:</p>
 
 \[\xi(\mathbf{x}) = \mathcal{L}(f, g, \pi_{\mathbf{x}}) + \Omega(g)\]
 
-<p>The above equation contains the tradeoff between <em>local fidelity</em> which is expressed by $L$ and <em>complexity</em> that it is expressed by $\Omega$.</p>
+<p>The above equation contains the tradeoff between <em>local fidelity</em>
+which is expressed by $L$ and the <em>complexity</em> of the explainer that it is expressed
+by $\Omega$.</p>
 
-<p>The first term <mark style="background-color:LightCyan;">$\mathcal{L}(f, g, \pi_{\mathbf{x}})$</mark> in the equation is represented by the weighted square loss:</p>
+<p>The first term $\mathcal{L}(f, g, \pi_{\mathbf{x}})$ in the equation is represented by the weighted square loss:</p>
 
 \[\mathcal{L}(f, g, \pi_{\mathbf{x}}) = \sum_{\mathbf{z}, \mathbf{z}^{'}}\pi_{\mathbf{x}}(\mathbf{z})(f(\mathbf{z})- g(\mathbf{z}^{'}))^{2}\]
 
-<p>with <mark style="background-color:LightCyan;">$\pi_{\mathbf{x}}$</mark> to be a kernel function that measures the proximity of $z$ to $x$:</p>
+<p>with $\pi_{\mathbf{x}}$ to be a kernel function that measures the proximity of $z$ to $x$:</p>
 
 \[\pi_{\mathbf{x}} =  \exp(-D(\mathbf{x},\mathbf{z})^{2}/\sigma*{2})\]
 
-<p>The idea is that by tuning the weights $\mathbf{w}$ we can use them directly as a feature attribution to each super-pixel. The higher the weight that corresponds to a specific super-pixel the more important this super-pixel is for the prediction of the <em>black-box</em> model and vice-versa.</p>
+<p>The idea is that by tuning the weights $\mathbf{w}$ we can use them
+directly as a feature attribution to each super-pixel. The higher the
+weight that corresponds to a specific super-pixel the more important
+this super-pixel is for the prediction of the <em>black-box</em> model
+and vice-versa.</p>
 
-<p>Another noteworthy definition is about the terms <em>faithfulness</em> and <em>local fidelity</em> and they are about how well our explainer $g$ can approximate the decision of the <em>black-box</em> model $f$ in the locality defined by $\pi_{\mathbf{x}}$.</p>
+<p>It’s important to remind you here of the terms <em>faithfulness</em>
+and <em>local fidelity</em> which are about how well our explainer
+$g$ can approximate the decision of the <em>black-box</em> model $f$ in
+the locality defined by $\pi_{\mathbf{x}}$.</p>
 
-<p>The whole LIME algorithm can be summarized as follows:</p>
+<p>The whole <mark style="background-color:LavenderBlush;">LIME</mark> algorithm can be summarized as follows:</p>
 
 <figure>
 
@@ -256,7 +345,19 @@ being explained (in our case a vector with all pixels), and we use $\mathbf{x}^{
 
 </figure>
 
-<p>The kernel is the distance between the instance being explained and the instance in the neighborhood. The neighborhood is generated by <mark style="background-color:LightCyan;">sampling</mark> instances around the instance being explained. The sampling is done by perturbing the instance being explained. For example, in the case of images, we can perturb the image by zeroing out some super-pixels. The perturbed instances are then fed to the <em>black-box</em> model and the output is used to train the explainer. The weights of the interpretable model are then used to explain the prediction of the <em>black-box</em> model. Finally, in the algorithm, <mark style="background-color:Lavender;">K-lasso</mark> refers to the regulizarion that is introduced in a previous equation and relates with the term $\Omega(g)$.</p>
+<p>The <mark style="background-color:LavenderBlush;">kernel</mark> shows the proximity between the instance that we desire to explain and the
+generated samples in the neighborhood. The neighborhood is created by
+<mark style="background-color:LightCyan;">sampling</mark> instances
+around the initial image. The sampling is done by perturbing
+the instance being explained. For example, in the case of images, we can
+perturb the image by zeroing out some super-pixels. The perturbed
+instances are then fed to the <em>black-box</em> model and the output is
+used to train the explainer. The weights of the interpretable model are
+then used to explain the prediction of the <em>black-box</em> model.
+Finally, in the algorithm,
+<mark style="background-color:Lavender;">K-lasso</mark> refers to the
+regularization that is introduced in a previous equation and relates to
+the term $\Omega(g)$.</p>
 
 <center>
 <video autoplay="" muted="" loop="" controls="" src="https://kristosh.github.io/kristosh//assets/video/2023-05-13-LIME/LIME3.mp4" style="width:600px" type="video/mp4">
@@ -264,11 +365,28 @@ being explained (in our case a vector with all pixels), and we use $\mathbf{x}^{
 <figcaption>A demonstration of the whole LIME algorithm.</figcaption>
 </center>
 
-<p>The above video explains the whole LIME process. The initial surface represents the <mark style="background-color:Lavender;">black-box</mark> classifier and the regions for the class of interest (e.g. Caretta-caretta with the light-pink color). The dark red-colored dot denotes the sample that we would like to explain and it is an image with the label <em> Caretta-caretta</em>. The first step is to sample the neighborhood of the point $\mathbf{x}$ that we would like to explain. Several points are generated. The size of each generated sample and the transparency relates to the distance from the initial point $\mathbf{x}$ which is calculated based using $\pi_{\mathbf{x}}(\mathbf{z})$. The next step is to apply the <mark style="background-color:Lavender;">black-box</mark> classifier $f()$ to find the label for each generated point. Samples with red represent class caretta-caretta while samples with purple represent class is not Caretta-caretta. The next step is to train the interpretable model $g()$ using the generated samples. The weights of the interpretable model are used to explain the prediction of the <mark style="background-color:Lavender;">black-box</mark> classifier. The explanation is a linear classifier that separates the two classes. The weights of the linear classifier can be used as an explanation for the whole approach.</p>
+<p>The above video explains the whole <mark style="background-color:LavenderBlush;">LIME</mark> process. The initial surface
+represents the <mark style="background-color:Lavender;">black-box</mark>
+classifier and the regions for the class of interest
+(e.g. Caretta-caretta with the light-pink color). The dark red-colored
+dot denotes the sample that we would like to explain and it is an image
+with the label <em> Caretta-caretta</em>. The first step is to sample
+the neighborhood of the point $\mathbf{x}$ that we would like to
+explain. Several points are generated. The size of each generated sample
+and the transparency relates to the distance from the initial point
+$\mathbf{x}$ which is calculated based using
+$\pi_{\mathbf{x}}(\mathbf{z})$. The next step is to apply the
+<mark style="background-color:Lavender;">black-box</mark> classifier
+$f()$ to find the label for each generated point. Samples with red
+represent the class Caretta-caretta while samples with purple represent
+the adversary class (not Caretta-caretta ;). The next step is to train the
+interpretable model $g()$ using the generated samples. The weights of
+the interpretable model are used to explain the prediction of the
+<mark style="background-color:Lavender;">black-box</mark> classifier.</p>
 
 <h2 id="code-implementation">Code implementation</h2>
 
-<p>Firstly, we will need to import the required libraries. The code is written in Python 3.6.9 and PyTorch 1.7.0. You can access the code in google colab using the following <a href="TBA">link</a>. Firstly, you should run the following command in order to install the necessary libraries:</p>
+<p>Firstly, we will need to import the required libraries. The code is written in Python 3.6.9 and PyTorch 1.7.0. You can access the code in google colab using the following <a href="TBA">link</a>. Firstly, you should run the following command to install the necessary libraries:</p>
 
 <pre><code class="language-ptyhon">conda env create -f my_lime.yml
 conda activate my_lime
@@ -297,7 +415,14 @@ conda activate my_lime
 </code></pre></div></div>
 
 <h3 id="initialization-of-a-pre-trained-vgg19-model">Initialization of a pre-trained VGG19 model</h3>
-<p>The very first thing that we will do is load a pre-trained VGG19 model. This model will be used to classify images and we will try to explain its behavior. The output of the model is a vector of 1000 probabilities belonging to each class from the ImageNet dataset. The model is initialized and the weights are loaded. The model is set to evaluation mode. The model is set to run on GPU if available. You can do that on google colab by enabling the GPU option. The steps for that are the following: <mark>Edit -&gt; Notebook settings -&gt; Hardware accelerator -&gt; GPU</mark>. The code for all these steps is the following:</p>
+<p>The very first thing that we will do is load a pre-trained VGG19 model. This model will be used to classify images and we will try to explain
+its behavior. The output of the model is a vector of 1000 probabilities
+belonging to each class from the ImageNet dataset. The model is
+initialized and the weights are loaded. The model is set to evaluation
+mode. The model is set to run on GPU if available. You can do that on
+google colab by enabling the GPU option. The steps for that are the
+following: <mark>Edit -\&gt; Notebook settings -\&gt; Hardware accelerator -\&gt;
+GPU</mark>. The code for all these steps is the following:</p>
 
 <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># load model
 # model_type = 'vgg19'
@@ -312,8 +437,12 @@ conda activate my_lime
 </span><span class="n">model</span><span class="p">.</span><span class="nf">eval</span><span class="p">()</span>
 </code></pre></div></div>
 
-<p>Ignore for now the warnings! This code should return the architecture of the VGG19 model. Of course, feel free to choose the model of your choice the code should work with any model.
-Now let’s load and process the image (for the VGG19 classifier) that we would like to test our <mark style="background-color:Lavender;">LIME</mark> explainer. You can freely choose the image that you would like to explain.</p>
+<p>Ignore for now the warnings! This code should return the architecture of
+the VGG19 model. Of course, feel free to choose the model of your choice
+(the code should work with any model). Now let’s load and process the
+image (for the VGG19 classifier) that we would like to test our
+<mark style="background-color:Lavender;">LIME</mark> explainer. You can
+freely choose the image that you would like to explain.</p>
 
 <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">imread_img</span><span class="p">(</span><span class="n">file_name</span><span class="p">):</span>
   
@@ -329,13 +458,21 @@ Now let’s load and process the image (for the VGG19 classifier) that we would 
   
   <span class="k">return</span> <span class="n">img</span>
 </code></pre></div></div>
-<p>We do make use of the <mark style="background-color:Lavender;">OpenCV</mark> library to read the <mark style="background-color:Lavender;">caretta.png</mark> image. You can check all the provided images or download one from the web.</p>
+<p>We do make use of the
+<mark style="background-color:Lavender;">OpenCV</mark> library to read
+the <mark style="background-color:Lavender;">caretta.png</mark> image from <mark>files/</mark>.
+You can check all the provided images or download one from the web.</p>
 
-<p>Note that you could do the same by using <mark>torchvision datasets and transforms</mark>. We will show an example of that when we will use the <mark style="background-color:Lavender;">LIME</mark> explainer for our lab exercise at the end of this tutorial.</p>
+<p>Note that you could do the same by using torchvision datasets and
+transforms. We will show an example of that when we will use the
+<mark style="background-color:Lavender;">LIME</mark> explainer for our
+lab exercise at the end of this tutorial.</p>
 
 <h3 id="image-pre-processing">Image pre-processing</h3>
 
-<p>As usual, we will need to normalize our input image. The normalization is done using the mean and standard deviation of the ImageNet dataset. The image is also transposed to the correct tensor format:</p>
+<p>As usual, we will need to normalize our input image. The normalization
+is done using the mean and standard deviation of the ImageNet dataset.
+The image is also transposed to the correct tensor format:</p>
 
 <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">pre_processing</span><span class="p">(</span><span class="n">obs</span><span class="p">,</span> <span class="n">cuda</span><span class="p">):</span>
     <span class="c1"># Students should transpose the image to the correct tensor format. 
@@ -360,7 +497,8 @@ Now let’s load and process the image (for the VGG19 classifier) that we would 
     <span class="k">return</span> <span class="n">obs_tensor</span>
 </code></pre></div></div>
 
-<p>We can do the same (resizing, normalization and conversion to tensor) by using the torchvision transform:</p>
+<p>We can do the same (resizing, normalization and conversion to tensor) by
+using the torchvision transform:</p>
 
 <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">transform</span> <span class="o">=</span> <span class="n">A</span><span class="p">.</span><span class="nc">Compose</span><span class="p">([</span>
         <span class="n">A</span><span class="p">.</span><span class="nc">Resize</span><span class="p">(</span><span class="mi">224</span><span class="p">,</span> <span class="mi">224</span><span class="p">),</span>
@@ -368,7 +506,10 @@ Now let’s load and process the image (for the VGG19 classifier) that we would 
         <span class="nc">ToTensorV2</span><span class="p">()])</span>
 </code></pre></div></div>
 
-<p>Then, the next that we will do is load the image and preprocess it. We will also check the prediction of the VGG19 model. Note that the prediction is correct (E.g. 33 and 34 are ‘caretta-caretta’ and ‘turtle’). The code is the following:</p>
+<p>Then, the next that we will do is load the image and preprocess it. We
+will also check the prediction of the VGG19 model. Note that the
+prediction is correct (E.g. 33 and 34 are ‘caretta-caretta’ and
+‘turtle’). The code is the following:</p>
 
 <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">predict</span><span class="p">(</span><span class="nb">input</span><span class="p">,</span> <span class="n">model</span><span class="p">,</span> <span class="n">target_label_idx</span><span class="p">,</span> <span class="n">cuda</span><span class="p">):</span>
     <span class="c1"># Makes prediction after preprocessing image 
@@ -402,7 +543,14 @@ Now let’s load and process the image (for the VGG19 classifier) that we would 
 </code></pre></div></div>
 
 <h2 id="lime-explanation">LIME explanation</h2>
-<p>The following figure illustrates the basic idea behind LIME. The figure shows light pink and blue areas which are the decision boundaries for the classifier (for the VGG19 pre-trained model on ImageNet for instance). <mark style="background-color:Lavender;">LIME</mark> can provide explanations for the predictions of an individual instance (the one with the dark red dot). These explanations are created by generating a new dataset of perturbations around the instance to be explained (in our image are depicted with dot circles around the initial instance).</p>
+<p>The following figure illustrates the basic idea behind LIME. The figure
+shows light pink and blue areas which are the decision boundaries for
+the classifier (for the VGG19 pre-trained model on ImageNet for
+instance). <mark style="background-color:Lavender;">LIME</mark> can
+provide explanations for the predictions of an individual instance (the
+one with the dark red dot). These explanations are created by generating
+a new dataset of perturbations around the instance to be explained (in
+our image are depicted with dot circles around the initial instance).</p>
 
 <figure>
 
@@ -416,14 +564,41 @@ Now let’s load and process the image (for the VGG19 classifier) that we would 
 
 </figure>
 
-<p>Then, we apply our <mark style="background-color:Lavender;">black-box</mark> model <mark style="background-color:Lavender;">$g()$</mark> and we can extract the label for all the perturbations (and can be seen with red that denotes turtle and purple that denotes non-turtle). The <em>importance</em> of each perturbation is determined by measuring its distance from the original instance to be explained (<mark style="background-color:Lavender;">. These distances are converted to weights by mapping the distances to a zero-one scale using a kernel function ($\pi_{\mathbf{x}}$ </mark>). All this information: the newly generated dataset, its class predictions and its weights are used to fit a simple model, such as a linear model (gray line), that can be interpreted. The coefficients for this model are extracted and used as the explanation for the prediction of the instance we want to explain. The higher the coefficient, the more important the feature is for the prediction.</p>
+<p>Then, we apply our
+<mark style="background-color:Lavender;">black-box</mark> model
+<mark style="background-color:Lavender;">$g()$</mark> and we can extract
+the label for all the perturbations (and can be seen with red that
+denotes turtle and purple that denotes non-turtle). The
+<em>importance</em> of each perturbation is determined by measuring its
+distance from the original instance to be explained
+(<mark style="background-color:Lavender;">. These distances are
+converted to weights by mapping the distances to a zero-one scale using
+a kernel function ($\pi_{\mathbf{x}}$ </mark>). All this information:
+the newly generated dataset, its class predictions and its weights are
+used to fit a simple model, such as a linear model (gray line), that can
+be interpreted. The coefficients for this model are extracted and used
+as the explanation for the prediction of the instance we want to
+explain. The higher the coefficient, the more important the feature is
+for the prediction.</p>
 
 <h2 id="creating-perturbations-of-image">Creating Perturbations of image</h2>
 
-<p>In the case of image explanations, our perturbations will be generated by zeroing out some of the superpixels in the image.</p>
+<p>In the case of image explanations, our perturbations will be generated
+by zeroing out some of the superpixels in the image.</p>
 
 <h4 id="extract-super-pixels-from-the-image">Extract super-pixels from the image</h4>
-<p>The superpixels are generated using the <mark style="background-color:Lavender;">quickshift</mark> segmentation algorithm. This algorithm is provided by the <mark style="background-color:Lavender;">skimage.segmentation</mark> library. It can be noted that for the given image, <mark style="background-color:Lavender;">68</mark> superpixels were generated. That of course will change if you will update the <mark style="background-color:Lavender;">quickshift</mark> parameters (<mark style="background-color:Lavender;">kernel_size</mark> and <mark style="background-color:Lavender;">max_dist</mark>). The code snippet can be found below:</p>
+
+<p>The superpixels are generated using the
+<mark style="background-color:Lavender;">quickshift</mark> segmentation
+algorithm. This algorithm is provided by the
+<mark style="background-color:Lavender;">skimage.segmentation</mark>
+library. It can be noted that for the given image,
+<mark style="background-color:Lavender;">68</mark> superpixels were
+generated. That of course will change if you will update the
+<mark style="background-color:Lavender;">quickshift</mark> parameters
+(<mark style="background-color:Lavender;">kernel_size</mark> and
+<mark style="background-color:Lavender;">max_dist</mark>). The code
+snippet can be found below:</p>
 
 <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">import</span> <span class="n">skimage.io</span> 
 <span class="kn">import</span> <span class="n">skimage.segmentation</span>
@@ -438,14 +613,24 @@ Now let’s load and process the image (for the VGG19 classifier) that we would 
 
 </code></pre></div></div>
 
-<p>The generated superpixels for the input Caretta-caretta image are shown in the image below. Note that you can improve the result of the approach or use another method for creating the superpixels.</p>
+<p>The generated superpixels for the input Caretta-caretta image are shown
+in the image below. Note that you can improve the result of the approach
+or use another method for creating the superpixels.</p>
 
 <p><img src="../../../assets/img/2023-05-13-LIME/caretta_2.jpg" style="width:400px;height:400px;" class="center"></p>
 
 <h3 id="creating-random-perturbations">Creating random perturbations</h3>
-<p>In this example, 150 perturbations were used. However, for real-life applications, a larger number of perturbations will produce more reliable explanations.</p>
+<p>In this example, 14 super-pixels were used. However, for real-life
+applications, a larger number of super-pixels will produce more
+reliable explanations.</p>
 
-<p>The way that these perturbations are calculated is the following: Random zeros and ones are generated and shaped as a matrix with perturbations as rows and superpixels as columns. An example of a perturbation (the first one) is shown below. Here, <code class="language-plaintext highlighter-rouge">1</code> represents that a superpixel is on and <code class="language-plaintext highlighter-rouge">0</code> represents it is off. Notice that the length of the shown vector corresponds to the number of superpixels in the image. By running this code:</p>
+<p>Having extracted the super-pixels, the way that perturbations are calculated is the following: Random
+zeros and ones are generated and shaped as a matrix with perturbations
+as rows and superpixels as columns. An example of a perturbation (the
+first one) is shown below. Here, <code class="language-plaintext highlighter-rouge">1</code> represents that a superpixel is on
+and <code class="language-plaintext highlighter-rouge">0</code> represents it is off. Notice that the length of the shown vector
+corresponds to the number of superpixels in the image. By running this
+code:</p>
 
 <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">num_perturb</span> <span class="o">=</span> <span class="mi">150</span>
 <span class="n">perturbations</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">random</span><span class="p">.</span><span class="nf">binomial</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="n">num_perturb</span><span class="p">,</span> <span class="n">num_superpixels</span><span class="p">))</span>
@@ -455,13 +640,12 @@ Now let’s load and process the image (for the VGG19 classifier) that we would 
 
 <p>We can produce this sequence:</p>
 
-<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>  <span class="nf">array</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span>
-       <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span>
-       <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span>
-       <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">])</span>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code> <span class="nf">array</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">])</span>
 </code></pre></div></div>
 
-<p>The following function <code class="language-plaintext highlighter-rouge">perturb_image</code> perturbs the given image (<code class="language-plaintext highlighter-rouge">img</code>) based on a perturbation vector (<code class="language-plaintext highlighter-rouge">perturbation</code>) and predefined superpixels (<code class="language-plaintext highlighter-rouge">segments</code>).</p>
+<p>The following function <code class="language-plaintext highlighter-rouge">perturb_image</code> perturbs the given image (<code class="language-plaintext highlighter-rouge">img</code>)
+based on a perturbation vector (<code class="language-plaintext highlighter-rouge">perturbation</code>) and predefined
+superpixels (<code class="language-plaintext highlighter-rouge">segments</code>).</p>
 
 <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">perturb_image</span><span class="p">(</span><span class="n">img</span><span class="p">,</span><span class="n">perturbation</span><span class="p">,</span><span class="n">segments</span><span class="p">):</span>
   <span class="n">active_pixels</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="nf">where</span><span class="p">(</span><span class="n">perturbation</span> <span class="o">==</span> <span class="mi">1</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
@@ -475,13 +659,17 @@ Now let’s load and process the image (for the VGG19 classifier) that we would 
 
 <p>Let’s use the previous function to see what a perturbed image would look like:</p>
 
-<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">skimage</span><span class="p">.</span><span class="n">io</span><span class="p">.</span><span class="nf">imshow</span><span class="p">(</span><span class="nf">perturb_image</span><span class="p">(</span><span class="n">img</span><span class="o">/</span><span class="mi">2</span><span class="o">+</span><span class="mf">0.5</span><span class="p">,</span><span class="n">perturbations</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="n">superpixels</span><span class="p">))</span>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">skimage</span><span class="p">.</span><span class="n">io</span><span class="p">.</span><span class="nf">imshow</span><span class="p">(</span><span class="nf">perturb_image</span><span class="p">(</span><span class="n">img</span><span class="o">/</span><span class="mi">255</span><span class="p">,</span><span class="n">perturbations</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="n">superpixels</span><span class="p">))</span>
 </code></pre></div></div>
 
 <p><img src="../../../assets/img/2023-05-13-LIME/caretta_3.jpg" style="width:400px;height:400px;" class="center"></p>
 
 <h3 id="step-2-use-ml-classifier-to-predict-classes-of-newly-generated-images">Step 2: Use ML classifier to predict classes of newly generated images</h3>
-<p>This is the most computationally expensive step in LIME because a prediction for each perturbed image is computed. From the shape of the predictions, we can see for each of the perturbations we have the output probability for each of the 1000 classes.</p>
+
+<p>This is the most computationally expensive step in LIME because a
+prediction for each perturbed image is computed. Our aim is to construct a label for each pertubation. From the shape of the
+predictions, we can see for each of the perturbations we have the output
+probability for each of the 1000 classes.</p>
 
 <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">predictions</span> <span class="o">=</span> <span class="p">[]</span>
 <span class="k">for</span> <span class="n">pert</span> <span class="ow">in</span> <span class="n">perturbations</span><span class="p">:</span>
@@ -501,20 +689,25 @@ Now let’s load and process the image (for the VGG19 classifier) that we would 
 <span class="n">predictions</span><span class="p">.</span><span class="n">shape</span>
 </code></pre></div></div>
 
-<p>Then, we will need to calculate the distances between the perturbations and the original image. The distances are calculated using the cosine distance. The smaller the distance, the more similar the vectors are. The distances are then converted to weights using a kernel function.</p>
+<p>Then, we will need to calculate the distances between the perturbations
+and the original image. The distances are calculated using the cosine
+distance. The smaller the distance, the more similar the vectors are.
+The distances are then converted to weights using a kernel function.</p>
 
 <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">original_image</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="nf">ones</span><span class="p">(</span><span class="n">num_superpixels</span><span class="p">)[</span><span class="n">np</span><span class="p">.</span><span class="n">newaxis</span><span class="p">,:]</span> <span class="c1">#Perturbation with all superpixels enabled 
 </span><span class="n">distances</span> <span class="o">=</span> <span class="n">sklearn</span><span class="p">.</span><span class="n">metrics</span><span class="p">.</span><span class="nf">pairwise_distances</span><span class="p">(</span><span class="n">perturbations</span><span class="p">,</span><span class="n">original_image</span><span class="p">,</span> <span class="n">metric</span><span class="o">=</span><span class="sh">'</span><span class="s">cosine</span><span class="sh">'</span><span class="p">).</span><span class="nf">ravel</span><span class="p">()</span>
 <span class="n">distances</span><span class="p">.</span><span class="n">shape</span>
 </code></pre></div></div>
 
-<p>As we shown before, after calculating the distances we need to aplpy kernels to use them in the loss function. The employed can is as follows:</p>
+<p>As we have shown before, after calculating the distances we need to apply
+kernels to use them in the loss function. The employed can is as
+follows:</p>
 
 <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">kernel_width</span> <span class="o">=</span> <span class="mf">0.25</span>	
 <span class="n">weights</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="nf">sqrt</span><span class="p">(</span><span class="n">np</span><span class="p">.</span><span class="nf">exp</span><span class="p">(</span><span class="o">-</span><span class="p">(</span><span class="n">distances</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span><span class="o">/</span><span class="n">kernel_width</span><span class="o">**</span><span class="mi">2</span><span class="p">))</span> <span class="c1">#Kernel function 
 </span><span class="n">weights</span><span class="p">.</span><span class="n">shape</span>
 </code></pre></div></div>
-<p>Now we can calculate the explanation for our predictions. We want to keep the five highest values in our calculated weights.</p>
+<p>Having calculated the proximity of each perturbation from the original image, as a final step we can calculate the explanation for our predictions. To do that, we will train the explainer using the generated perturbations. Finally, we will need to keep the five highest values in our calculated weights.</p>
 
 <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">out</span> <span class="o">=</span> <span class="nf">model</span><span class="p">(</span><span class="nb">input</span><span class="p">)</span>     
 <span class="nf">print </span><span class="p">(</span><span class="n">out</span><span class="p">.</span><span class="n">shape</span><span class="p">)</span>                
@@ -534,7 +727,10 @@ Now let’s load and process the image (for the VGG19 classifier) that we would 
 <span class="nf">print</span><span class="p">(</span><span class="n">topk_indices</span><span class="p">)</span>
 </code></pre></div></div>
 
-<p>We can now train the linear model using the perturbations and the predictions with the highest probability. The extracted coefficients (or the explainer model weights) of the linear model are the explanations for the predictions.</p>
+<p>We can now train the linear model using the perturbations and the
+predictions with the highest probability. The extracted coefficients (or
+the explainer model weights) of the linear model are the explanations
+for the predictions.</p>
 
 <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">simpler_model</span> <span class="o">=</span> <span class="nc">LinearRegression</span><span class="p">()</span>
 <span class="n">simpler_model</span><span class="p">.</span><span class="nf">fit</span><span class="p">(</span><span class="n">X</span><span class="o">=</span><span class="n">perturbations</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="n">predictions</span><span class="p">[:,:,</span><span class="n">topk_indices</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]],</span> <span class="n">sample_weight</span><span class="o">=</span><span class="n">weights</span><span class="p">)</span>
@@ -557,15 +753,31 @@ Now let’s load and process the image (for the VGG19 classifier) that we would 
 
 <p><img src="../../../assets/img/2023-05-13-LIME/caretta_4.jpg" style="width:400px;height:400px;" class="center"></p>
 
-<h1 id="debiasing-a-classifier-using-lime">Debiasing a classifier using LIME</h1>
-<p>This part of the tutorial is a lab exercise where you will use LIME to debias a classifier. The goal is to understand how LIME can be used to explain the behavior of a classifier and how we can use this information to debias the classifier.</p>
+<h1 id="lab-exercise-tosubmit">Lab exercise <mark>TOSUBMIT</mark>
+</h1>
 
-<p>The classifier is trained to classify images of <em>huskies</em> and <em>wolves</em>. The classifier is a <mark style="background-color:Lavender;"> black-box $f(.)$</mark> so we do not have access to it. We have zero knowledge of the training dataset but also of the classifier’s architecture.</p>
+<p>This part of the tutorial is a lab exercise where you will use LIME to
+debias a classifier. The goal is to understand how LIME can be used to
+explain the behavior of a classifier and how we can use this information
+to debias the classifier.</p>
 
-<p>We hope that we will be able to identify the bias in the classifier and try to debias it. We will need to explain the behavior of the classifier using images from huskies and wolves. You should make use also the images that you can find on the Canvas page of the course or from google colab page. If you want you can use also your own husky and wolf images.</p>
+<p>The classifier is trained to classify images of <em>huskies</em> and
+<em>wolves</em>. The classifier is a
+<mark style="background-color:Lavender;"> black-box $f(.)$</mark> so we
+do not have access to its internal states. We have zero knowledge of the training dataset
+but also of the classifier’s architecture.</p>
 
-<p>Firstly, we will load the classifier and the images we want to explain. The following code checks the performance of the classifier in a test set.</p>
+<p>We hope that we will be able to identify the biases in the classifier and
+try to debias it using LIME explainer.</p>
 
+<p>We will need to explain the behavior of the classifier
+using images from huskies and wolves. You should make use also the
+images that you can find on the Canvas page of the course or from google
+colab page. If you want you can use also your own husky and wolf images.</p>
+
+<p>Firstly, we will load the classifier and the images we want to explain.
+The following code checks the performance of the classifier in a test
+set.</p>
 <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">check_accuracy</span><span class="p">(</span><span class="n">loader</span><span class="p">,</span> <span class="n">model</span><span class="p">,</span> <span class="n">device</span><span class="p">):</span>
     <span class="n">num_correct</span> <span class="o">=</span> <span class="mi">0</span>
     <span class="n">num_samples</span> <span class="o">=</span> <span class="mi">0</span>
@@ -592,7 +804,11 @@ Now let’s load and process the image (for the VGG19 classifier) that we would 
 <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">torch</span><span class="p">.</span><span class="nf">load</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="sh">'</span><span class="s">model/hus_wolf_model.pth</span><span class="sh">'</span><span class="p">)</span>
 </code></pre></div></div>
 
-<p>The following code loads the images and creates the dataloader. The dataloader is used to load the images in batches. The images are preprocessed using the same transformations that were used to train the classifier. Note that the following code is the same as the one used in the previous part of the tutorial for preprocessing images.</p>
+<p>The following code loads the images and creates the dataloader. The
+dataloader is used to load the images in batches. The images are
+preprocessed using the same transformations that were used to train the
+classifier. Note that the following code is the same as the one used in
+the previous part of the tutorial for preprocessing images.</p>
 
 <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># create the transformation for all the images
 </span><span class="n">transform</span> <span class="o">=</span> <span class="n">transforms</span><span class="p">.</span><span class="nc">Compose</span><span class="p">([</span><span class="n">transforms</span><span class="p">.</span><span class="nc">Resize</span><span class="p">(</span><span class="mi">256</span><span class="p">),</span>
@@ -614,36 +830,83 @@ Now let’s load and process the image (for the VGG19 classifier) that we would 
 
 <p>The expected result should be around <mark style="background-color:Lavender;">36%</mark> accuracy.</p>
 
-<p>As a <em>lab exercise</em>, and by using the LIME algorithm established in previous cells, you should explain the behavior of the classifier. You should use the provided images in <mark>data/test/</mark> folder. <mark style="background-color:Lavender;"> Add your conclusions about the model $f()$. What are the main problems with this classifier?</mark>. Let’s discuss the results during the Werkcollege.</p>
+<p>As a <em>lab exercise</em>, and by using the LIME algorithm established
+in previous cells, you should explain the behavior of the classifier.
+You should use the provided images in <mark>data/test/</mark> folder.
+<mark style="background-color:Lavender;"> Add your conclusions about the
+model $f()$</mark>. What are the main problems with this classifier?
+Let’s discuss the results during the Werkcollege.</p>
 
-<h1 id="you-should-not-trust-me-tosubmit">You should not trust me! TOSUBMIT</h1>
+<h1 id="you-should-not-trust-me-tosubmit">You should not trust me! <mark>TOSUBMIT</mark>
+</h1>
 
-<p>Now you feel like a <em>hacker</em> and you would like to fool LIME explanations by constructing adversarial classifiers. To do that we will follow the process that is described in the following paper [4]. You can find a detailed also explanation in the following video:</p>
+<p>Now you feel like a <em>hacker</em> and you would like to fool LIME
+explanations by constructing adversarial classifiers. To do that we will
+follow the process that is described in the following paper [4]. You
+can find a detailed also explanation in the following video:</p>
 
 <p><a href="https://www.youtube.com/watch?v=qCYAKmFFpbs&amp;ab_channel=MLExplained-AggregateIntellect-AI.SCIENCE" title="You should not trust me!" rel="external nofollow noopener" target="_blank"><img src="../../../assets/img/2023-05-13-LIME/fooling_LIME.PNG" alt="You should not trust me!"></a></p>
 
-<p>This part of the tutorial is the home assignment you need to <mark>TOSUBMIT</mark>. The goal is to understand the limitations of LIME and how we can take advantage of them to perform adversarial attacks. The main focus is to understand the way that LIME generates samples (the perturbations and the distribution of the perturbations in comparison with the real data).</p>
+<p>This part of the tutorial is the third part of the assignment you need to
+  <mark>TOSUBMIT</mark>. The goal is to understand the limitations of LIME
+  and how we can take advantage of them to perform adversarial attacks.
+  The main focus is to understand the way that LIME generates samples (the
+  perturbations and the distribution of the perturbations in comparison
+  with the real data).</p>
 
 <p>The setup is the following:</p>
 
-<p>As an adversary hacker, you are intending to
-deploy the biased classifier $f$ for making a <em>critical decision</em> (e.g., confusing huskies with wolves 😱) in the real world. The adversary must provide black
-box access to customers and examiners, who may use post hoc
-explanation techniques to better understand $f$ and determine if $f$ is
-ready to be used in the real world. If customers and regulators detect
-that $f$ is biased, they are not likely to approve it for deployment.
-The goal of the adversary is to fool post hoc explanation techniques
-and hide the underlying biases of $f$.</p>
+<p>As an adversary hacker, you are intending to deploy the biased
+  classifier $f$ for making a <em>critical decision</em> (e.g., confusing
+  huskies with wolves 😱) in the real world. The adversary must provide
+  black box access to customers and examiners, who may use post hoc
+  explanation techniques to better understand $f$ and determine if $f$ is
+  ready to be used in the real world. If customers and regulators detect
+  that $f$ is biased, they are not likely to approve it for deployment.
+  The goal of the adversary is to fool post hoc explanation techniques and
+  hide the underlying biases of $f$.</p>
 
-<p>In this assignment, you should create a scaffolded classifier $e$ that behaves exactly like $f$ when making predictions on instances sampled from $X_{dist}$, but will not reveal the underlying biases of $f$ when probed with leading post hoc explanation techniques such as LIME.</p>
+<p>In this assignment, check you need to illustrate the difference between the distribution of real samples and the perturbations. Find a way to illustrate that in an example of your choice.</p>
 
-<p>To do that you will need to follow the steps of the suggested paper. You need to find ways to differentiate the real data from the generated data and based on that create the scaffolded classifier $e$ that will fool LIME.</p>
+<p><mark>Optionally</mark>, you should create a scaffolded classifier $e$ that
+  behaves exactly like $f$ when making predictions on instances sampled
+  from $X_{dist}$ (real samples) but will not reveal the underlying biases of $f$ when probed with leading post hoc explanation techniques such as LIME.</p>
 
-<p>For this assignment, you will need to submit your code and a report of 2 pages where you analyze your findings!</p>
+<p>To do that you will need to follow the steps of the suggested paper. You
+  need to find ways to differentiate the real data from the generated data
+  and based on that create the scaffolded classifier $e$ that will fool
+  LIME.</p>
+
+<p>For this assignment, you will need to read the proposed paper and think of ways to perform adversarial attacks using the provided model. Add in your report an explanation of the procedure and the image with the difference between the 2 distributions. Optionally you can add examples of how the classifier $e$ can work in our case.</p>
+
+<h2 id="guidelines-for-the-canvas-submissions">Guidelines for the Canvas submissions:</h2>
+
+<ul>
+  <li>You should prepare a report based on researching the <mark>TOSUBMIT</mark> from both notebooks.</li>
+  <li>This report should contain three paragraphs. One will be about Integrated gradient and the questions that can be found at the end of the first notebook, one for the LIME explanations and finally one about adversarial attacks.</li>
+  <li>Optionally, you should add one paragraph with the results of a scaffolding classifier that can fool LIME and some visual results with that.</li>
+</ul>
+
+<h1 id="journal-club-for-weeks-2-and-3">Journal club for weeks 2 and 3</h1>
+
+<p>The papers for weeks 2 and 3 can be found on Canvas at the following links:</p>
+
+<ul>
+  <li>https://arxiv.org/pdf/1711.11279.pdf</li>
+  <li>https://openaccess.thecvf.com/content/CVPR2021/papers/Chefer_Transformer_Interpretability_Beyond_Attention_Visualization_CVPR_2021_paper.pdf</li>
+</ul>
+
+<h1 id="mini-project-ideas">Mini-project ideas</h1>
+
+<p>This part of the tutorial relates to ideas about extending parts of this tutorial. One point of criticism of the LIME technique is the way that the perturbations are taking place since the distributions between real and generated data are significantly different. Think of ways to improve the gap (using alternative ways to perform perturbations).</p>
+<ul>
+  <li>Think of ways to improve the feature repressions (replacing super-pixels).</li>
+  <li>Another direction could be to come up with an evaluation scheme and perform a study comparing LIME, IG or other methods for explainable AI.</li>
+</ul>
 
 <h1 id="conclusions">Conclusions</h1>
 
-<p>In this tutorial, we have analyzed LIME a posthoc XAI technique. An explanation of how this technique works but also step-by-step the code to implement it. We have also seen how we can use LIME to explain image-classifiers but also how to identify the bias in a classifier.</p>
+<p>In this tutorial, we have analyzed LIME a posthoc XAI technique. An explanation of how this technique works but also step-by-step the code to implement it. We have also seen how we can use LIME to explain image classifiers but also how to identify the bias in a classifier.</p>
 
 <h1 id="references">References</h1>
 <p style="font-size: smaller"><a href="https://arxiv.org/pdf/1602.04938.pdf" rel="external nofollow noopener" target="_blank">[1] Ribeuro, M.T. et al. Why Should I Trust You? Explaining the Predictions of Any Classifier, 2016. SIGKDD.</a></p>
