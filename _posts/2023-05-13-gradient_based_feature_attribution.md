@@ -278,13 +278,12 @@ def calculate_outputs_and_gradients(inputs, model, target_label_idx, cuda=False)
         print (target_label_idx)
         _, output = predict(input, model, target_label_idx, cuda)
         # clear grad
-        model.zero_grad()
         ## BEGIN student code
         # Perform a backward pass on the output and collect the gradient w.r.t. the input
         # Store this gradient in the variable 'gradient' 
-        output.backward()
-        gradient = input.grad.detach().cpu().numpy()[0]  # do backward and gather gradients of input
         ## END student code
+        gradient = input.grad.detach().cpu().numpy()[0]  # do backward and gather gradients of input
+        
         gradients.append(gradient)
     gradients = np.array(gradients)
     return gradients, target_label_idx
@@ -463,12 +462,14 @@ class VGG(nn.Module):
     def get_activations_gradient(self):
         ## Should return the gradients of the output with respect to the last convolutional layer
         ## BEGIN Students TODO
-        return self.gradients
+        return notImplemented
         ## END students TODO
     
     # method for the activation exctraction
     def get_activations(self, x):
-        return self.features_conv(x)    
+        ## BEGIN Students TODO
+        return notImplemented
+        ## END students TODO
 
 vgg = VGG(model)
 print('cuda:', cuda, 'device:', device)
@@ -610,7 +611,7 @@ def integrated_gradients(inputs, model, target_label_idx, baseline, steps=50, cu
     grads, _ = calculate_outputs_and_gradients(scaled_inputs, model, target_label_idx, cuda)
 
    # BEGIN students TODO
-    avg_grads = np.average(grads[:-1], axis=0)      # why 51 steps and then remove final result ?
+    avg_grads = np.average(grads[:-1], axis=0)  
     avg_grads = np.transpose(avg_grads, (1, 2, 0))
     delta_X = (pre_processing(inputs, cuda) - pre_processing(baseline, cuda)).detach().squeeze(0).cpu().numpy()
     delta_X = np.transpose(delta_X, (1, 2, 0))
