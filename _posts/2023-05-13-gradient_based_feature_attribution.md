@@ -55,9 +55,6 @@ _styles: >
   }
 ---
 
-
-
-
 # Gradient-based feature attribution for Vision
 
 Before starting with the explanation of the gradient-based methodologies, we provide some useful code for all the necessarry packages loacing a pre-trained VGG model (in Imagenet) but also code to load a image for a local directory in PyTorch. You can access the code of this tutorial in the following [google colab link](https://colab.research.google.com/drive/1zWmtpOTXfxv1Hxwl7G5heU73vz90iNhl?usp=sharing).  
@@ -665,15 +662,12 @@ plot_gradients(img, int_gradients_zerobl, 'Image and Integrated Gradients with Z
 plot_gradients(img, int_gradients_randombl, 'Image and Integrated Gradients with sample of Random Baselines')
 ```
 
-<font color='red'><b>ToSubmit 3</b></font>
+# **Homework-part 1 <mark>TOSUBMIT</mark>**.  
 
-Include in your  Workshop-0 report two images  with results applying  integrated gradients illustrating the strongest differences you have found (i.e., manipulating target categories, baselines, number of samples, or number of steps along the integration path). Include a brief caption that describes the experiment and your interpretation.
+Work for home:
+  - Read the main article
+  -  Why integraded gradients give better results than the other saliency methods?
+  - Think about what the role of the baseline is how it impact negatively the reults.
+  - Propose a way to improve the technique using alternative baselines.
 
-
-<!-- ## LIME
-
-[LIME tutorial](../../2022/LIME/) -->
-
-## Conclusion
-
-In this post, ...
+   <mark>TOSUBMIT</mark> At your first paragraph of your report you should analyze this.
