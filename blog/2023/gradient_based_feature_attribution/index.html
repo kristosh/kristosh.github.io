@@ -442,14 +442,13 @@
         <span class="nf">print </span><span class="p">(</span><span class="n">target_label_idx</span><span class="p">)</span>
         <span class="n">_</span><span class="p">,</span> <span class="n">output</span> <span class="o">=</span> <span class="nf">predict</span><span class="p">(</span><span class="nb">input</span><span class="p">,</span> <span class="n">model</span><span class="p">,</span> <span class="n">target_label_idx</span><span class="p">,</span> <span class="n">cuda</span><span class="p">)</span>
         <span class="c1"># clear grad
-</span>        <span class="n">model</span><span class="p">.</span><span class="nf">zero_grad</span><span class="p">()</span>
-        <span class="c1">## BEGIN student code
+</span>        <span class="c1">## BEGIN student code
 </span>        <span class="c1"># Perform a backward pass on the output and collect the gradient w.r.t. the input
 </span>        <span class="c1"># Store this gradient in the variable 'gradient' 
-</span>        <span class="n">output</span><span class="p">.</span><span class="nf">backward</span><span class="p">()</span>
-        <span class="n">gradient</span> <span class="o">=</span> <span class="nb">input</span><span class="p">.</span><span class="n">grad</span><span class="p">.</span><span class="nf">detach</span><span class="p">().</span><span class="nf">cpu</span><span class="p">().</span><span class="nf">numpy</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>  <span class="c1"># do backward and gather gradients of input
 </span>        <span class="c1">## END student code
-</span>        <span class="n">gradients</span><span class="p">.</span><span class="nf">append</span><span class="p">(</span><span class="n">gradient</span><span class="p">)</span>
+</span>        <span class="n">gradient</span> <span class="o">=</span> <span class="nb">input</span><span class="p">.</span><span class="n">grad</span><span class="p">.</span><span class="nf">detach</span><span class="p">().</span><span class="nf">cpu</span><span class="p">().</span><span class="nf">numpy</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>  <span class="c1"># do backward and gather gradients of input
+</span>        
+        <span class="n">gradients</span><span class="p">.</span><span class="nf">append</span><span class="p">(</span><span class="n">gradient</span><span class="p">)</span>
     <span class="n">gradients</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="nf">array</span><span class="p">(</span><span class="n">gradients</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">gradients</span><span class="p">,</span> <span class="n">target_label_idx</span>
 </code></pre></div></div>
@@ -634,13 +633,15 @@
 </span>    <span class="k">def</span> <span class="nf">get_activations_gradient</span><span class="p">(</span><span class="n">self</span><span class="p">):</span>
         <span class="c1">## Should return the gradients of the output with respect to the last convolutional layer
 </span>        <span class="c1">## BEGIN Students TODO
-</span>        <span class="k">return</span> <span class="n">self</span><span class="p">.</span><span class="n">gradients</span>
+</span>        <span class="k">return</span> <span class="n">notImplemented</span>
         <span class="c1">## END students TODO
 </span>    
     <span class="c1"># method for the activation exctraction
 </span>    <span class="k">def</span> <span class="nf">get_activations</span><span class="p">(</span><span class="n">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
-        <span class="k">return</span> <span class="n">self</span><span class="p">.</span><span class="nf">features_conv</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>    
-
+        <span class="c1">## BEGIN Students TODO
+</span>        <span class="k">return</span> <span class="n">notImplemented</span>
+        <span class="c1">## END students TODO
+</span>
 <span class="n">vgg</span> <span class="o">=</span> <span class="nc">VGG</span><span class="p">(</span><span class="n">model</span><span class="p">)</span>
 <span class="nf">print</span><span class="p">(</span><span class="sh">'</span><span class="s">cuda:</span><span class="sh">'</span><span class="p">,</span> <span class="n">cuda</span><span class="p">,</span> <span class="sh">'</span><span class="s">device:</span><span class="sh">'</span><span class="p">,</span> <span class="n">device</span><span class="p">)</span>
 <span class="n">vgg</span> <span class="o">=</span> <span class="n">vgg</span><span class="p">.</span><span class="nf">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
@@ -778,8 +779,8 @@ gradients = np.transpose(gradients[0], (1, 2, 0))
     <span class="n">grads</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="nf">calculate_outputs_and_gradients</span><span class="p">(</span><span class="n">scaled_inputs</span><span class="p">,</span> <span class="n">model</span><span class="p">,</span> <span class="n">target_label_idx</span><span class="p">,</span> <span class="n">cuda</span><span class="p">)</span>
 
    <span class="c1"># BEGIN students TODO
-</span>    <span class="n">avg_grads</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="nf">average</span><span class="p">(</span><span class="n">grads</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>      <span class="c1"># why 51 steps and then remove final result ?
-</span>    <span class="n">avg_grads</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="nf">transpose</span><span class="p">(</span><span class="n">avg_grads</span><span class="p">,</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span>
+</span>    <span class="n">avg_grads</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="nf">average</span><span class="p">(</span><span class="n">grads</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>  
+    <span class="n">avg_grads</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="nf">transpose</span><span class="p">(</span><span class="n">avg_grads</span><span class="p">,</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span>
     <span class="n">delta_X</span> <span class="o">=</span> <span class="p">(</span><span class="nf">pre_processing</span><span class="p">(</span><span class="n">inputs</span><span class="p">,</span> <span class="n">cuda</span><span class="p">)</span> <span class="o">-</span> <span class="nf">pre_processing</span><span class="p">(</span><span class="n">baseline</span><span class="p">,</span> <span class="n">cuda</span><span class="p">)).</span><span class="nf">detach</span><span class="p">().</span><span class="nf">squeeze</span><span class="p">(</span><span class="mi">0</span><span class="p">).</span><span class="nf">cpu</span><span class="p">().</span><span class="nf">numpy</span><span class="p">()</span>
     <span class="n">delta_X</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="nf">transpose</span><span class="p">(</span><span class="n">delta_X</span><span class="p">,</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span>
     <span class="n">integrated_grad</span> <span class="o">=</span> <span class="n">delta_X</span> <span class="o">*</span> <span class="n">avg_grads</span>

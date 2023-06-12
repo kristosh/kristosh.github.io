@@ -650,11 +650,8 @@ superpixels (<code class="language-plaintext highlighter-rouge">segments</code>)
 <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">perturb_image</span><span class="p">(</span><span class="n">img</span><span class="p">,</span><span class="n">perturbation</span><span class="p">,</span><span class="n">segments</span><span class="p">):</span>
   <span class="n">active_pixels</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="nf">where</span><span class="p">(</span><span class="n">perturbation</span> <span class="o">==</span> <span class="mi">1</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
   <span class="n">mask</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="nf">zeros</span><span class="p">(</span><span class="n">segments</span><span class="p">.</span><span class="n">shape</span><span class="p">)</span>
-  <span class="k">for</span> <span class="n">active</span> <span class="ow">in</span> <span class="n">active_pixels</span><span class="p">:</span>
-      <span class="n">mask</span><span class="p">[</span><span class="n">segments</span> <span class="o">==</span> <span class="n">active</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span> 
-  <span class="n">perturbed_image</span> <span class="o">=</span> <span class="n">copy</span><span class="p">.</span><span class="nf">deepcopy</span><span class="p">(</span><span class="n">img</span><span class="p">)</span>
-  <span class="n">perturbed_image</span> <span class="o">=</span> <span class="n">perturbed_image</span><span class="o">*</span><span class="n">mask</span><span class="p">[:,:,</span><span class="n">np</span><span class="p">.</span><span class="n">newaxis</span><span class="p">]</span>
-  <span class="k">return</span> <span class="n">perturbed_image</span>
+  <span class="c1">#Add your code here
+</span>  <span class="k">return</span> <span class="n">perturbed_image</span>
 </code></pre></div></div>
 
 <p>Let’s use the previous function to see what a perturbed image would look like:</p>
@@ -733,8 +730,8 @@ the explainer model weights) of the linear model are the explanations
 for the predictions.</p>
 
 <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">simpler_model</span> <span class="o">=</span> <span class="nc">LinearRegression</span><span class="p">()</span>
-<span class="n">simpler_model</span><span class="p">.</span><span class="nf">fit</span><span class="p">(</span><span class="n">X</span><span class="o">=</span><span class="n">perturbations</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="n">predictions</span><span class="p">[:,:,</span><span class="n">topk_indices</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]],</span> <span class="n">sample_weight</span><span class="o">=</span><span class="n">weights</span><span class="p">)</span>
-<span class="n">coeff</span> <span class="o">=</span> <span class="n">simpler_model</span><span class="p">.</span><span class="n">coef_</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+<span class="c1">#simpler_model.fit()
+</span><span class="n">coeff</span> <span class="o">=</span> <span class="n">simpler_model</span><span class="p">.</span><span class="n">coef_</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
 <span class="n">coeff</span>
 </code></pre></div></div>
 

@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" xml:lang="en"><generator uri="https://jekyllrb.com/" version="4.3.2">Jekyll</generator><link href="https://kristosh.github.io/kristosh/feed.xml" rel="self" type="application/atom+xml" /><link href="https://kristosh.github.io/kristosh/" rel="alternate" type="text/html" hreflang="en" /><updated>2023-06-12T22:17:05+00:00</updated><id>https://kristosh.github.io/kristosh/feed.xml</id><title type="html">blank</title><subtitle>A simple, whitespace theme for academics.
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" xml:lang="en"><generator uri="https://jekyllrb.com/" version="4.3.2">Jekyll</generator><link href="https://kristosh.github.io/kristosh/feed.xml" rel="self" type="application/atom+xml" /><link href="https://kristosh.github.io/kristosh/" rel="alternate" type="text/html" hreflang="en" /><updated>2023-06-12T22:20:45+00:00</updated><id>https://kristosh.github.io/kristosh/feed.xml</id><title type="html">blank</title><subtitle>A simple, whitespace theme for academics.
 </subtitle><entry><title type="html">Why should I trust you? LIME for image classification</title><link href="https://kristosh.github.io/kristosh/blog/2023/LIME/" rel="alternate" type="text/html" title="Why should I trust you? LIME for image classification" /><published>2023-05-13T00:00:00+00:00</published><updated>2023-05-13T00:00:00+00:00</updated><id>https://kristosh.github.io/kristosh/blog/2023/LIME</id><content type="html" xml:base="https://kristosh.github.io/kristosh/blog/2023/LIME/"><![CDATA[<h1 id="local-interpretable-model-agnostic-explanations">Local Interpretable Model-agnostic Explanations</h1>
 
 <center>
@@ -460,11 +460,8 @@ superpixels (<code class="language-plaintext highlighter-rouge">segments</code>)
 <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">perturb_image</span><span class="p">(</span><span class="n">img</span><span class="p">,</span><span class="n">perturbation</span><span class="p">,</span><span class="n">segments</span><span class="p">):</span>
   <span class="n">active_pixels</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="nf">where</span><span class="p">(</span><span class="n">perturbation</span> <span class="o">==</span> <span class="mi">1</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
   <span class="n">mask</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="nf">zeros</span><span class="p">(</span><span class="n">segments</span><span class="p">.</span><span class="n">shape</span><span class="p">)</span>
-  <span class="k">for</span> <span class="n">active</span> <span class="ow">in</span> <span class="n">active_pixels</span><span class="p">:</span>
-      <span class="n">mask</span><span class="p">[</span><span class="n">segments</span> <span class="o">==</span> <span class="n">active</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span> 
-  <span class="n">perturbed_image</span> <span class="o">=</span> <span class="n">copy</span><span class="p">.</span><span class="nf">deepcopy</span><span class="p">(</span><span class="n">img</span><span class="p">)</span>
-  <span class="n">perturbed_image</span> <span class="o">=</span> <span class="n">perturbed_image</span><span class="o">*</span><span class="n">mask</span><span class="p">[:,:,</span><span class="n">np</span><span class="p">.</span><span class="n">newaxis</span><span class="p">]</span>
-  <span class="k">return</span> <span class="n">perturbed_image</span>
+  <span class="c1">#Add your code here
+</span>  <span class="k">return</span> <span class="n">perturbed_image</span>
 </code></pre></div></div>
 
 <p>Let’s use the previous function to see what a perturbed image would look like:</p>
@@ -543,8 +540,8 @@ the explainer model weights) of the linear model are the explanations
 for the predictions.</p>
 
 <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">simpler_model</span> <span class="o">=</span> <span class="nc">LinearRegression</span><span class="p">()</span>
-<span class="n">simpler_model</span><span class="p">.</span><span class="nf">fit</span><span class="p">(</span><span class="n">X</span><span class="o">=</span><span class="n">perturbations</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="n">predictions</span><span class="p">[:,:,</span><span class="n">topk_indices</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]],</span> <span class="n">sample_weight</span><span class="o">=</span><span class="n">weights</span><span class="p">)</span>
-<span class="n">coeff</span> <span class="o">=</span> <span class="n">simpler_model</span><span class="p">.</span><span class="n">coef_</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+<span class="c1">#simpler_model.fit()
+</span><span class="n">coeff</span> <span class="o">=</span> <span class="n">simpler_model</span><span class="p">.</span><span class="n">coef_</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
 <span class="n">coeff</span>
 </code></pre></div></div>
 
@@ -946,14 +943,13 @@ can find a detailed also explanation in the following video:</p>
         <span class="nf">print </span><span class="p">(</span><span class="n">target_label_idx</span><span class="p">)</span>
         <span class="n">_</span><span class="p">,</span> <span class="n">output</span> <span class="o">=</span> <span class="nf">predict</span><span class="p">(</span><span class="nb">input</span><span class="p">,</span> <span class="n">model</span><span class="p">,</span> <span class="n">target_label_idx</span><span class="p">,</span> <span class="n">cuda</span><span class="p">)</span>
         <span class="c1"># clear grad
-</span>        <span class="n">model</span><span class="p">.</span><span class="nf">zero_grad</span><span class="p">()</span>
-        <span class="c1">## BEGIN student code
+</span>        <span class="c1">## BEGIN student code
 </span>        <span class="c1"># Perform a backward pass on the output and collect the gradient w.r.t. the input
 </span>        <span class="c1"># Store this gradient in the variable 'gradient' 
-</span>        <span class="n">output</span><span class="p">.</span><span class="nf">backward</span><span class="p">()</span>
-        <span class="n">gradient</span> <span class="o">=</span> <span class="nb">input</span><span class="p">.</span><span class="n">grad</span><span class="p">.</span><span class="nf">detach</span><span class="p">().</span><span class="nf">cpu</span><span class="p">().</span><span class="nf">numpy</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>  <span class="c1"># do backward and gather gradients of input
 </span>        <span class="c1">## END student code
-</span>        <span class="n">gradients</span><span class="p">.</span><span class="nf">append</span><span class="p">(</span><span class="n">gradient</span><span class="p">)</span>
+</span>        <span class="n">gradient</span> <span class="o">=</span> <span class="nb">input</span><span class="p">.</span><span class="n">grad</span><span class="p">.</span><span class="nf">detach</span><span class="p">().</span><span class="nf">cpu</span><span class="p">().</span><span class="nf">numpy</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>  <span class="c1"># do backward and gather gradients of input
+</span>        
+        <span class="n">gradients</span><span class="p">.</span><span class="nf">append</span><span class="p">(</span><span class="n">gradient</span><span class="p">)</span>
     <span class="n">gradients</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="nf">array</span><span class="p">(</span><span class="n">gradients</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">gradients</span><span class="p">,</span> <span class="n">target_label_idx</span>
 </code></pre></div></div>
@@ -1138,13 +1134,15 @@ can find a detailed also explanation in the following video:</p>
 </span>    <span class="k">def</span> <span class="nf">get_activations_gradient</span><span class="p">(</span><span class="n">self</span><span class="p">):</span>
         <span class="c1">## Should return the gradients of the output with respect to the last convolutional layer
 </span>        <span class="c1">## BEGIN Students TODO
-</span>        <span class="k">return</span> <span class="n">self</span><span class="p">.</span><span class="n">gradients</span>
+</span>        <span class="k">return</span> <span class="n">notImplemented</span>
         <span class="c1">## END students TODO
 </span>    
     <span class="c1"># method for the activation exctraction
 </span>    <span class="k">def</span> <span class="nf">get_activations</span><span class="p">(</span><span class="n">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
-        <span class="k">return</span> <span class="n">self</span><span class="p">.</span><span class="nf">features_conv</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>    
-
+        <span class="c1">## BEGIN Students TODO
+</span>        <span class="k">return</span> <span class="n">notImplemented</span>
+        <span class="c1">## END students TODO
+</span>
 <span class="n">vgg</span> <span class="o">=</span> <span class="nc">VGG</span><span class="p">(</span><span class="n">model</span><span class="p">)</span>
 <span class="nf">print</span><span class="p">(</span><span class="sh">'</span><span class="s">cuda:</span><span class="sh">'</span><span class="p">,</span> <span class="n">cuda</span><span class="p">,</span> <span class="sh">'</span><span class="s">device:</span><span class="sh">'</span><span class="p">,</span> <span class="n">device</span><span class="p">)</span>
 <span class="n">vgg</span> <span class="o">=</span> <span class="n">vgg</span><span class="p">.</span><span class="nf">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
@@ -1279,8 +1277,8 @@ gradients = np.transpose(gradients[0], (1, 2, 0))
     <span class="n">grads</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="nf">calculate_outputs_and_gradients</span><span class="p">(</span><span class="n">scaled_inputs</span><span class="p">,</span> <span class="n">model</span><span class="p">,</span> <span class="n">target_label_idx</span><span class="p">,</span> <span class="n">cuda</span><span class="p">)</span>
 
    <span class="c1"># BEGIN students TODO
-</span>    <span class="n">avg_grads</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="nf">average</span><span class="p">(</span><span class="n">grads</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>      <span class="c1"># why 51 steps and then remove final result ?
-</span>    <span class="n">avg_grads</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="nf">transpose</span><span class="p">(</span><span class="n">avg_grads</span><span class="p">,</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span>
+</span>    <span class="n">avg_grads</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="nf">average</span><span class="p">(</span><span class="n">grads</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>  
+    <span class="n">avg_grads</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="nf">transpose</span><span class="p">(</span><span class="n">avg_grads</span><span class="p">,</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span>
     <span class="n">delta_X</span> <span class="o">=</span> <span class="p">(</span><span class="nf">pre_processing</span><span class="p">(</span><span class="n">inputs</span><span class="p">,</span> <span class="n">cuda</span><span class="p">)</span> <span class="o">-</span> <span class="nf">pre_processing</span><span class="p">(</span><span class="n">baseline</span><span class="p">,</span> <span class="n">cuda</span><span class="p">)).</span><span class="nf">detach</span><span class="p">().</span><span class="nf">squeeze</span><span class="p">(</span><span class="mi">0</span><span class="p">).</span><span class="nf">cpu</span><span class="p">().</span><span class="nf">numpy</span><span class="p">()</span>
     <span class="n">delta_X</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="nf">transpose</span><span class="p">(</span><span class="n">delta_X</span><span class="p">,</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span>
     <span class="n">integrated_grad</span> <span class="o">=</span> <span class="n">delta_X</span> <span class="o">*</span> <span class="n">avg_grads</span>
