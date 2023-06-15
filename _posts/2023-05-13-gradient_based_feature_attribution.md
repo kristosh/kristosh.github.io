@@ -1,6 +1,6 @@
 ---
 layout: distill
-title: Gradient-based feature attribution for Vision
+title: Gradient-based feature attribution
 description: This page's main focus is to analyze a branch of explainable & interpretable AI (XAI) called posthoc XAI. We will analyze theory, taxonomy, applications, shortcomings of posthoc XAI approaches and apply them on image classification using popular CNN architectures and explain their black box nature. Part of the assessemnet for this tutorial/workshop, will be some research questions that needs be answered by you. These questions can be found all over this blogspot using the <mark>TOSUBMIT</mark> tag and will be summarized them at the end of the blogspot.
   
 date: 2023-05-13
