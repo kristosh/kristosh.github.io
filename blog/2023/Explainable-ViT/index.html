@@ -1,7 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
-
-  <!-- Head -->
+<!-- _layouts/distill.html --><html>
   <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">    <!-- Metadata, OpenGraph and Schema.org -->
     
@@ -10,10 +8,9 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <title>Announcement_2 | Christos  Athanasiadis</title>
+    <title>How to explain the behavior of vision transformers? | Christos  Athanasiadis</title>
     <meta name="author" content="Christos  Athanasiadis">
-    <meta name="description" content="A simple, whitespace theme for academics.
-">
+    <meta name="description" content="This page's goal is to present a PostHoc feature attribution XAI methodology called LIME (Local Interpretable Model-agnostic Explanations) and demonstrate how it can be used to explain image classification tasks. You will be guided through the code and the results of the LIME algorithm. Part of this workshop will be some research questions that need to be answered by you. These questions can be found in the last part of the tutorials and you will encounter these questions with the &lt;mark&gt;TOSUBMIT&lt;/mark&gt; tag. You will need to submit your answers to these questions in the form of a .pdf file on Canvas. The deadline for submitting your answers is the .. of June 2023.">
     <meta name="keywords" content="jekyll, jekyll-theme, academic-website, portfolio-website">
 
 
@@ -39,7 +36,7 @@
     <link rel="shortcut icon" href="data:image/svg+xml,&lt;svg%20xmlns=%22http://www.w3.org/2000/svg%22%20viewBox=%220%200%20100%20100%22&gt;&lt;text%20y=%22.9em%22%20font-size=%2290%22&gt;%F0%9F%98%8E&lt;/text&gt;&lt;/svg&gt;">
     
     <link rel="stylesheet" href="/kristosh/assets/css/main.css">
-    <link rel="canonical" href="https://kristosh.github.io/kristosh/news/announcement_2/">
+    <link rel="canonical" href="https://kristosh.github.io/kristosh/blog/2023/Explainable-ViT/">
 
     <!-- Dark Mode -->
     
@@ -49,10 +46,65 @@
     <script src="/kristosh/assets/js/dark_mode.js"></script>
     
 
+
+    <!-- jQuery -->
+  <script src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
+
+    <!-- MathJax -->
+  <script type="text/javascript">
+    window.MathJax = {
+      tex: {
+        tags: 'ams'
+      }
+    };
+  </script>
+  <script defer type="text/javascript" id="MathJax-script" src="https://cdn.jsdelivr.net/npm/mathjax@3.2.0/es5/tex-mml-chtml.js"></script>
+  <script defer src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+
+    <!-- Distill js -->
+    <script src="/kristosh/assets/js/distillpub/template.v2.js"></script>
+    <script src="/kristosh/assets/js/distillpub/transforms.v2.js"></script>
+    <script src="/kristosh/assets/js/distillpub/overrides.js"></script>
+    
   </head>
 
-  <!-- Body -->
-  <body class="fixed-top-nav ">
+  <body>
+<d-front-matter>
+    <script async type="text/json">{
+      "title": "How to explain the behavior of vision transformers?",
+      "description": "This page's goal is to present a PostHoc feature attribution XAI methodology called LIME (Local Interpretable Model-agnostic Explanations) and demonstrate how it can be used to explain image classification tasks. You will be guided through the code and the results of the LIME algorithm. Part of this workshop will be some research questions that need to be answered by you. These questions can be found in the last part of the tutorials and you will encounter these questions with the <mark>TOSUBMIT</mark> tag. You will need to submit your answers to these questions in the form of a .pdf file on Canvas. The deadline for submitting your answers is the .. of June 2023.",
+      "published": "May 13, 2023",
+      "authors": [
+        {
+          "author": "Christos Athanasiadis",
+          "authorURL": "https://www.linkedin.com/in/christos-athanasiadis-a3b51035/",
+          "affiliations": [
+            {
+              "name": "UvA, Interpretability and Explainability in AI",
+              "url": ""
+            }
+          ]
+        }
+        
+      ],
+      "katex": {
+        "delimiters": [
+          {
+            "left": "$",
+            "right": "$",
+            "display": false
+          },
+          {
+            "left": "$$",
+            "right": "$$",
+            "display": true
+          }
+        ]
+      }
+    }</script>
+  </d-front-matter>
+
+  
 
     <!-- Header -->
     <header>
@@ -78,8 +130,8 @@
               </li>
               
               <!-- Blog -->
-              <li class="nav-item ">
-                <a class="nav-link" href="/kristosh/blog/">blog</a>
+              <li class="nav-item active">
+                <a class="nav-link" href="/kristosh/blog/">blog<span class="sr-only">(current)</span></a>
               </li>
 
               <!-- Other pages -->
@@ -112,32 +164,61 @@
 
 
     <!-- Content -->
-    <div class="container mt-5">
-      
-        <!-- _layouts/post.html -->
+    <div class="post distill">
 
-<div class="post">
+      <d-title>
+        <h1>How to explain the behavior of vision transformers?</h1>
+        <p>This page's goal is to present a PostHoc feature attribution XAI methodology called LIME (Local Interpretable Model-agnostic Explanations) and demonstrate how it can be used to explain image classification tasks. You will be guided through the code and the results of the LIME algorithm. Part of this workshop will be some research questions that need to be answered by you. These questions can be found in the last part of the tutorials and you will encounter these questions with the <mark>TOSUBMIT</mark> tag. You will need to submit your answers to these questions in the form of a .pdf file on Canvas. The deadline for submitting your answers is the .. of June 2023.</p>
+      </d-title>
 
-  <header class="post-header">
-    <h1 class="post-title">Announcement_2</h1>
-    <p class="post-meta">August 15, 2020</p>
-    <p class="post-tags">
-      <a href="/kristosh//blog/2020"> <i class="fas fa-calendar fa-sm"></i> 2020 </a>
+      <d-byline></d-byline>
 
-    </p>
-  </header>
+      <d-article>
+        <d-contents>
+          <nav class="l-text figcaption">
+          <h3>Contents</h3>
+            <div><a href="#local-interpretable-model-agnostic-explanations">Local Interpretable Model-agnostic Explanations</a></div>
+            <ul>
+              <li><a href="#interpretable-representations">Interpretable Representations</a></li>
+              <li><a href="#lime-approach-details">LIME approach details</a></li>
+              <li><a href="#code-implementation">Code implementation</a></li>
+              <li><a href="#lime-explanation">LIME explanation</a></li>
+              <li><a href="#creating-perturbations-of-image">Creating Perturbations of image</a></li>
+              
+            </ul>
+<div><a href="#results">Results</a></div>
+            <div><a href="#adversarial-attacks">Adversarial attacks</a></div>
+            <div><a href="#tosubmit">TOSUBMIT</a></div>
+            <div><a href="#conclusions">Conclusions</a></div>
+            <div><a href="#references">References</a></div>
+            
+          </nav>
+        </d-contents>
 
-  <article class="post-content">
+        <h1 id="local-interpretable-model-agnostic-explanations">Local Interpretable Model-agnostic Explanations</h1>
+
+<figure>
+
+  <picture>
     
-    <div id="markdown-content">
-      <p>I have started working on UvA as a junior lecturer at the Artificial intelligence master program.</p>
 
-    </div>
-  </article>
+    <!-- Fallback to the original file -->
+    <img src="/kristosh/assets/img/2023-06-23-Explainable-ViT/ViT_architecture.PNG" class="img-fluid" width="auto" height="auto" onerror="this.onerror=null; $('.responsive-img-srcset').remove();">
+
+  </picture>
+
+</figure>
+
+
+      </d-article>
+
+      <d-appendix>
+        <d-footnote-list></d-footnote-list>
+        <d-citation-list></d-citation-list>
+      </d-appendix>
+
+      <d-bibliography src="/kristosh/assets/bibliography/"></d-bibliography>
 </div>
-
-      
-    </div>
 
     <!-- Footer -->    
     <footer class="fixed-bottom">
@@ -147,45 +228,9 @@
       </div>
     </footer>
 
-    <!-- JavaScripts -->
-    <!-- jQuery -->
-  <script src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
-
     <!-- Bootsrap & MDB scripts -->
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.1/dist/js/bootstrap.bundle.min.js" integrity="sha256-fgLAgv7fyCGopR/gBNq2iW3ZKIdqIcyshnUULC4vex8=" crossorigin="anonymous"></script>
   <script src="https://cdn.jsdelivr.net/npm/mdbootstrap@4.20.0/js/mdb.min.js" integrity="sha256-NdbiivsvWt7VYCt6hYNT3h/th9vSTL4EDWeGs5SN3DA=" crossorigin="anonymous"></script>
-
-    <!-- Masonry & imagesLoaded -->
-  <script defer src="https://cdn.jsdelivr.net/npm/masonry-layout@4.2.2/dist/masonry.pkgd.min.js" integrity="sha256-Nn1q/fx0H7SNLZMQ5Hw5JLaTRZp0yILA/FRexe19VdI=" crossorigin="anonymous"></script>
-  <script defer src="https://cdn.jsdelivr.net/npm/imagesloaded@4/imagesloaded.pkgd.min.js"></script>
-  <script defer src="/kristosh/assets/js/masonry.js" type="text/javascript"></script>
-    
-  <!-- Medium Zoom JS -->
-  <script defer src="https://cdn.jsdelivr.net/npm/medium-zoom@1.0.8/dist/medium-zoom.min.js" integrity="sha256-7PhEpEWEW0XXQ0k6kQrPKwuoIomz8R8IYyuU1Qew4P8=" crossorigin="anonymous"></script>
-  <script defer src="/kristosh/assets/js/zoom.js"></script>
-
-  <!-- Bootstrap Table -->
-  <script defer src="https://unpkg.com/bootstrap-table@1.21.3/dist/bootstrap-table.min.js"></script>
-
-  <!-- Load Common JS -->
-  <script src="/kristosh/assets/js/no_defer.js"></script>
-  <script defer src="/kristosh/assets/js/common.js"></script>
-  <script defer src="/kristosh/assets/js/copy_code.js" type="text/javascript"></script>
-
-    
-  <script async src="https://d1bxh8uas1mnw7.cloudfront.net/assets/embed.js"></script>
-  <script async src="https://badge.dimensions.ai/badge.js"></script>
-
-    <!-- MathJax -->
-  <script type="text/javascript">
-    window.MathJax = {
-      tex: {
-        tags: 'ams'
-      }
-    };
-  </script>
-  <script defer type="text/javascript" id="MathJax-script" src="https://cdn.jsdelivr.net/npm/mathjax@3.2.0/es5/tex-mml-chtml.js"></script>
-  <script defer src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
 
     
     
@@ -267,5 +312,6 @@
   }
 </script>
 
-  </body>
+  
+</body>
 </html>
