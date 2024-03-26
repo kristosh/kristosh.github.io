@@ -53,6 +53,7 @@ rss_icon: true
 
 navbar_fixed: true
 footer_fixed: true
+pygments: true  # enable code syntax highlighting
 
 # Dimensions
 max_width: 800px
