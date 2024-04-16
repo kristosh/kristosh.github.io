@@ -37,9 +37,7 @@ toc:
 
 {% include figure.html path="assets/img/2023-06-23-Explainable-ViT/ViT_architecture.PNG" class="img-fluid" %}
 
-What is a Visual Transformer? What is going on with the inner mechanism of it? How do they even work? Can we poke at them and dissect them into pieces to understand them better? These are some questions that we will try to answer in this post. Firstly, we will try to remind our reader about what is exactly a visual transformer and how it works. Secondly, we will try to revise methods
-that aim to shed light on their inner mechanisms. Our aim goal is to investigate all the current standard practices for visualizing the mechanisms that cause the ViT classifier to predict a
-specific class each time. These visualizations could be useful for:
+What is a Visual Transformer? What is going on with the inner mechanism of it? How do they even work? Can we poke at them and dissect them into pieces to understand them better? These are some questions that we will try to answer in this post. Firstly, we will try to remind our reader about what is exactly a visual transformer and how it works. Secondly, we will try to revise methods that aim to shed light on their inner mechanisms. Our aim goal is to investigate all the current standard practices for visualizing the mechanisms that cause the ViT classifier to predict a specific class each time. These visualizations could be useful for:
 
 - **the developer**: What’s going on inside when we run the Transformer on this image? Being able to look at intermediate activation layers. In computer vision - these are usually images! These are kind of interpretable since you can display the different channel activations as 2D images.
 
@@ -47,9 +45,14 @@ specific class each time. These visualizations could be useful for:
 
 - **both the developer and the user**: What did it see in this image? Being able to Answer <em>What part of the image is responsible for the network prediction</em>, is sometimes called <em>Pixel Attribution</em>.
 
-This tutorial was following link: [https://uvadlc-notebooks.readthedocs.io/en/latest/tutorial_notebooks/tutorial15/Vision_Transformer.html](https://uvadlc-notebooks.readthedocs.io/en/latest/tutorial_notebooks/tutorial15/Vision_Transformer.html).
+This tutorial was based on the code from the following tutorial: [https://uvadlc-notebooks.readthedocs.io/en/latest/tutorial_notebooks/tutorial15/Vision_Transformer.html](https://uvadlc-notebooks.readthedocs.io/en/latest/tutorial_notebooks/tutorial15/Vision_Transformer.html).
 
-The expectation from this tutorial 
+What we will cover in this tutorial are the following things:
+
+- Firstly, we will create a simple ViT classifier trained in three classes. We will check how well it works and we will perform transfer-learning to improve its performance.
+- Then, we will check several methods to shed light on how the ViT classifier works. More specifically, we will check two methods called: *Rollout methods** and **Gradient-based methods**
+
+Finally, a simple TODO exercise will be provided to gauge the performance of different XAI methods for our built ViT model.
 
 # Vision Transformers
 
@@ -90,140 +93,119 @@ Breaking the hyperparameters down:
 - **Heads**: How many heads are there in the Multi-Head Attention layers?
 - **Params**: What is the total number of parameters of the model? Generally, more parameters lead to better performance but at the cost of more compute. You'll notice even ViT-Base has far more parameters than any other model we've used so far.
 
-## Vision Transformers (ViTs) Tokenization
+# Vision Transformers (ViTs) Tokenization
 
-The standard Transformer receives as input a 1D sequence of token embeddings. To handle 2D images, we reshape the image $\mathbf{x} \in \mathbb{R}^{H \times W \times C}$ into a sequence of flattened patches with size $\mathbf{x}_{P} \in \mathbb{R}^{N\times C*P^{2}}$, when $H, W$ represent the height and the width of an image while $C$ represents the number of channels, then, $N$ is the number of patches and $P$ is the patch dimensionality. The Transformer uses constant latent vector size  $D$ through all of its layers, so we flatten the patches and map to $D$ dimensions with a trainable linear projection (Eq. 1). We refer to the output of this projection as the patch embeddings.
-
-
-```python
-def img_to_patch(x, patch_size, flatten_channels=True):
-    """
-    Inputs:
-        x - torch.Tensor representing the image of shape [B, C, H, W]
-        patch_size - Number of pixels per dimension of the patches (integer)
-        flatten_channels - If True, the patches will be returned in a flattened format
-                           as a feature vector instead of a image grid.
-    """
-    B, C, H, W = x.shape
-    x = x.reshape(B, C, H//patch_size, patch_size, W//patch_size, patch_size)
-    x = x.permute(0, 2, 4, 1, 3, 5) # [B, H', W', C, p_H, p_W]
-    x = x.flatten(1,2)              # [B, H'*W', C, p_H, p_W]
-    if flatten_channels:
-        x = x.flatten(2,4)          # [B, H'*W', C*p_H*p_W]
-    return x
-
-```
-
-If the input image is of size $224 \times 224 \times 3$ and the patch size is $16$ then the output should be of size $196 \times 768$, where the first dimension is the number of patches and the second dimension is the size of the patch embeddings $16*16*3 = 768$.
+The standard Transformer receives as input a 1D sequence of token embeddings. To handle 2D images, we reshape the image $\mathbf{x} \in \mathbb{R}^{H \times W \times C}$ into a sequence of flattened patches with size $\mathbf{x}_P \in \mathbb{R}^{N \times CP^2}$, when $H, W$ represent the height and the width of an image while $C$ represents the number of channels, then, $N$ is the number of patches and $P$ is the patch dimensionality. The Transformer uses constant latent vector size  $D$ through all of its layers, so we flatten the patches and map to $D$ dimensions with a trainable linear projection (Eq. 1). We refer to the output of this projection as the patch embeddings. If the input image is of size $224 \times 224 \times 3$ and the patch size is $16$ then the output should be of size $196 \times 768$, where the first dimension is the number of patches and the second dimension is the size of the patch embeddings $16\cdot 16\cdot 3 = 768$.
 
 Having created the patches, it is time to create an implementation for the attention block which is the core unit of the ViTs architecture. The attention block is the same as the one in the vanilla transformers. It consists of a multi-head self-attention mechanism followed by a feed-forward neural network. The multi-head self-attention mechanism is used to capture the dependencies between the patches. The feed-forward neural network is used to capture the non-linear interactions between the patches. The following image portrays the mechanism of the attention block.
 
+Here we will need to decide whether the input to our model will be the full image or the image patches. To decide that we will take into account that a lot of pre-trained models have as input the full image. Thus, for now, we will use the full image as input to our model. 
+
 {% include figure.html path="assets/img/2023-06-23-Explainable-ViT/ViT_architecture.PNG" class="img-fluid" %}
 
+# Load the pizza-sushi-steak dataset 🍕🍣🥩
 
-The attention block is implemented as follows:
-
-```python
-class AttentionBlock(nn.Module):
-    
-    def __init__(self, embed_dim, hidden_dim, num_heads, dropout=0.0):
-        """
-        Inputs:
-            embed_dim - Dimensionality of input and attention feature vectors
-            hidden_dim - Dimensionality of hidden layer in feed-forward network 
-                         (usually 2-4x larger than embed_dim)
-            num_heads - Number of heads to use in the Multi-Head Attention block
-            dropout - Amount of dropout to apply in the feed-forward network
-        """
-        super().__init__()
-        
-        self.layer_norm_1 = nn.LayerNorm(embed_dim)
-        self.attn = nn.MultiheadAttention(embed_dim, num_heads, 
-                                          dropout=dropout)
-        self.layer_norm_2 = nn.LayerNorm(embed_dim)
-        self.linear = nn.Sequential(
-            nn.Linear(embed_dim, hidden_dim),
-            nn.GELU(),
-            nn.Dropout(dropout),
-            nn.Linear(hidden_dim, embed_dim),
-            nn.Dropout(dropout)
-        )
-        
-        
-    def forward(self, x):
-        inp_x = self.layer_norm_1(x)
-        x = x + self.attn(inp_x, inp_x, inp_x)[0]
-        x = x + self.linear(self.layer_norm_2(x))
-        return x
-
-```
-
-Now we have all modules ready to build our own Vision Transformer. Besides the Transformer encoder, we need the following modules:
-- A linear projection layer that maps the input patches to a feature vector of larger size. It is implemented by a simple linear layer that takes each 
- patch independently as input.
-- A classification token is added to the input sequence. We will use the output feature vector of the classification token (CLS token in short) for determining the classification prediction.
-- Learnable positional encodings that are added to the tokens before being processed by the Transformer. Those are needed to learn position-dependent information and convert the set to a sequence. Since we usually work with a fixed resolution, we can learn the positional encodings instead of having the pattern of sine and cosine functions.
-- An MLP head that takes the output feature vector of the CLS token, and maps it to a classification prediction. This is usually implemented by a small feed-forward network or even a single linear layer.
-
-With those components in mind, let’s implement the full Vision Transformer below:
+In this section, we will implement a simple ViT classifier for the pizza-sushi-steak dataset. The dataset contains train and test folders with 450 images for training and 150 images for testing. We will start by providing some code for setting up our data. Firstly, we should download the dataset:
 
 ```python
-    class VisionTransformer(nn.Module):
-
-    def __init__(self, embed_dim, hidden_dim, num_channels, num_heads, num_layers, num_classes, patch_size, num_patches, dropout=0.0):
-        """
-        Inputs:
-            embed_dim - Dimensionality of the input feature vectors to the Transformer
-            hidden_dim - Dimensionality of the hidden layer in the feed-forward networks
-                         within the Transformer
-            num_channels - Number of channels of the input (3 for RGB)
-            num_heads - Number of heads to use in the Multi-Head Attention block
-            num_layers - Number of layers to use in the Transformer
-            num_classes - Number of classes to predict
-            patch_size - Number of pixels that the patches have per dimension
-            num_patches - Maximum number of patches an image can have
-            dropout - Amount of dropout to apply in the feed-forward network and
-                      on the input encoding
-        """
-        super().__init__()
-
-        self.patch_size = patch_size
-
-        # Layers/Networks
-        self.input_layer = nn.Linear(num_channels*(patch_size**2), embed_dim)
-        self.transformer = nn.Sequential(*[AttentionBlock(embed_dim, hidden_dim, num_heads, dropout=dropout) for _ in range(num_layers)])
-        self.mlp_head = nn.Sequential(
-            nn.LayerNorm(embed_dim),
-            nn.Linear(embed_dim, num_classes)
-        )
-        self.dropout = nn.Dropout(dropout)
-
-        # Parameters/Embeddings
-        self.cls_token = nn.Parameter(torch.randn(1,1,embed_dim))
-        self.pos_embedding = nn.Parameter(torch.randn(1,1+num_patches,embed_dim))
-
-
-    def forward(self, x):
-        # Preprocess input
-        x = img_to_patch(x, self.patch_size)
-        B, T, _ = x.shape
-        x = self.input_layer(x)
-
-        # Add CLS token and positional encoding
-        cls_token = self.cls_token.repeat(B, 1, 1)
-        x = torch.cat([cls_token, x], dim=1)
-        x = x + self.pos_embedding[:,:T+1]
-
-        # Apply Transforrmer
-        x = self.dropout(x)
-        x = x.transpose(0, 1)
-        x = self.transformer(x)
-
-        # Perform classification prediction
-        cls = x[0]
-        out = self.mlp_head(cls)
-        return out
+image_path = download_data(source="https://github.com/mrdbourke/pytorch-deep-learning/raw/main/data/pizza_steak_sushi.zip",
+    destination="pizza_steak_sushi")
 ```
+
+Set up the paths for the training and testing data:
+
+```python
+data_path = Path("data/")
+image_path = data_path / "pizza_steak_sushi"
+
+# Setup directory paths to train and test images
+train_dir = image_path / "train"
+test_dir = image_path / "test"
+```
+
+Then, we would like to perform some basic transformations to our data:
+
+```python
+# Create image size (from Table 3 in the ViT paper)
+IMG_SIZE = 224
+
+# Create transform pipeline manually
+manual_transforms = transforms.Compose([
+    transforms.Resize((IMG_SIZE, IMG_SIZE)),
+    transforms.ToTensor(),
+])
+```
+
+Then you will need to create the dataloaders for train and test sets:
+
+```python
+# Use ImageFolder to create dataset(s)
+  train_data = datasets.ImageFolder(train_dir, transform=transform)
+  test_data = datasets.ImageFolder(test_dir, transform=transform)
+
+  # Get class names
+  class_names = train_data.classes
+
+  # Turn images into data loaders
+  train_dataloader = DataLoader(
+      train_data,
+      batch_size=batch_size,
+      shuffle=True,
+      num_workers=num_workers,
+      pin_memory=True,
+  )
+  
+  test_dataloader = DataLoader(
+      test_data,
+      batch_size=batch_size,
+      shuffle=False, # don't need to shuffle test data
+      num_workers=num_workers,
+      pin_memory=True,
+  )
+```
+
+And return a batch of images and labels with the following code:
+
+```python
+image_batch, label_batch = next(iter(train_dataloader))
+```
+# Create a ViT classifier
+
+Having loaded the data, now it's time to create a simple ViT classifier and fit our data. We will call the ViT model and pass the image batch to it. The output of the model will be the logits for each class. We will then use the cross-entropy loss to calculate the loss and the Adam optimizer to update the weights of the model. The following code will help you to create a simple ViT classifier:
+
+```python
+device = "cuda" if torch.cuda.is_available() else "cpu"
+set_seeds()
+# Create an instance of ViT with the number of classes we're working with (pizza, steak, sushi)
+vit = ViT(num_classes=len(cls_names))
+
+# Setup the optimizer to optimize our ViT model parameters using hyperparameters from the ViT paper
+optimizer = torch.optim.Adam(params=vit.parameters(),
+    lr=3e-3, # Base LR from Table 3 for ViT-* ImageNet-1k
+    betas=(0.9, 0.999), # default values but also mentioned in ViT paper section 4.1 (Training & Fine-tuning)
+    weight_decay=0.3) # from the ViT paper section 4.1 (Training & Fine-tuning) and Table 3 for ViT-* ImageNet-1k
+
+# Setup the loss function for multi-class classification
+loss_fn = torch.nn.CrossEntropyLoss()
+# Train the model and save the training results to a dictionary
+results = train_function(model=vit,
+    train_dataloader=train_dataloader,
+    test_dataloader=test_dataloader,
+    optimizer=optimizer,
+    loss_fn=loss_fn,
+    epochs=10,
+    device=device)
+```
+
+## Building the ViT model 
+
+## Training function for the ViT model
+
+## Measuring the performance of the ViT model
+
+# Explainable Vision Transformers
+
+# TODO
 
 # Conclusions
 
