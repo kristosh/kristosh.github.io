@@ -201,9 +201,7 @@
 
 </figure>
 
-<p>What is a Visual Transformer? What is going on with the inner mechanism of it? How do they even work? Can we poke at them and dissect them into pieces to understand them better? These are some questions that we will try to answer in this post. Firstly, we will try to remind our reader about what is exactly a visual transformer and how it works. Secondly, we will try to revise methods
-that aim to shed light on their inner mechanisms. Our aim goal is to investigate all the current standard practices for visualizing the mechanisms that cause the ViT classifier to predict a
-specific class each time. These visualizations could be useful for:</p>
+<p>What is a Visual Transformer? What is going on with the inner mechanism of it? How do they even work? Can we poke at them and dissect them into pieces to understand them better? These are some questions that we will try to answer in this post. Firstly, we will try to remind our reader about what is exactly a visual transformer and how it works. Secondly, we will try to revise methods that aim to shed light on their inner mechanisms. Our aim goal is to investigate all the current standard practices for visualizing the mechanisms that cause the ViT classifier to predict a specific class each time. These visualizations could be useful for:</p>
 
 <ul>
   <li>
@@ -217,9 +215,17 @@ specific class each time. These visualizations could be useful for:</p>
   </li>
 </ul>
 
-<p>This tutorial was following link: <a href="https://uvadlc-notebooks.readthedocs.io/en/latest/tutorial_notebooks/tutorial15/Vision_Transformer.html" rel="external nofollow noopener" target="_blank">https://uvadlc-notebooks.readthedocs.io/en/latest/tutorial_notebooks/tutorial15/Vision_Transformer.html</a>.</p>
+<p>This tutorial was based on the code from the following tutorial: <a href="https://uvadlc-notebooks.readthedocs.io/en/latest/tutorial_notebooks/tutorial15/Vision_Transformer.html" rel="external nofollow noopener" target="_blank">https://uvadlc-notebooks.readthedocs.io/en/latest/tutorial_notebooks/tutorial15/Vision_Transformer.html</a>.</p>
 
-<p>The expectation from this tutorial</p>
+<p>What we will cover in this tutorial are the following things:</p>
+
+<ul>
+  <li>Firstly, we will create a simple ViT classifier trained in three classes. We will check how well it works and we will perform transfer-learning to improve its performance.</li>
+  <li>Then, we will check several methods to shed light on how the ViT classifier works. More specifically, we will check two methods called: *Rollout methods** and <strong>Gradient-based methods</strong>
+</li>
+</ul>
+
+<p>Finally, a simple TODO exercise will be provided to gauge the performance of different XAI methods for our built ViT model.</p>
 
 <h1 id="vision-transformers">Vision Transformers</h1>
 
@@ -285,31 +291,13 @@ specific class each time. These visualizations could be useful for:</p>
 <strong>Params</strong>: What is the total number of parameters of the model? Generally, more parameters lead to better performance but at the cost of more compute. You’ll notice even ViT-Base has far more parameters than any other model we’ve used so far.</li>
 </ul>
 
-<h2 id="vision-transformers-vits-tokenization">Vision Transformers (ViTs) Tokenization</h2>
+<h1 id="vision-transformers-vits-tokenization">Vision Transformers (ViTs) Tokenization</h1>
 
-<p>The standard Transformer receives as input a 1D sequence of token embeddings. To handle 2D images, we reshape the image $\mathbf{x} \in \mathbb{R}^{H \times W \times C}$ into a sequence of flattened patches with size $\mathbf{x}_{P} \in \mathbb{R}^{N\times C*P^{2}}$, when $H, W$ represent the height and the width of an image while $C$ represents the number of channels, then, $N$ is the number of patches and $P$ is the patch dimensionality. The Transformer uses constant latent vector size  $D$ through all of its layers, so we flatten the patches and map to $D$ dimensions with a trainable linear projection (Eq. 1). We refer to the output of this projection as the patch embeddings.</p>
-
-<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">img_to_patch</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">patch_size</span><span class="p">,</span> <span class="n">flatten_channels</span><span class="o">=</span><span class="bp">True</span><span class="p">):</span>
-    <span class="sh">"""</span><span class="s">
-    Inputs:
-        x - torch.Tensor representing the image of shape [B, C, H, W]
-        patch_size - Number of pixels per dimension of the patches (integer)
-        flatten_channels - If True, the patches will be returned in a flattened format
-                           as a feature vector instead of a image grid.
-    </span><span class="sh">"""</span>
-    <span class="n">B</span><span class="p">,</span> <span class="n">C</span><span class="p">,</span> <span class="n">H</span><span class="p">,</span> <span class="n">W</span> <span class="o">=</span> <span class="n">x</span><span class="p">.</span><span class="n">shape</span>
-    <span class="n">x</span> <span class="o">=</span> <span class="n">x</span><span class="p">.</span><span class="nf">reshape</span><span class="p">(</span><span class="n">B</span><span class="p">,</span> <span class="n">C</span><span class="p">,</span> <span class="n">H</span><span class="o">//</span><span class="n">patch_size</span><span class="p">,</span> <span class="n">patch_size</span><span class="p">,</span> <span class="n">W</span><span class="o">//</span><span class="n">patch_size</span><span class="p">,</span> <span class="n">patch_size</span><span class="p">)</span>
-    <span class="n">x</span> <span class="o">=</span> <span class="n">x</span><span class="p">.</span><span class="nf">permute</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">5</span><span class="p">)</span> <span class="c1"># [B, H', W', C, p_H, p_W]
-</span>    <span class="n">x</span> <span class="o">=</span> <span class="n">x</span><span class="p">.</span><span class="nf">flatten</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">)</span>              <span class="c1"># [B, H'*W', C, p_H, p_W]
-</span>    <span class="k">if</span> <span class="n">flatten_channels</span><span class="p">:</span>
-        <span class="n">x</span> <span class="o">=</span> <span class="n">x</span><span class="p">.</span><span class="nf">flatten</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="mi">4</span><span class="p">)</span>          <span class="c1"># [B, H'*W', C*p_H*p_W]
-</span>    <span class="k">return</span> <span class="n">x</span>
-
-</code></pre></div></div>
-
-<p>If the input image is of size $224 \times 224 \times 3$ and the patch size is $16$ then the output should be of size $196 \times 768$, where the first dimension is the number of patches and the second dimension is the size of the patch embeddings $16<em>16</em>3 = 768$.</p>
+<p>The standard Transformer receives as input a 1D sequence of token embeddings. To handle 2D images, we reshape the image $\mathbf{x} \in \mathbb{R}^{H \times W \times C}$ into a sequence of flattened patches with size $\mathbf{x}_P \in \mathbb{R}^{N \times CP^2}$, when $H, W$ represent the height and the width of an image while $C$ represents the number of channels, then, $N$ is the number of patches and $P$ is the patch dimensionality. The Transformer uses constant latent vector size  $D$ through all of its layers, so we flatten the patches and map to $D$ dimensions with a trainable linear projection (Eq. 1). We refer to the output of this projection as the patch embeddings. If the input image is of size $224 \times 224 \times 3$ and the patch size is $16$ then the output should be of size $196 \times 768$, where the first dimension is the number of patches and the second dimension is the size of the patch embeddings $16\cdot 16\cdot 3 = 768$.</p>
 
 <p>Having created the patches, it is time to create an implementation for the attention block which is the core unit of the ViTs architecture. The attention block is the same as the one in the vanilla transformers. It consists of a multi-head self-attention mechanism followed by a feed-forward neural network. The multi-head self-attention mechanism is used to capture the dependencies between the patches. The feed-forward neural network is used to capture the non-linear interactions between the patches. The following image portrays the mechanism of the attention block.</p>
+
+<p>Here we will need to decide whether the input to our model will be the full image or the image patches. To decide that we will take into account that a lot of pre-trained models have as input the full image. Thus, for now, we will use the full image as input to our model.</p>
 
 <figure>
 
@@ -323,109 +311,103 @@ specific class each time. These visualizations could be useful for:</p>
 
 </figure>
 
-<p>The attention block is implemented as follows:</p>
+<h1 id="load-the-pizza-sushi-steak-dataset-">Load the pizza-sushi-steak dataset 🍕🍣🥩</h1>
 
-<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">class</span> <span class="nc">AttentionBlock</span><span class="p">(</span><span class="n">nn</span><span class="p">.</span><span class="n">Module</span><span class="p">):</span>
-    
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="n">self</span><span class="p">,</span> <span class="n">embed_dim</span><span class="p">,</span> <span class="n">hidden_dim</span><span class="p">,</span> <span class="n">num_heads</span><span class="p">,</span> <span class="n">dropout</span><span class="o">=</span><span class="mf">0.0</span><span class="p">):</span>
-        <span class="sh">"""</span><span class="s">
-        Inputs:
-            embed_dim - Dimensionality of input and attention feature vectors
-            hidden_dim - Dimensionality of hidden layer in feed-forward network 
-                         (usually 2-4x larger than embed_dim)
-            num_heads - Number of heads to use in the Multi-Head Attention block
-            dropout - Amount of dropout to apply in the feed-forward network
-        </span><span class="sh">"""</span>
-        <span class="nf">super</span><span class="p">().</span><span class="nf">__init__</span><span class="p">()</span>
-        
-        <span class="n">self</span><span class="p">.</span><span class="n">layer_norm_1</span> <span class="o">=</span> <span class="n">nn</span><span class="p">.</span><span class="nc">LayerNorm</span><span class="p">(</span><span class="n">embed_dim</span><span class="p">)</span>
-        <span class="n">self</span><span class="p">.</span><span class="n">attn</span> <span class="o">=</span> <span class="n">nn</span><span class="p">.</span><span class="nc">MultiheadAttention</span><span class="p">(</span><span class="n">embed_dim</span><span class="p">,</span> <span class="n">num_heads</span><span class="p">,</span> 
-                                          <span class="n">dropout</span><span class="o">=</span><span class="n">dropout</span><span class="p">)</span>
-        <span class="n">self</span><span class="p">.</span><span class="n">layer_norm_2</span> <span class="o">=</span> <span class="n">nn</span><span class="p">.</span><span class="nc">LayerNorm</span><span class="p">(</span><span class="n">embed_dim</span><span class="p">)</span>
-        <span class="n">self</span><span class="p">.</span><span class="n">linear</span> <span class="o">=</span> <span class="n">nn</span><span class="p">.</span><span class="nc">Sequential</span><span class="p">(</span>
-            <span class="n">nn</span><span class="p">.</span><span class="nc">Linear</span><span class="p">(</span><span class="n">embed_dim</span><span class="p">,</span> <span class="n">hidden_dim</span><span class="p">),</span>
-            <span class="n">nn</span><span class="p">.</span><span class="nc">GELU</span><span class="p">(),</span>
-            <span class="n">nn</span><span class="p">.</span><span class="nc">Dropout</span><span class="p">(</span><span class="n">dropout</span><span class="p">),</span>
-            <span class="n">nn</span><span class="p">.</span><span class="nc">Linear</span><span class="p">(</span><span class="n">hidden_dim</span><span class="p">,</span> <span class="n">embed_dim</span><span class="p">),</span>
-            <span class="n">nn</span><span class="p">.</span><span class="nc">Dropout</span><span class="p">(</span><span class="n">dropout</span><span class="p">)</span>
-        <span class="p">)</span>
-        
-        
-    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="n">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
-        <span class="n">inp_x</span> <span class="o">=</span> <span class="n">self</span><span class="p">.</span><span class="nf">layer_norm_1</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
-        <span class="n">x</span> <span class="o">=</span> <span class="n">x</span> <span class="o">+</span> <span class="n">self</span><span class="p">.</span><span class="nf">attn</span><span class="p">(</span><span class="n">inp_x</span><span class="p">,</span> <span class="n">inp_x</span><span class="p">,</span> <span class="n">inp_x</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
-        <span class="n">x</span> <span class="o">=</span> <span class="n">x</span> <span class="o">+</span> <span class="n">self</span><span class="p">.</span><span class="nf">linear</span><span class="p">(</span><span class="n">self</span><span class="p">.</span><span class="nf">layer_norm_2</span><span class="p">(</span><span class="n">x</span><span class="p">))</span>
-        <span class="k">return</span> <span class="n">x</span>
+<p>In this section, we will implement a simple ViT classifier for the pizza-sushi-steak dataset. The dataset contains train and test folders with 450 images for training and 150 images for testing. We will start by providing some code for setting up our data. Firstly, we should download the dataset:</p>
 
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">image_path</span> <span class="o">=</span> <span class="nf">download_data</span><span class="p">(</span><span class="n">source</span><span class="o">=</span><span class="sh">"</span><span class="s">https://github.com/mrdbourke/pytorch-deep-learning/raw/main/data/pizza_steak_sushi.zip</span><span class="sh">"</span><span class="p">,</span>
+    <span class="n">destination</span><span class="o">=</span><span class="sh">"</span><span class="s">pizza_steak_sushi</span><span class="sh">"</span><span class="p">)</span>
 </code></pre></div></div>
 
-<p>Now we have all modules ready to build our own Vision Transformer. Besides the Transformer encoder, we need the following modules:</p>
-<ul>
-  <li>A linear projection layer that maps the input patches to a feature vector of larger size. It is implemented by a simple linear layer that takes each 
- patch independently as input.</li>
-  <li>A classification token is added to the input sequence. We will use the output feature vector of the classification token (CLS token in short) for determining the classification prediction.</li>
-  <li>Learnable positional encodings that are added to the tokens before being processed by the Transformer. Those are needed to learn position-dependent information and convert the set to a sequence. Since we usually work with a fixed resolution, we can learn the positional encodings instead of having the pattern of sine and cosine functions.</li>
-  <li>An MLP head that takes the output feature vector of the CLS token, and maps it to a classification prediction. This is usually implemented by a small feed-forward network or even a single linear layer.</li>
-</ul>
+<p>Set up the paths for the training and testing data:</p>
 
-<p>With those components in mind, let’s implement the full Vision Transformer below:</p>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">data_path</span> <span class="o">=</span> <span class="nc">Path</span><span class="p">(</span><span class="sh">"</span><span class="s">data/</span><span class="sh">"</span><span class="p">)</span>
+<span class="n">image_path</span> <span class="o">=</span> <span class="n">data_path</span> <span class="o">/</span> <span class="sh">"</span><span class="s">pizza_steak_sushi</span><span class="sh">"</span>
 
-<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>    <span class="k">class</span> <span class="nc">VisionTransformer</span><span class="p">(</span><span class="n">nn</span><span class="p">.</span><span class="n">Module</span><span class="p">):</span>
-
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="n">self</span><span class="p">,</span> <span class="n">embed_dim</span><span class="p">,</span> <span class="n">hidden_dim</span><span class="p">,</span> <span class="n">num_channels</span><span class="p">,</span> <span class="n">num_heads</span><span class="p">,</span> <span class="n">num_layers</span><span class="p">,</span> <span class="n">num_classes</span><span class="p">,</span> <span class="n">patch_size</span><span class="p">,</span> <span class="n">num_patches</span><span class="p">,</span> <span class="n">dropout</span><span class="o">=</span><span class="mf">0.0</span><span class="p">):</span>
-        <span class="sh">"""</span><span class="s">
-        Inputs:
-            embed_dim - Dimensionality of the input feature vectors to the Transformer
-            hidden_dim - Dimensionality of the hidden layer in the feed-forward networks
-                         within the Transformer
-            num_channels - Number of channels of the input (3 for RGB)
-            num_heads - Number of heads to use in the Multi-Head Attention block
-            num_layers - Number of layers to use in the Transformer
-            num_classes - Number of classes to predict
-            patch_size - Number of pixels that the patches have per dimension
-            num_patches - Maximum number of patches an image can have
-            dropout - Amount of dropout to apply in the feed-forward network and
-                      on the input encoding
-        </span><span class="sh">"""</span>
-        <span class="nf">super</span><span class="p">().</span><span class="nf">__init__</span><span class="p">()</span>
-
-        <span class="n">self</span><span class="p">.</span><span class="n">patch_size</span> <span class="o">=</span> <span class="n">patch_size</span>
-
-        <span class="c1"># Layers/Networks
-</span>        <span class="n">self</span><span class="p">.</span><span class="n">input_layer</span> <span class="o">=</span> <span class="n">nn</span><span class="p">.</span><span class="nc">Linear</span><span class="p">(</span><span class="n">num_channels</span><span class="o">*</span><span class="p">(</span><span class="n">patch_size</span><span class="o">**</span><span class="mi">2</span><span class="p">),</span> <span class="n">embed_dim</span><span class="p">)</span>
-        <span class="n">self</span><span class="p">.</span><span class="n">transformer</span> <span class="o">=</span> <span class="n">nn</span><span class="p">.</span><span class="nc">Sequential</span><span class="p">(</span><span class="o">*</span><span class="p">[</span><span class="nc">AttentionBlock</span><span class="p">(</span><span class="n">embed_dim</span><span class="p">,</span> <span class="n">hidden_dim</span><span class="p">,</span> <span class="n">num_heads</span><span class="p">,</span> <span class="n">dropout</span><span class="o">=</span><span class="n">dropout</span><span class="p">)</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nf">range</span><span class="p">(</span><span class="n">num_layers</span><span class="p">)])</span>
-        <span class="n">self</span><span class="p">.</span><span class="n">mlp_head</span> <span class="o">=</span> <span class="n">nn</span><span class="p">.</span><span class="nc">Sequential</span><span class="p">(</span>
-            <span class="n">nn</span><span class="p">.</span><span class="nc">LayerNorm</span><span class="p">(</span><span class="n">embed_dim</span><span class="p">),</span>
-            <span class="n">nn</span><span class="p">.</span><span class="nc">Linear</span><span class="p">(</span><span class="n">embed_dim</span><span class="p">,</span> <span class="n">num_classes</span><span class="p">)</span>
-        <span class="p">)</span>
-        <span class="n">self</span><span class="p">.</span><span class="n">dropout</span> <span class="o">=</span> <span class="n">nn</span><span class="p">.</span><span class="nc">Dropout</span><span class="p">(</span><span class="n">dropout</span><span class="p">)</span>
-
-        <span class="c1"># Parameters/Embeddings
-</span>        <span class="n">self</span><span class="p">.</span><span class="n">cls_token</span> <span class="o">=</span> <span class="n">nn</span><span class="p">.</span><span class="nc">Parameter</span><span class="p">(</span><span class="n">torch</span><span class="p">.</span><span class="nf">randn</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="n">embed_dim</span><span class="p">))</span>
-        <span class="n">self</span><span class="p">.</span><span class="n">pos_embedding</span> <span class="o">=</span> <span class="n">nn</span><span class="p">.</span><span class="nc">Parameter</span><span class="p">(</span><span class="n">torch</span><span class="p">.</span><span class="nf">randn</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="o">+</span><span class="n">num_patches</span><span class="p">,</span><span class="n">embed_dim</span><span class="p">))</span>
-
-
-    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="n">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
-        <span class="c1"># Preprocess input
-</span>        <span class="n">x</span> <span class="o">=</span> <span class="nf">img_to_patch</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">self</span><span class="p">.</span><span class="n">patch_size</span><span class="p">)</span>
-        <span class="n">B</span><span class="p">,</span> <span class="n">T</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">x</span><span class="p">.</span><span class="n">shape</span>
-        <span class="n">x</span> <span class="o">=</span> <span class="n">self</span><span class="p">.</span><span class="nf">input_layer</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
-
-        <span class="c1"># Add CLS token and positional encoding
-</span>        <span class="n">cls_token</span> <span class="o">=</span> <span class="n">self</span><span class="p">.</span><span class="n">cls_token</span><span class="p">.</span><span class="nf">repeat</span><span class="p">(</span><span class="n">B</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
-        <span class="n">x</span> <span class="o">=</span> <span class="n">torch</span><span class="p">.</span><span class="nf">cat</span><span class="p">([</span><span class="n">cls_token</span><span class="p">,</span> <span class="n">x</span><span class="p">],</span> <span class="n">dim</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
-        <span class="n">x</span> <span class="o">=</span> <span class="n">x</span> <span class="o">+</span> <span class="n">self</span><span class="p">.</span><span class="n">pos_embedding</span><span class="p">[:,:</span><span class="n">T</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span>
-
-        <span class="c1"># Apply Transforrmer
-</span>        <span class="n">x</span> <span class="o">=</span> <span class="n">self</span><span class="p">.</span><span class="nf">dropout</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
-        <span class="n">x</span> <span class="o">=</span> <span class="n">x</span><span class="p">.</span><span class="nf">transpose</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
-        <span class="n">x</span> <span class="o">=</span> <span class="n">self</span><span class="p">.</span><span class="nf">transformer</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
-
-        <span class="c1"># Perform classification prediction
-</span>        <span class="n">cls</span> <span class="o">=</span> <span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-        <span class="n">out</span> <span class="o">=</span> <span class="n">self</span><span class="p">.</span><span class="nf">mlp_head</span><span class="p">(</span><span class="n">cls</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">out</span>
+<span class="c1"># Setup directory paths to train and test images
+</span><span class="n">train_dir</span> <span class="o">=</span> <span class="n">image_path</span> <span class="o">/</span> <span class="sh">"</span><span class="s">train</span><span class="sh">"</span>
+<span class="n">test_dir</span> <span class="o">=</span> <span class="n">image_path</span> <span class="o">/</span> <span class="sh">"</span><span class="s">test</span><span class="sh">"</span>
 </code></pre></div></div>
+
+<p>Then, we would like to perform some basic transformations to our data:</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># Create image size (from Table 3 in the ViT paper)
+</span><span class="n">IMG_SIZE</span> <span class="o">=</span> <span class="mi">224</span>
+
+<span class="c1"># Create transform pipeline manually
+</span><span class="n">manual_transforms</span> <span class="o">=</span> <span class="n">transforms</span><span class="p">.</span><span class="nc">Compose</span><span class="p">([</span>
+    <span class="n">transforms</span><span class="p">.</span><span class="nc">Resize</span><span class="p">((</span><span class="n">IMG_SIZE</span><span class="p">,</span> <span class="n">IMG_SIZE</span><span class="p">)),</span>
+    <span class="n">transforms</span><span class="p">.</span><span class="nc">ToTensor</span><span class="p">(),</span>
+<span class="p">])</span>
+</code></pre></div></div>
+
+<p>Then you will need to create the dataloaders for train and test sets:</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># Use ImageFolder to create dataset(s)
+</span>  <span class="n">train_data</span> <span class="o">=</span> <span class="n">datasets</span><span class="p">.</span><span class="nc">ImageFolder</span><span class="p">(</span><span class="n">train_dir</span><span class="p">,</span> <span class="n">transform</span><span class="o">=</span><span class="n">transform</span><span class="p">)</span>
+  <span class="n">test_data</span> <span class="o">=</span> <span class="n">datasets</span><span class="p">.</span><span class="nc">ImageFolder</span><span class="p">(</span><span class="n">test_dir</span><span class="p">,</span> <span class="n">transform</span><span class="o">=</span><span class="n">transform</span><span class="p">)</span>
+
+  <span class="c1"># Get class names
+</span>  <span class="n">class_names</span> <span class="o">=</span> <span class="n">train_data</span><span class="p">.</span><span class="n">classes</span>
+
+  <span class="c1"># Turn images into data loaders
+</span>  <span class="n">train_dataloader</span> <span class="o">=</span> <span class="nc">DataLoader</span><span class="p">(</span>
+      <span class="n">train_data</span><span class="p">,</span>
+      <span class="n">batch_size</span><span class="o">=</span><span class="n">batch_size</span><span class="p">,</span>
+      <span class="n">shuffle</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span>
+      <span class="n">num_workers</span><span class="o">=</span><span class="n">num_workers</span><span class="p">,</span>
+      <span class="n">pin_memory</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span>
+  <span class="p">)</span>
+  
+  <span class="n">test_dataloader</span> <span class="o">=</span> <span class="nc">DataLoader</span><span class="p">(</span>
+      <span class="n">test_data</span><span class="p">,</span>
+      <span class="n">batch_size</span><span class="o">=</span><span class="n">batch_size</span><span class="p">,</span>
+      <span class="n">shuffle</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="c1"># don't need to shuffle test data
+</span>      <span class="n">num_workers</span><span class="o">=</span><span class="n">num_workers</span><span class="p">,</span>
+      <span class="n">pin_memory</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span>
+  <span class="p">)</span>
+</code></pre></div></div>
+
+<p>And return a batch of images and labels with the following code:</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">image_batch</span><span class="p">,</span> <span class="n">label_batch</span> <span class="o">=</span> <span class="nf">next</span><span class="p">(</span><span class="nf">iter</span><span class="p">(</span><span class="n">train_dataloader</span><span class="p">))</span>
+</code></pre></div></div>
+<h1 id="create-a-vit-classifier">Create a ViT classifier</h1>
+
+<p>Having loaded the data, now it’s time to create a simple ViT classifier and fit our data. We will call the ViT model and pass the image batch to it. The output of the model will be the logits for each class. We will then use the cross-entropy loss to calculate the loss and the Adam optimizer to update the weights of the model. The following code will help you to create a simple ViT classifier:</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">device</span> <span class="o">=</span> <span class="sh">"</span><span class="s">cuda</span><span class="sh">"</span> <span class="k">if</span> <span class="n">torch</span><span class="p">.</span><span class="n">cuda</span><span class="p">.</span><span class="nf">is_available</span><span class="p">()</span> <span class="k">else</span> <span class="sh">"</span><span class="s">cpu</span><span class="sh">"</span>
+<span class="nf">set_seeds</span><span class="p">()</span>
+<span class="c1"># Create an instance of ViT with the number of classes we're working with (pizza, steak, sushi)
+</span><span class="n">vit</span> <span class="o">=</span> <span class="nc">ViT</span><span class="p">(</span><span class="n">num_classes</span><span class="o">=</span><span class="nf">len</span><span class="p">(</span><span class="n">cls_names</span><span class="p">))</span>
+
+<span class="c1"># Setup the optimizer to optimize our ViT model parameters using hyperparameters from the ViT paper
+</span><span class="n">optimizer</span> <span class="o">=</span> <span class="n">torch</span><span class="p">.</span><span class="n">optim</span><span class="p">.</span><span class="nc">Adam</span><span class="p">(</span><span class="n">params</span><span class="o">=</span><span class="n">vit</span><span class="p">.</span><span class="nf">parameters</span><span class="p">(),</span>
+    <span class="n">lr</span><span class="o">=</span><span class="mf">3e-3</span><span class="p">,</span> <span class="c1"># Base LR from Table 3 for ViT-* ImageNet-1k
+</span>    <span class="n">betas</span><span class="o">=</span><span class="p">(</span><span class="mf">0.9</span><span class="p">,</span> <span class="mf">0.999</span><span class="p">),</span> <span class="c1"># default values but also mentioned in ViT paper section 4.1 (Training &amp; Fine-tuning)
+</span>    <span class="n">weight_decay</span><span class="o">=</span><span class="mf">0.3</span><span class="p">)</span> <span class="c1"># from the ViT paper section 4.1 (Training &amp; Fine-tuning) and Table 3 for ViT-* ImageNet-1k
+</span>
+<span class="c1"># Setup the loss function for multi-class classification
+</span><span class="n">loss_fn</span> <span class="o">=</span> <span class="n">torch</span><span class="p">.</span><span class="n">nn</span><span class="p">.</span><span class="nc">CrossEntropyLoss</span><span class="p">()</span>
+<span class="c1"># Train the model and save the training results to a dictionary
+</span><span class="n">results</span> <span class="o">=</span> <span class="nf">train_function</span><span class="p">(</span><span class="n">model</span><span class="o">=</span><span class="n">vit</span><span class="p">,</span>
+    <span class="n">train_dataloader</span><span class="o">=</span><span class="n">train_dataloader</span><span class="p">,</span>
+    <span class="n">test_dataloader</span><span class="o">=</span><span class="n">test_dataloader</span><span class="p">,</span>
+    <span class="n">optimizer</span><span class="o">=</span><span class="n">optimizer</span><span class="p">,</span>
+    <span class="n">loss_fn</span><span class="o">=</span><span class="n">loss_fn</span><span class="p">,</span>
+    <span class="n">epochs</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span>
+    <span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">)</span>
+</code></pre></div></div>
+
+<h2 id="building-the-vit-model">Building the ViT model</h2>
+
+<h2 id="training-function-for-the-vit-model">Training function for the ViT model</h2>
+
+<h2 id="measuring-the-performance-of-the-vit-model">Measuring the performance of the ViT model</h2>
+
+<h1 id="explainable-vision-transformers">Explainable Vision Transformers</h1>
+
+<h1 id="todo">TODO</h1>
 
 <h1 id="conclusions">Conclusions</h1>
 
