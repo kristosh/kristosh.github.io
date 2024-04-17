@@ -205,33 +205,28 @@ We have already provided the basic code on how to call the ViT model but we have
 # 1. Create a ViT class that inherits from nn.Module
 class ViT(nn.Module):
     """Creates a Vision Transformer architecture with ViT-Base hyperparameters by default."""
-    # 2. Initialize the class with hyperparameters from Table 1 and Table 3
+    # Initialize the class with hyperparameters from Table 1 and Table 3 from original ViT paper
     def __init__(self,
             img_size:int=224, # Training resolution from Table 3 in ViT paper
             in_channels:int=3, # Number of channels in input image
             patch_size:int=16, # Patch size
-            num_transformer_layers:int=12, # Layers from Table 1 for ViT-Base
-            embedding_dim:int=768, # Hidden size D from Table 1 for ViT-Base
-            mlp_size:int=3072, # MLP size from Table 1 for ViT-Base
-            num_heads:int=12, # Heads from Table 1 for ViT-Base
-            attn_dropout:float=0, # Dropout for attention projection
-            mlp_dropout:float=0.1, # Dropout for dense/MLP layers
-            embedding_dropout:float=0.1, # Dropout for patch and position embeddings
-            num_classes:int=1000): # Default for ImageNet but can customize this
-        super().__init__() # don't forget the super().__init__()!
+            num_transformer_layers:int=12, # Layers from Table 1 for ViT-paper
+            embedding_dim:int=768, # Hidden size D from Table 1 for ViT-paper
+            mlp_size:int=3072, # MLP size from Table 1 for ViT-paper
+            num_heads:int=12, # Heads from Table 1 for ViT-paper
+            attn_dropout:float=0,
+            mlp_dropout:float=0.1,
+            embedding_dropout:float=0.1, 
+            num_classes:int=3): # The nubmer of classes in the dataset
+        super().__init__() # inherited initialization from nn.Module
 
-        # 4. Calculate number of patches (height * width/patch^2)
-        self.num_patches = (img_size * img_size) // patch_size**2
-        # 5. Create learnable class embedding (needs to go at front of sequence of patch embeddings)
-        self.class_embedding = nn.Parameter(data=torch.randn(1, 1, embedding_dim),
+        self.num_patches = (img_size * img_size) // patch_size**2 # Calculate number of patches (height * width/patch^2) 
+        self.class_embedding = nn.Parameter(data=torch.randn(1, 1, embedding_dim), # Create learnable class embedding
             requires_grad=True)
-        # 6. Create learnable position embedding
-        self.position_embedding = nn.Parameter(data=torch.randn(1, self.num_patches+1, embedding_dim),
+        self.position_embedding = nn.Parameter(data=torch.randn(1, self.num_patches+1, embedding_dim),  # Create learnable position embedding
             requires_grad=True)
-        # 7. Create embedding dropout value
-        self.embedding_dropout = nn.Dropout(p=embedding_dropout)
-        # 8. Create patch embedding layer
-        self.patch_embedding = PatchEmbedding(in_channels=in_channels,
+        self.embedding_dropout = nn.Dropout(p=embedding_dropout)  # Create embedding dropout value
+        self.patch_embedding = PatchEmbedding(in_channels=in_channels, # Create patch embedding layer
             patch_size=patch_size,
             embedding_dim=embedding_dim)
 
