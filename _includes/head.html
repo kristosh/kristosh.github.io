@@ -1,6 +1,8 @@
     <!-- Metadata, OpenGraph and Schema.org -->
     {% include metadata.html %}
 
+    <link rel="stylesheet" href="{{ '/assets/css/codeblock.css' |  prepend: site.baseurl }}">
+
     <!-- Bootstrap & MDB -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@{{ site.bootstrap.version }}/dist/css/bootstrap.min.css" rel="stylesheet" integrity="{{ site.bootstrap.integrity.css }}" crossorigin="anonymous">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/mdbootstrap@{{ site.mdb.version }}/css/mdb.min.css" integrity="{{ site.mdb.integrity.css }}" crossorigin="anonymous" />
@@ -16,10 +18,7 @@
     <!-- Code Syntax Highlighting -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/jwarby/jekyll-pygments-themes@master/{{ site.highlight_theme_light | append: '.css' }}" media="" id="highlight_theme_light" />
 
-    {% if page.toc and page.toc.sidebar %}
-    <!-- Sidebar Table of Contents -->
-    <link href="https://cdn.rawgit.com/afeld/bootstrap-toc/v1.0.1/dist/bootstrap-toc.min.css" rel="stylesheet" />
-    {% endif %}
+
 
     <!-- Styles -->
     {% if site.icon.size <= 4 %}
@@ -27,6 +26,8 @@
     {% elsif site.icon != blank %}
     <link rel="shortcut icon" href="{{ site.icon | prepend: '/assets/img/' | relative_url}}"/>
     {% endif %}
+    
+
     <link rel="stylesheet" href="{{ '/assets/css/main.css' | relative_url }}">
     <link rel="canonical" href="{{ page.url | replace:'index.html','' | absolute_url }}">
 
@@ -37,3 +38,5 @@
     <script src="{{ '/assets/js/theme.js' | relative_url }}"></script>
     <script src="{{ '/assets/js/dark_mode.js' | relative_url }}"></script>
     {% endif %}
+
+    <link rel="stylesheet" href="{{ '/assets/css/codeblock.scss' |  prepend: site.baseurl }}">

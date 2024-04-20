@@ -264,6 +264,19 @@ class ViT(nn.Module):
         x = self.classifier(x[:, 0]) # run on each sample in a batch at 0 index
         return x
 ```
+### Breaking down the code step-by-step
+
+Firstly, as mentioned in the code block comments we follow the details of the ViT paper such as batch size, number of patches, number of layers, the dimensionality of the embeddings, number of heads, etc. More details can be found in the paper's Table 1 and Table 3.
+
+The first thing that our code tries to emulate is the creation of patches. Given, an image we create patches of size $16 \times 16$ ($P \times P$). Thus, if the input image has size $H \times W \times C$  and is $224 \times 224 \times 3$, the total amount of patches is $N = 196$, and can be calculated by the following formula $N = HW/P^{2}$. Then, these image patches are turned into embeddings, by using the <mark style="background-color:LavenderBlush;">PatchEmbedding</mark> functionality. The benefit of turning the raw images into embeddings is that we can learn a representation of the image that can improve with training.
+
+Different values for the size of the embeddings can be found in Table 1, but throughout this tutorial, we will make use of $D = 768$. The idea is to first split the image into patches and then apply a learnable 2d convolutional layer to each patch. If we set the proper values for the kernel_size and stride parameters of a torch.nn.Conv2d() then we can have the desired output embedding for instance D = 768 in our case. To facilitate the dimensions of output smoothly we will need to make use of a flatten() function to flatten the output of the convolutional layer.
+
+So far we have created the patch embeddings, but we will need to write code for the token embeddings abd also for the position embeddings. The token embeddings are created by using a learnable class embedding similar to BERT.
+
+Reading the second paragraph of section 3.1 from the ViT paper, we see the following description:
+
+
 
 ## Training function for the ViT model
 

@@ -1,3 +1,9 @@
+Code Beautifier
+CSS Formatter and Optimiser
+based on csstidy 1.3
+language: en de fr ptAddThis
+CSS Input
+CSS-Code:
 .highlight table td {padding: 10px !important;}
 .highlight table pre {margin: 0 !important;}
 
@@ -198,4 +204,133 @@
 }
 .highlight .o {
   color: #f92672 !important;
+}
+
+CSS from URL:
+ 
+Code Layout
+Compression (code layout):
+
+Standard (balance between readability and size)
+Custom template
+Options
+ Preserve CSS
+ Sort Selectors (caution)
+ Sort Properties
+Regroup selectors
+
+Merge selectors with the same properties (fast)
+Optimise shorthands
+
+Safe optimisations
+ Compress colors
+ Compress font-weight
+ Lowercase selectors
+Case for properties:
+ None
+ Lowercase
+ Uppercase
+ Remove unnecessary backslashes
+ Remove last ;
+ Discard invalid properties
+
+CSS2.1
+ Add timestamp
+ Output as file
+ Messages
+5
+Optimised color: Changed "#ffffff" to "#fff"
+16
+Optimised color: Changed "#888888" to "#888"
+19
+Optimised color: Changed "#555555" to "#555"
+22
+Optimised color: Changed "#555555" to "#555"
+25
+Optimised color: Changed "#aaaaaa" to "#aaa"
+145
+Optimised color: Changed "#ffffff" to "#fff"
+149
+Optimised color: Changed "#ffffff" to "#fff"
+153
+Optimised color: Changed "#ffffff" to "#fff"
+157
+Optimised color: Changed "#ffffff" to "#fff"
+161
+Optimised color: Changed "#ffffff" to "#fff"
+165
+Optimised color: Changed "#ffffff" to "#fff"
+169
+Optimised color: Changed "#ffffff" to "#fff"
+173
+Optimised color: Changed "#ffffff" to "#fff"
+177
+Optimised color: Changed "#ffffff" to "#fff"
+181
+Optimised color: Changed "#ffffff" to "#fff"
+Input: 3.896KB, Output:1.638KB, Compression Ratio: 58%(-2258 Bytes)
+Select or Copy to Clipboard
+.highlight table td {
+padding:10px!important;
+}
+
+.highlight table pre {
+margin:0!important;
+}
+
+.highlight .gh {
+color:#7e7e7e!important;
+}
+
+.highlight .go {
+color:#888!important;
+}
+
+.highlight .gu {
+color:#aaa!important;
+}
+
+.highlight,.highlight .vc,.highlight .nn,.highlight .nl,.highlight .ni,.highlight .bp,.highlight .vg,.highlight .vi,.highlight .nv,.highlight .vm,.highlight .w,.highlight .n,.highlight .py,.highlight .nx {
+color:#fff!important;
+background-color:#272822!important;
+}
+
+.highlight .sr,.highlight .nb {
+color:#f6aa11!important;
+}
+
+.highlight .gp,.highlight .gs {
+color:#555!important;
+}
+
+.highlight .cm,.highlight .cp,.highlight .c1,.highlight .cs,.highlight .c,.highlight .ch,.highlight .cd,.highlight .cpf {
+color:#75715e!important;
+}
+
+.highlight .err,.highlight .gr,.highlight .gt {
+color:#960050!important;
+}
+
+.highlight .gd,.highlight .gi,.highlight .ge {
+color:#49483e!important;
+}
+
+.highlight .kc,.highlight .kd,.highlight .kr,.highlight .no,.highlight .kt {
+color:#66d9ef!important;
+}
+
+.highlight .mf,.highlight .mh,.highlight .il,.highlight .mi,.highlight .mo,.highlight .m,.highlight .mb,.highlight .mx,.highlight .sc,.highlight .se,.highlight .ss {
+color:#ae81ff!important;
+}
+
+.highlight .sd,.highlight .s2,.highlight .sb,.highlight .sh,.highlight .si,.highlight .sx,.highlight .s1,.highlight .s,.highlight .sa,.highlight .dl {
+color:#e6db74!important;
+}
+
+.highlight .na,.highlight .nc,.highlight .nd,.highlight .ne,.highlight .nf,.highlight .fm {
+color:#a6e22e!important;
+}
+
+.highlight .ow,.highlight .nt,.highlight .k,.highlight .kv,.highlight .kn,.highlight .kp,.highlight .o {
+color:#f92672!important;
 }
