@@ -14,6 +14,8 @@
     <meta name="keywords" content="jekyll, jekyll-theme, academic-website, portfolio-website">
 
 
+    <link rel="stylesheet" href="/assets/css/codeblock.css">
+
     <!-- Bootstrap & MDB -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha256-DF7Zhf293AJxJNTmh5zhoYYIMs2oXitRfBjY+9L//AY=" crossorigin="anonymous">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/mdbootstrap@4.20.0/css/mdb.min.css" integrity="sha256-jpjYvU3G3N6nrrBwXJoVEYI/0zw8htfFnhT9ljN3JJw=" crossorigin="anonymous">
@@ -27,25 +29,28 @@
     <link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700|Roboto+Slab:100,300,400,500,700|Material+Icons">
 
     <!-- Code Syntax Highlighting -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/jwarby/jekyll-pygments-themes@master/github.css" media="" id="highlight_theme_light">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/jwarby/jekyll-pygments-themes@master/.css" media="" id="highlight_theme_light">
 
-    
+
 
     <!-- Styles -->
     
     <link rel="shortcut icon" href="data:image/svg+xml,&lt;svg%20xmlns=%22http://www.w3.org/2000/svg%22%20viewBox=%220%200%20100%20100%22&gt;&lt;text%20y=%22.9em%22%20font-size=%2290%22&gt;%F0%9F%98%8E&lt;/text&gt;&lt;/svg&gt;">
     
+    
+
     <link rel="stylesheet" href="/assets/css/main.css">
     <link rel="canonical" href="https://kristosh.github.io//blog/2023/Explainable-ViT/">
 
     <!-- Dark Mode -->
     
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/jwarby/jekyll-pygments-themes@master/native.css" media="none" id="highlight_theme_dark">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/jwarby/jekyll-pygments-themes@master/.css" media="none" id="highlight_theme_dark">
 
     <script src="/assets/js/theme.js"></script>
     <script src="/assets/js/dark_mode.js"></script>
     
 
+    <link rel="stylesheet" href="/assets/css/codeblock.scss">
 
     <!-- jQuery -->
   <script src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
@@ -465,6 +470,17 @@
 </span>        <span class="n">x</span> <span class="o">=</span> <span class="n">self</span><span class="p">.</span><span class="nf">classifier</span><span class="p">(</span><span class="n">x</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">])</span> <span class="c1"># run on each sample in a batch at 0 index
 </span>        <span class="k">return</span> <span class="n">x</span>
 </code></pre></div></div>
+<h3 id="breaking-down-the-code-step-by-step">Breaking down the code step-by-step</h3>
+
+<p>Firstly, as mentioned in the code block comments we follow the details of the ViT paper such as batch size, number of patches, number of layers, the dimensionality of the embeddings, number of heads, etc. More details can be found in the paper’s Table 1 and Table 3.</p>
+
+<p>The first thing that our code tries to emulate is the creation of patches. Given, an image we create patches of size $16 \times 16$ ($P \times P$). Thus, if the input image has size $H \times W \times C$  and is $224 \times 224 \times 3$, the total amount of patches is $N = 196$, and can be calculated by the following formula $N = HW/P^{2}$. Then, these image patches are turned into embeddings, by using the <mark style="background-color:LavenderBlush;">PatchEmbedding</mark> functionality. The benefit of turning the raw images into embeddings is that we can learn a representation of the image that can improve with training.</p>
+
+<p>Different values for the size of the embeddings can be found in Table 1, but throughout this tutorial, we will make use of $D = 768$. The idea is to first split the image into patches and then apply a learnable 2d convolutional layer to each patch. If we set the proper values for the kernel_size and stride parameters of a torch.nn.Conv2d() then we can have the desired output embedding for instance D = 768 in our case. To facilitate the dimensions of output smoothly we will need to make use of a flatten() function to flatten the output of the convolutional layer.</p>
+
+<p>So far we have created the patch embeddings, but we will need to write code for the token embeddings abd also for the position embeddings. The token embeddings are created by using a learnable class embedding similar to BERT.</p>
+
+<p>Reading the second paragraph of section 3.1 from the ViT paper, we see the following description:</p>
 
 <h2 id="training-function-for-the-vit-model">Training function for the ViT model</h2>
 

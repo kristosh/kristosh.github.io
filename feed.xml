@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" xml:lang="en"><generator uri="https://jekyllrb.com/" version="4.3.3">Jekyll</generator><link href="https://kristosh.github.io//feed.xml" rel="self" type="application/atom+xml" /><link href="https://kristosh.github.io//" rel="alternate" type="text/html" hreflang="en" /><updated>2024-04-17T09:20:49+00:00</updated><id>https://kristosh.github.io//feed.xml</id><title type="html">blank</title><subtitle>A simple, whitespace theme for academics.
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" xml:lang="en"><generator uri="https://jekyllrb.com/" version="4.3.3">Jekyll</generator><link href="https://kristosh.github.io//feed.xml" rel="self" type="application/atom+xml" /><link href="https://kristosh.github.io//" rel="alternate" type="text/html" hreflang="en" /><updated>2024-04-20T21:11:31+00:00</updated><id>https://kristosh.github.io//feed.xml</id><title type="html">blank</title><subtitle>A simple, whitespace theme for academics.
 </subtitle><entry><title type="html">Why should I trust you? Local Interpretable Model-agnostic Explanations</title><link href="https://kristosh.github.io//blog/2023/LIME/" rel="alternate" type="text/html" title="Why should I trust you? Local Interpretable Model-agnostic Explanations" /><published>2023-05-13T00:00:00+00:00</published><updated>2023-05-13T00:00:00+00:00</updated><id>https://kristosh.github.io//blog/2023/LIME</id><content type="html" xml:base="https://kristosh.github.io//blog/2023/LIME/"><![CDATA[<h1 id="local-interpretable-model-agnostic-explanations">Local Interpretable Model-agnostic Explanations</h1>
 
 <center>
@@ -1599,6 +1599,17 @@ plot_gradients(img, int_gradients_randombl, 'Image and Integrated Gradients with
 </span>        <span class="n">x</span> <span class="o">=</span> <span class="n">self</span><span class="p">.</span><span class="nf">classifier</span><span class="p">(</span><span class="n">x</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">])</span> <span class="c1"># run on each sample in a batch at 0 index
 </span>        <span class="k">return</span> <span class="n">x</span>
 </code></pre></div></div>
+<h3 id="breaking-down-the-code-step-by-step">Breaking down the code step-by-step</h3>
+
+<p>Firstly, as mentioned in the code block comments we follow the details of the ViT paper such as batch size, number of patches, number of layers, the dimensionality of the embeddings, number of heads, etc. More details can be found in the paper’s Table 1 and Table 3.</p>
+
+<p>The first thing that our code tries to emulate is the creation of patches. Given, an image we create patches of size $16 \times 16$ ($P \times P$). Thus, if the input image has size $H \times W \times C$  and is $224 \times 224 \times 3$, the total amount of patches is $N = 196$, and can be calculated by the following formula $N = HW/P^{2}$. Then, these image patches are turned into embeddings, by using the <mark style="background-color:LavenderBlush;">PatchEmbedding</mark> functionality. The benefit of turning the raw images into embeddings is that we can learn a representation of the image that can improve with training.</p>
+
+<p>Different values for the size of the embeddings can be found in Table 1, but throughout this tutorial, we will make use of $D = 768$. The idea is to first split the image into patches and then apply a learnable 2d convolutional layer to each patch. If we set the proper values for the kernel_size and stride parameters of a torch.nn.Conv2d() then we can have the desired output embedding for instance D = 768 in our case. To facilitate the dimensions of output smoothly we will need to make use of a flatten() function to flatten the output of the convolutional layer.</p>
+
+<p>So far we have created the patch embeddings, but we will need to write code for the token embeddings abd also for the position embeddings. The token embeddings are created by using a learnable class embedding similar to BERT.</p>
+
+<p>Reading the second paragraph of section 3.1 from the ViT paper, we see the following description:</p>
 
 <h2 id="training-function-for-the-vit-model">Training function for the ViT model</h2>
 
