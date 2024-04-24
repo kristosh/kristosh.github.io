@@ -1,336 +1,196 @@
-Code Beautifier
-CSS Formatter and Optimiser
-based on csstidy 1.3
-language: en de fr ptAddThis
-CSS Input
-CSS-Code:
-.highlight table td {padding: 10px !important;}
-.highlight table pre {margin: 0 !important;}
-
-.highlight {
-  color: #ffffff !important;
-  background-color: #272822 !important;
-}
-
+.highlight table td { padding: 5px; }
+.highlight table pre { margin: 0; }
 .highlight .gh {
-  color: #7e7e7e !important; 
+  color: #999999;
 }
 .highlight .sr {
-  color: #f6aa11 !important;
+  color: #f6aa11;
 }
 .highlight .go {
-  color: #888888 !important;
+  color: #888888;
 }
 .highlight .gp {
-  color: #555555 !important;
-}
-.highlight .gs {
-  color: #555555 !important;
+  color: #555555;
 }
 .highlight .gu {
-  color: #aaaaaa !important;
+  color: #aaaaaa;
 }
 .highlight .nb {
-  color: #f6aa11 !important;
+  color: #f6aa11;
 }
 .highlight .cm {
-  color: #75715e !important;
+  color: #75715e;
 }
 .highlight .cp {
-  color: #75715e !important;
+  color: #75715e;
 }
 .highlight .c1 {
-  color: #75715e !important;
+  color: #75715e;
 }
 .highlight .cs {
-  color: #75715e !important;
+  color: #75715e;
 }
 .highlight .c, .highlight .ch, .highlight .cd, .highlight .cpf {
-  color: #75715e !important;
+  color: #75715e;
 }
 .highlight .err {
-  color: #960050 !important;
+  color: #960050;
 }
 .highlight .gr {
-  color: #960050 !important;
+  color: #960050;
 }
 .highlight .gt {
-  color: #960050 !important;
+  color: #960050;
 }
 .highlight .gd {
-  color: #49483e !important;
+  color: #49483e;
 }
 .highlight .gi {
-  color: #49483e !important;
+  color: #49483e;
 }
 .highlight .ge {
-  color: #49483e !important;
+  color: #49483e;
 }
 .highlight .kc {
-  color: #66d9ef !important;
+  color: #66d9ef;
 }
 .highlight .kd {
-  color: #66d9ef !important;
+  color: #66d9ef;
 }
 .highlight .kr {
-  color: #66d9ef !important;
+  color: #66d9ef;
 }
 .highlight .no {
-  color: #66d9ef !important;
+  color: #66d9ef;
 }
 .highlight .kt {
-  color: #66d9ef !important;
+  color: #66d9ef;
 }
 .highlight .mf {
-  color: #ae81ff !important;
+  color: #ae81ff;
 }
 .highlight .mh {
-  color: #ae81ff !important;
+  color: #ae81ff;
 }
 .highlight .il {
-  color: #ae81ff !important;
+  color: #ae81ff;
 }
 .highlight .mi {
-  color: #ae81ff !important;
+  color: #ae81ff;
 }
 .highlight .mo {
-  color: #ae81ff !important;
+  color: #ae81ff;
 }
 .highlight .m, .highlight .mb, .highlight .mx {
-  color: #ae81ff !important;
+  color: #ae81ff;
 }
 .highlight .sc {
-  color: #ae81ff !important;
+  color: #ae81ff;
 }
 .highlight .se {
-  color: #ae81ff !important;
+  color: #ae81ff;
 }
 .highlight .ss {
-  color: #ae81ff !important;
+  color: #ae81ff;
 }
 .highlight .sd {
-  color: #e6db74 !important;
+  color: #e6db74;
 }
 .highlight .s2 {
-  color: #e6db74 !important;
+  color: #e6db74;
 }
 .highlight .sb {
-  color: #e6db74 !important;
+  color: #e6db74;
 }
 .highlight .sh {
-  color: #e6db74 !important;
+  color: #e6db74;
 }
 .highlight .si {
-  color: #e6db74 !important;
+  color: #e6db74;
 }
 .highlight .sx {
-  color: #e6db74 !important;
+  color: #e6db74;
 }
 .highlight .s1 {
-  color: #e6db74 !important;
+  color: #e6db74;
 }
 .highlight .s, .highlight .sa, .highlight .dl {
-  color: #e6db74 !important;
+  color: #e6db74;
 }
 .highlight .na {
-  color: #a6e22e !important;
+  color: #a6e22e;
 }
 .highlight .nc {
-  color: #a6e22e !important;
+  color: #a6e22e;
 }
 .highlight .nd {
-  color: #a6e22e !important;
+  color: #a6e22e;
 }
 .highlight .ne {
-  color: #a6e22e !important;
+  color: #a6e22e;
 }
 .highlight .nf, .highlight .fm {
-  color: #a6e22e !important;
+  color: #a6e22e;
 }
 .highlight .vc {
-  color: #ffffff !important;
-  background-color: #272822 !important;
+  color: #ffffff;
+  background-color: #272822;
 }
 .highlight .nn {
-  color: #ffffff !important;
-  background-color: #272822 !important;
+  color: #ffffff;
+  background-color: #272822;
 }
 .highlight .nl {
-  color: #ffffff !important;
-  background-color: #272822 !important;
+  color: #ffffff;
+  background-color: #272822;
 }
 .highlight .ni {
-  color: #ffffff !important;
-  background-color: #272822 !important;
+  color: #ffffff;
+  background-color: #272822;
 }
 .highlight .bp {
-  color: #ffffff !important;
-  background-color: #272822 !important;
+  color: #ffffff;
+  background-color: #272822;
 }
 .highlight .vg {
-  color: #ffffff !important;
-  background-color: #272822 !important;
+  color: #ffffff;
+  background-color: #272822;
 }
 .highlight .vi {
-  color: #ffffff !important;
-  background-color: #272822 !important;
+  color: #ffffff;
+  background-color: #272822;
 }
 .highlight .nv, .highlight .vm {
-  color: #ffffff !important;
-  background-color: #272822 !important;
+  color: #ffffff;
+  background-color: #272822;
 }
 .highlight .w {
-  color: #ffffff !important;
-  background-color: #272822 !important;
+  color: #ffffff;
+  background-color: #272822;
+}
+.highlight {
+  color: #ffffff;
+  background-color: #272822;
 }
 .highlight .n, .highlight .py, .highlight .nx {
-  color: #ffffff !important;
-  background-color: #272822 !important;
+  color: #ffffff;
+  background-color: #272822;
 }
 .highlight .ow {
-  color: #f92672 !important;
+  color: #f92672;
 }
 .highlight .nt {
-  color: #f92672 !important;
+  color: #f92672;
 }
 .highlight .k, .highlight .kv {
-  color: #f92672 !important;
+  color: #f92672;
 }
 .highlight .kn {
-  color: #f92672 !important;
+  color: #f92672;
 }
 .highlight .kp {
-  color: #f92672 !important;
+  color: #f92672;
 }
 .highlight .o {
-  color: #f92672 !important;
-}
-
-CSS from URL:
- 
-Code Layout
-Compression (code layout):
-
-Standard (balance between readability and size)
-Custom template
-Options
- Preserve CSS
- Sort Selectors (caution)
- Sort Properties
-Regroup selectors
-
-Merge selectors with the same properties (fast)
-Optimise shorthands
-
-Safe optimisations
- Compress colors
- Compress font-weight
- Lowercase selectors
-Case for properties:
- None
- Lowercase
- Uppercase
- Remove unnecessary backslashes
- Remove last ;
- Discard invalid properties
-
-CSS2.1
- Add timestamp
- Output as file
- Messages
-5
-Optimised color: Changed "#ffffff" to "#fff"
-16
-Optimised color: Changed "#888888" to "#888"
-19
-Optimised color: Changed "#555555" to "#555"
-22
-Optimised color: Changed "#555555" to "#555"
-25
-Optimised color: Changed "#aaaaaa" to "#aaa"
-145
-Optimised color: Changed "#ffffff" to "#fff"
-149
-Optimised color: Changed "#ffffff" to "#fff"
-153
-Optimised color: Changed "#ffffff" to "#fff"
-157
-Optimised color: Changed "#ffffff" to "#fff"
-161
-Optimised color: Changed "#ffffff" to "#fff"
-165
-Optimised color: Changed "#ffffff" to "#fff"
-169
-Optimised color: Changed "#ffffff" to "#fff"
-173
-Optimised color: Changed "#ffffff" to "#fff"
-177
-Optimised color: Changed "#ffffff" to "#fff"
-181
-Optimised color: Changed "#ffffff" to "#fff"
-Input: 3.896KB, Output:1.638KB, Compression Ratio: 58%(-2258 Bytes)
-Select or Copy to Clipboard
-.highlight table td {
-padding:10px!important;
-}
-
-.highlight table pre {
-margin:0!important;
-}
-
-.highlight .gh {
-color:#7e7e7e!important;
-}
-
-.highlight .go {
-color:#888!important;
-}
-
-.highlight .gu {
-color:#aaa!important;
-}
-
-.highlight,.highlight .vc,.highlight .nn,.highlight .nl,.highlight .ni,.highlight .bp,.highlight .vg,.highlight .vi,.highlight .nv,.highlight .vm,.highlight .w,.highlight .n,.highlight .py,.highlight .nx {
-color:#fff!important;
-background-color:#272822!important;
-}
-
-.highlight .sr,.highlight .nb {
-color:#f6aa11!important;
-}
-
-.highlight .gp,.highlight .gs {
-color:#555!important;
-}
-
-.highlight .cm,.highlight .cp,.highlight .c1,.highlight .cs,.highlight .c,.highlight .ch,.highlight .cd,.highlight .cpf {
-color:#75715e!important;
-}
-
-.highlight .err,.highlight .gr,.highlight .gt {
-color:#960050!important;
-}
-
-.highlight .gd,.highlight .gi,.highlight .ge {
-color:#49483e!important;
-}
-
-.highlight .kc,.highlight .kd,.highlight .kr,.highlight .no,.highlight .kt {
-color:#66d9ef!important;
-}
-
-.highlight .mf,.highlight .mh,.highlight .il,.highlight .mi,.highlight .mo,.highlight .m,.highlight .mb,.highlight .mx,.highlight .sc,.highlight .se,.highlight .ss {
-color:#ae81ff!important;
-}
-
-.highlight .sd,.highlight .s2,.highlight .sb,.highlight .sh,.highlight .si,.highlight .sx,.highlight .s1,.highlight .s,.highlight .sa,.highlight .dl {
-color:#e6db74!important;
-}
-
-.highlight .na,.highlight .nc,.highlight .nd,.highlight .ne,.highlight .nf,.highlight .fm {
-color:#a6e22e!important;
-}
-
-.highlight .ow,.highlight .nt,.highlight .k,.highlight .kv,.highlight .kn,.highlight .kp,.highlight .o {
-color:#f92672!important;
+  color: #f92672;
 }
