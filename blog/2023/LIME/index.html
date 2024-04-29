@@ -763,18 +763,8 @@ reliable explanations.</p>
 <p>Having extracted the super-pixels, the way that perturbations are calculated is the following: Random
 zeros and ones are generated and shaped as a matrix with perturbations
 as rows and superpixels as columns. An example of a perturbation (the
-first one) is shown below. Here, <code class="language-plaintext highlighter-rouge"><table class="rouge-table"><tbody><tr>
-<td class="rouge-gutter gl"><pre class="lineno">1
-</pre></td>
-<td class="rouge-code"><pre>1
-</pre></td>
-</tr></tbody></table></code> represents that a superpixel is on
-and <code class="language-plaintext highlighter-rouge"><table class="rouge-table"><tbody><tr>
-<td class="rouge-gutter gl"><pre class="lineno">1
-</pre></td>
-<td class="rouge-code"><pre>0
-</pre></td>
-</tr></tbody></table></code> represents it is off. Notice that the length of the shown vector
+first one) is shown below. Here, <code class="language-plaintext highlighter-rouge">1</code> represents that a superpixel is on
+and <code class="language-plaintext highlighter-rouge">0</code> represents it is off. Notice that the length of the shown vector
 corresponds to the number of superpixels in the image. By running this
 code:</p>
 
@@ -800,29 +790,9 @@ code:</p>
 </pre></td>
 </tr></tbody></table></code></pre></div></div>
 
-<p>The following function <code class="language-plaintext highlighter-rouge"><table class="rouge-table"><tbody><tr>
-<td class="rouge-gutter gl"><pre class="lineno">1
-</pre></td>
-<td class="rouge-code"><pre>perturb_image
-</pre></td>
-</tr></tbody></table></code> perturbs the given image (<code class="language-plaintext highlighter-rouge"><table class="rouge-table"><tbody><tr>
-<td class="rouge-gutter gl"><pre class="lineno">1
-</pre></td>
-<td class="rouge-code"><pre>img
-</pre></td>
-</tr></tbody></table></code>)
-based on a perturbation vector (<code class="language-plaintext highlighter-rouge"><table class="rouge-table"><tbody><tr>
-<td class="rouge-gutter gl"><pre class="lineno">1
-</pre></td>
-<td class="rouge-code"><pre>perturbation
-</pre></td>
-</tr></tbody></table></code>) and predefined
-superpixels (<code class="language-plaintext highlighter-rouge"><table class="rouge-table"><tbody><tr>
-<td class="rouge-gutter gl"><pre class="lineno">1
-</pre></td>
-<td class="rouge-code"><pre>segments
-</pre></td>
-</tr></tbody></table></code>).</p>
+<p>The following function <code class="language-plaintext highlighter-rouge">perturb_image</code> perturbs the given image (<code class="language-plaintext highlighter-rouge">img</code>)
+based on a perturbation vector (<code class="language-plaintext highlighter-rouge">perturbation</code>) and predefined
+superpixels (<code class="language-plaintext highlighter-rouge">segments</code>).</p>
 
 <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr>
 <td class="rouge-gutter gl"><pre class="lineno">1
