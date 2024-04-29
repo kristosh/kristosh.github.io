@@ -208,7 +208,7 @@
 
 <p>What is a Vision Transformer? What is going on with the inner mechanism of it? How do they even work? Can we poke at them and dissect them into pieces to understand them better?</p>
 
-<p>These are some questions that we will try to answer in this post. Firstly, we will try to remind our reader about what is exactly a vision transformer and how it works. We will develop a simple image classifier that distinguishes between 🍕🍣🥩 images. Hence, we will try to revise methods that aim to shed light on their inner mechanisms. Our aim goal is to investigate all the current standard practices for visualizing the mechanisms that cause the ViT classifier to predict a specific class each time. These visualizations could be useful for:</p>
+<p>These are some questions that we will try to answer in this post. Firstly, we will try to remind our reader about what is exactly a vision transformer and how it works. We will develop a simple image classifier that distinguishes between 🍕🍣🥩 images. Hence, we will try to revise methods that aim to shed light on their inner mechanisms. Our aim goal is to investigate all the current standard practices for visualizing the mechanisms that cause the <code class="language-plaintext highlighter-rouge">ViT</code> classifier to predict a specific class each time. These visualizations could be useful for:</p>
 
 <ul>
   <li>
@@ -224,11 +224,11 @@
 
 <p>This tutorial was based on the code from the following tutorial: <a href="https://uvadlc-notebooks.readthedocs.io/en/latest/tutorial_notebooks/tutorial15/Vision_Transformer.html" rel="external nofollow noopener" target="_blank">https://uvadlc-notebooks.readthedocs.io/en/latest/tutorial_notebooks/tutorial15/Vision_Transformer.html</a>.</p>
 
-<p>At the end of this tutorial a simple TODO exercise will be provided to gauge the performance of different XAI methods for our built ViT model.</p>
+<p>At the end of this tutorial a simple TODO exercise will be provided to gauge the performance of different XAI methods for our built <code class="language-plaintext highlighter-rouge">ViT</code> model.</p>
 
 <h1 id="vision-transformers">Vision Transformers</h1>
 
-<p>The vanilla Transformer architecture was introduced by Vaswani et al. in 2017 [1], to tackle sequential data and particurarly textual information for the machine translation task. Given the success of the Transformer in the NLP domain, Dosovitskiy et al. [2] proposed the Vision Transformer (ViTs) architecture for visual classification tasks. The ViTs architecture is the standard transformer architecture but with visual information as input instead. In the ViTs context, we need to convert the 3D grid of pixels into a sequence of token embeddings. This could be done by splitting the image into non-overlapping patches and then, each patch should be flattened into a 1D vector and then linearly projected into a vector of token embeddings. Finally, these token embeddings are fed into the ViTs architecture in a similar way as the vanilla transformers. The basic blocks of the ViTs architecture can be seen in the previous image and are:</p>
+<p>The vanilla Transformer architecture was introduced by Vaswani et al. in 2017 [1], to tackle sequential data and particurarly textual information for the machine translation task. Given the success of the Transformer in the NLP domain, Dosovitskiy et al. [2] proposed the Vision Transformer (<code class="language-plaintext highlighter-rouge">ViT</code>) architecture for visual classification tasks. The <code class="language-plaintext highlighter-rouge">ViT</code> architecture is the standard transformer architecture but with visual information as input instead. In the <code class="language-plaintext highlighter-rouge">ViT</code> context, we need to convert the <code class="language-plaintext highlighter-rouge">3D</code> grid of pixels into a sequence of token embeddings. This could be done by splitting the image into non-overlapping patches and then, each patch should be flattened into a <code class="language-plaintext highlighter-rouge">1D</code> vector and then linearly projected into a vector of token embeddings. Finally, these token embeddings are fed into the <code class="language-plaintext highlighter-rouge">ViT</code> architecture in a similar way as the vanilla transformers. The basic blocks of the <code class="language-plaintext highlighter-rouge">ViT</code> architecture can be seen in the previous image and are:</p>
 
 <ul>
   <li><strong>inputs</strong></li>
@@ -262,17 +262,17 @@
   <li>
 <strong>Patch + Position Embedding (inputs)</strong>: Turns the input image into a sequence of image patches and adds a position number to specify in what order the patch comes in.</li>
   <li>
-<strong>Linear projection of flattened patches (Embedded Patches)</strong>: The image patches are get flattended and then projected into embeddings. The benefit of using embeddings rather than just the image values is that embeddings are learnable representations of the image that can improve with training.</li>
+<strong>Linear projection of flattened patches (Embedded Patches)</strong>: The image patches are flattened and then projected into embeddings. The benefit of using embeddings rather than just the image values is that embeddings are learnable representations of the image that can improve with training.</li>
   <li>
-<strong>Norm</strong>: This is short for <em>Layer Normalization</em> or <em>LayerNorm</em>, a technique for regularizing (reducing overfitting) a neural network, you can use LayerNorm via the PyTorch layer torch.nn.LayerNorm().</li>
+<strong>Norm</strong>: This is short for <code class="language-plaintext highlighter-rouge">Layer Normalization</code> or <code class="language-plaintext highlighter-rouge">LayerNorm</code>, a technique for regularizing (reducing overfitting) a neural network, you can use LayerNorm via the <code class="language-plaintext highlighter-rouge">PyTorch</code> layer <code class="language-plaintext highlighter-rouge">torch.nn.LayerNorm()</code>.</li>
   <li>
-<strong>Multi-Head Attention</strong>: This is a Multi-Headed Self-Attention layer or <mark style="background-color:LavenderBlush;">MSA</mark> for short. You can create an MSA layer via the PyTorch layer  <mark style="background-color:LavenderBlush;">torch.nn.MultiheadAttention()</mark>.</li>
+<strong>Multi-Head Attention</strong>: This is a Multi-Headed Self-Attention layer or <code class="language-plaintext highlighter-rouge">MSA</code> for short. You can create an MSA layer via the PyTorch layer <code class="language-plaintext highlighter-rouge">torch.nn.MultiheadAttention()</code>.</li>
   <li>
-<strong>MLP (or Multilayer perceptron)</strong>: An MLP can often refer to any collection of feedforward layers (or in PyTorch’s case, a collection of layers with a forward() method). In the ViT Paper, the authors refer to the MLP as “MLP block” and it contains two <mark style="background-color:LavenderBlush;">torch.nn.Linear()</mark> layers with a  <mark style="background-color:LavenderBlush;">torch.nn.GELU()</mark> non-linearity activation in between them (section 3.1) and a torch.nn.Dropout() layer after each.</li>
+<strong>MLP (or Multilayer perceptron)</strong>: An MLP can often refer to any collection of feedforward layers (or in PyTorch’s case, a collection of layers with a forward() method). In the <code class="language-plaintext highlighter-rouge">ViT</code> Paper, the authors refer to the MLP as “MLP block” and it contains two <code class="language-plaintext highlighter-rouge">torch.nn.Linear()</code> layers with a <code class="language-plaintext highlighter-rouge">torch.nn.GELU()</code> non-linearity activation in between them (section 3.1) and a <code class="language-plaintext highlighter-rouge">torch.nn.Dropout()</code> layer after each.</li>
   <li>
-<strong>Transformer Encoder</strong>: The Transformer Encoder, is a collection of the layers listed above. There are two skip connections inside the Transformer encoder (the “+” symbols) meaning the layer’s inputs are fed directly to immediate layers as well as subsequent layers. The overall ViT architecture is comprised of a number of Transformer encoders stacked on top of eachother.</li>
+<strong>Transformer Encoder</strong>: The Transformer Encoder, is a collection of the layers listed above. There are two skip connections inside the Transformer encoder (the “+” symbols) meaning the layer’s inputs are fed directly to immediate layers as well as subsequent layers. The overall <code class="language-plaintext highlighter-rouge">ViT</code> architecture is comprised of several Transformer encoders stacked on top of each other.</li>
   <li>
-<strong>MLP Head</strong>: This is the output layer of the architecture, it converts the learned features of an input to a class output. Since we’re working on image classification, you could also call this the “classifier head”. The structure of the MLP Head is similar to the MLP block.</li>
+<strong>MLP Head</strong>: This is the output layer of the architecture, it converts the learned features of an input to a class output. Since we’re working on image classification, you could also call this the “classifier head”. The structure of the <code class="language-plaintext highlighter-rouge">MLP</code> Head is similar to the MLP block.</li>
 </ul>
 
 <p>Breaking the hyperparameters down:</p>
@@ -281,7 +281,7 @@
   <li>
 <strong>Layers</strong>: How many Transformer Encoder blocks are there? (each of these will contain an MSA block and the MLP block)</li>
   <li>
-<strong>Hidden size  D</strong>: This is the embedding dimension throughout the architecture, this will be the size of the vector that our image gets turned into when it gets patched and embedded. Generally, the larger the embedding dimension, the more information can be captured, which leads to better results. However, a larger embedding comes at the cost of more compute. One niche issue here is that we need to distinguish the <em>layers</em> as hyperparameters that refer to the number of Transformer Encoder blocks and the <em>layer</em> as a building block of the encoder.</li>
+<strong>Hidden size  D</strong>: This is the embedding dimension throughout the architecture, this will be the size of the vector that our image gets turned into when it gets patched and embedded. Generally, the larger the embedding dimension, the more information can be captured, which leads to better results. However, a larger embedding comes at the cost of more computing. One niche issue here is that we need to distinguish the <em>layers</em> as hyperparameters that refer to the number of Transformer Encoder blocks and the <em>layer</em> as a building block of the encoder.</li>
   <li>
 <strong>MLP size</strong>: What are the number of hidden units in the MLP layers?</li>
   <li>
@@ -292,7 +292,7 @@
 
 <h2 id="vision-transformers-vits-tokenization">Vision Transformers (ViTs) Tokenization</h2>
 
-<p>The standard Transformer receives as input a 1D sequence of token embeddings. To handle 3D images, we reshape the image $\mathbf{x} \in \mathbb{R}^{H \times W \times C}$ into a sequence of flattened patches with size $\mathbf{x}_P \in \mathbb{R}^{N \times CP^2}$, when $H, W$ represent the height and the width of an image while $C$ represents the number of channels, then, $N$ is the number of patches and $P$ is the patch dimensionality. The Transformer uses constant latent vector size  $D$ through all of its layers, so we flatten the patches and map to $D$ dimensions with a trainable linear projection (Equation 1 from the ViT paper). We refer to the output of this projection as the patch embeddings. If the input image is of size $224 \times 224 \times 3$ and the patch size is $16$ then the output should be of size $196 \times 768$, where the first dimension is the number of patches and the second dimension is the size of the patch embeddings $16\cdot 16\cdot 3 = 768$.</p>
+<p>The standard Transformer receives as input a 1D sequence of token embeddings. To handle 3D images, we reshape the image $\mathbf{x} \in \mathbb{R}^{H \times W \times C}$ into a sequence of flattened patches with size $\mathbf{x}_P \in \mathbb{R}^{N \times CP^2}$, when $H, W$ represent the height and the width of an image while $C$ represents the number of channels, then, $N$ is the number of patches and $P$ is the patch dimensionality. The Transformer uses constant latent vector size  $D$ through all of its layers, so we flatten the patches and map to $D$ dimensions with a trainable linear projection (Equation 1 from the <code class="language-plaintext highlighter-rouge">ViT</code> paper). We refer to the output of this projection as the patch embeddings. If the input image is of size $224 \times 224 \times 3$ and the patch size is $16$ then the output should be of size $196 \times 768$, where the first dimension is the number of patches and the second dimension is the size of the patch embeddings $16\cdot 16\cdot 3 = 768$.</p>
 
 <!-- - is is the same with the transformer enconder? -->
 <h2 id="transformer-enconder">Transformer enconder</h2>
@@ -317,15 +317,15 @@
 
 <h2 id="layer-normalization">Layer normalization</h2>
 
-<p>The LayerNorm (LN) Layer Normalization (<mark>torch.nn.LayerNorm()</mark> or <mark>Norm</mark> or <mark>LayerNorm</mark> or <mark>LN</mark>) normalizes an input over the last dimension. PyTorch’s torch.nn.LayerNorm()’s main parameter is normalized_shape which we can set to be equal to the dimension size we’d like to noramlize over (in our case it’ll be  $D$ or $768$ for ViT-Base). What does it do?</p>
+<p>The LayerNorm (LN) Layer Normalization (<code class="language-plaintext highlighter-rouge">torch.nn.LayerNorm()</code> or <code class="language-plaintext highlighter-rouge">Norm</code> or <code class="language-plaintext highlighter-rouge">LayerNorm</code> or <code class="language-plaintext highlighter-rouge">LN</code>) normalizes an input over the last dimension. PyTorch’s <code class="language-plaintext highlighter-rouge">torch.nn.LayerNorm()</code> main parameter is normalized_shape which we can set to be equal to the dimension size we’d like to normalize over (in our case it’ll be  $D$ or $768$ for <code class="language-plaintext highlighter-rouge">ViT</code>-Base). What does it do?</p>
 
 <p>Layer Normalization helps improve training time and model generalization (ability to adapt to unseen data). I like to think of any kind of normalization as “getting the data into a similar format” or “getting data samples into a similar distribution”. Imagine trying to walk up (or down) a set of stairs all with differing heights and lengths.</p>
 
-<p>It’d take some adjustment on each step right? And what you learn for each step wouldn’t necessary help with the next one since they all differ, increasing the time it takes you to navigate the stairs. Normalization (including Layer Normalization) is the equivalent of making all the stairs the same height and length except the stairs are your data samples. So just like you can walk up (or down) stairs with similar heights and lengths much easier than those with unequal heights and widths, neural networks can optimize over data samples with similar distributions (similar mean and standard-deviations) easier than those with varying distributions.</p>
+<p>It’d take some adjustment on each step, right? And what you learn for each step wouldn’t necessarily help with the next one since they all differ, increasing the time it takes you to navigate the stairs. Normalization (including Layer Normalization) is the equivalent of making all the stairs the same height and length except the stairs are your data samples. So just like you can walk up (or down) stairs with similar heights and lengths much easier than those with unequal heights and widths, neural networks can optimize over data samples with similar distributions (similar mean and standard deviations) easier than those with varying distributions.</p>
 
 <h1 id="pizza-sushi-steak--classifier">Pizza-sushi-steak 🍕🍣🥩 classifier</h1>
 
-<p>Now it’s time to code all the above into a classifier. We will implement a simple ViT classifier for the pizza-sushi-steak dataset. The dataset contains train and test folders with 450 images for training and 150 images for testing. We will start by providing some code for setting up our data. Firstly, we should download the dataset:</p>
+<p>Now it’s time to code all the above into a classifier. We will implement a simple <code class="language-plaintext highlighter-rouge">ViT</code> classifier for the pizza-sushi-steak dataset. The dataset contains train and test folders with $450$ images for training and 150 images for testing. We will start by providing some code for setting up our data. Firstly, we should download the dataset:</p>
 
 <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr>
 <td class="rouge-gutter gl"><pre class="lineno">1
@@ -378,7 +378,7 @@
 </pre></td>
 </tr></tbody></table></code></pre></div></div>
 
-<p>Then you will need to create the necessarry dataloaders for train and test sets:</p>
+<p>Then you will need to create the necessary dataloaders for train and test sets:</p>
 
 <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr>
 <td class="rouge-gutter gl"><pre class="lineno">1
@@ -441,7 +441,7 @@
 </tr></tbody></table></code></pre></div></div>
 <h1 id="create-a-vit-classifier">Create a ViT classifier</h1>
 
-<p>Having loaded the data, now it’s time to introduce a simple ViT model and fit our data. We will call the ViT model and pass the image batch to it. The output of the model will be the logits for each class. We will then use the cross-entropy loss to calculate the loss and the Adam optimizer to update the weights of the model. The following code will help you to create a simple ViT classifier:</p>
+<p>Having loaded the data, now it’s time to introduce a simple <code class="language-plaintext highlighter-rouge">ViT</code> model and fit our data. We will call the <code class="language-plaintext highlighter-rouge">ViT</code> model and pass the image batch to it. The output of the model will be the logits for each class. We will then use the cross-entropy loss to calculate the loss and the Adam optimizer to update the weights of the model. The following code will help you to create a simple <code class="language-plaintext highlighter-rouge">ViT</code> classifier:</p>
 
 <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr>
 <td class="rouge-gutter gl"><pre class="lineno">1
