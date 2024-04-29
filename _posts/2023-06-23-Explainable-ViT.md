@@ -114,9 +114,9 @@ Layer Normalization helps improve training time and model generalization (abilit
 
 It'd take some adjustment on each step right? And what you learn for each step wouldn't necessary help with the next one since they all differ, increasing the time it takes you to navigate the stairs. Normalization (including Layer Normalization) is the equivalent of making all the stairs the same height and length except the stairs are your data samples. So just like you can walk up (or down) stairs with similar heights and lengths much easier than those with unequal heights and widths, neural networks can optimize over data samples with similar distributions (similar mean and standard-deviations) easier than those with varying distributions.
 
-# Train a pizza-sushi-steak dataset 🍕🍣🥩 classifier
+# Pizza-sushi-steak 🍕🍣🥩 classifier
 
-Now its time to code all the above into a classifier. We will implement a simple ViT classifier for the pizza-sushi-steak dataset. The dataset contains train and test folders with 450 images for training and 150 images for testing. We will start by providing some code for setting up our data. Firstly, we should download the dataset:
+Now it's time to code all the above into a classifier. We will implement a simple ViT classifier for the pizza-sushi-steak dataset. The dataset contains train and test folders with 450 images for training and 150 images for testing. We will start by providing some code for setting up our data. Firstly, we should download the dataset:
 
 ```python
 image_path = download_data(source="https://github.com/mrdbourke/pytorch-deep-learning/raw/main/data/pizza_steak_sushi.zip",
@@ -182,7 +182,7 @@ image_batch, label_batch = next(iter(train_dataloader))
 ```
 # Create a ViT classifier
 
-Having loaded the data, now it's time to create a simple ViT model and fit our data. We will call the ViT model and pass the image batch to it. The output of the model will be the logits for each class. We will then use the cross-entropy loss to calculate the loss and the Adam optimizer to update the weights of the model. The following code will help you to create a simple ViT classifier:
+Having loaded the data, now it's time to introduce a simple ViT model and fit our data. We will call the ViT model and pass the image batch to it. The output of the model will be the logits for each class. We will then use the cross-entropy loss to calculate the loss and the Adam optimizer to update the weights of the model. The following code will help you to create a simple ViT classifier:
 
 ```python
 device = "cuda" if torch.cuda.is_available() else "cpu"
@@ -210,7 +210,7 @@ results = train_function(model=vit,
 
 ## Building the ViT model 
 
-Of course we will need to develop some code for the vision transformer model as well. That is a bit more complicated. Firstly, we will provide the whole code and then, we will analyze all the unknown parts. The code looks as follows:
+Of course, we will need to develop the code for the `ViT` model as well. That is a bit more complicated. At first, we will illustrate the whole code and then, we will analyze it step by step. The code looks as follows:
 
 ```python
 # 1. Create a ViT class that inherits from nn.Module
@@ -277,23 +277,150 @@ class ViT(nn.Module):
 ```
 ### Breaking down the code step-by-step
 
-Firstly, as mentioned in the code block comments we follow the details of the ViT paper such as <mark>batch size</mark>, <mark>number of patches</mark>, <mark>number of layers</mark>, the <mark>dimensionality of the embeddings</mark>, <mark>number of heads</mark>, etc. More details can be found in the paper's Table 1 and Table 3.
+Firstly, as mentioned in the code block comments we follow the details of the ViT paper such as `batch size`, `number of patches`, `number of layers`, the `dimensionality of the embeddings`, `number of heads`, etc. More details can be found in the paper's Table 1 and Table 3.
 
-The first thing that our code tries to emulate is the creation of patches. Given, an image we create patches of size $16 \times 16$ ($P \times P$). Thus, if the input image has size $H \times W \times C$  and is $224 \times 224 \times 3$, the total amount of patches is $N = 196$, and can be calculated by the following formula $N = HW/P^{2}$. Then, these image patches are turned into embeddings, by using the <mark style="background-color:LavenderBlush;">PatchEmbedding</mark> functionality. The benefit of turning the raw images into embeddings is that we can learn a representation of the image that can improve with training.
+The first thing that our code tries to emulate is the creation of patches. Given, an image we create patches of size $16 \times 16$ ($P \times P$). Thus, if the input image has size $H \times W \times C$  and is $224 \times 224 \times 3$, the total amount of patches is $N = 196$, and can be calculated by the following formula $N = HW/P^{2}$. Then, these image patches are turned into embeddings, by using the `PatchEmbedding` functionality. The benefit of turning the raw images into embeddings is that we can learn a representation of the image that can improve with training.
 
-Different values for the size of the embeddings can be found in Table 1, but throughout this tutorial, we will make use of $D = 768$. The idea is to first split the image into patches and then apply a learnable 2d convolutional layer to each patch. If we set the proper values for the kernel_size and stride parameters of a torch.nn.Conv2d() then we can have the desired output embedding for instance D = 768 in our case. To facilitate the dimensions of output smoothly we will need to make use of a flatten() function to flatten the output of the convolutional layer.
+Different values for the size of the embeddings can be found in Table 1, but throughout this tutorial, we will make use of $D = 768$. The idea is to first split the image into patches and then apply a learnable 2d convolutional layer to each patch. If we set the proper values for the kernel_size and stride parameters of a `torch.nn.Conv2d()` then we can have the desired output embedding, for instance, $D = 768$ in our case. To facilitate the dimensions of output smoothly we will need to make use of a `flatten()` function to flatten the output of the convolutional layer.
 
-So far we have created the patch embeddings, but we will need to write code for the token embeddings abd also for the position embeddings. The token embeddings are created by using a learnable class embedding similar to BERT.
+The next step is to stack $m$ Transformer Encoders together using the following code: `nn.Sequential(*[TransformerEncoderBlock(.)` and finally add a linear layer that will output the desired amount of classes `nn.Linear(in_features=embedding_dim, out_features=num_classes)`.
 
-Reading the second paragraph of section 3.1 from the ViT paper, we see the following description:
+**PatchEmbedding code**: After having created the patches in the main `ViT` class, the next step is to calculate the embeddings of the patches. This is done by the `PatchEmbedding` class. The code for the `PatchEmbedding` class is as follows:
 
+```python 
+class PatchEmbedding(nn.Module):
+    """Turns a 2D input image into a 1D sequence learnable embedding vector.
+
+    Args:
+        in_channels (int): Number of color channels for the input images. Defaults to 3.
+        patch_size (int): Size of patches to convert input image into. Defaults to 16.
+        embedding_dim (int): Size of embedding to turn image into. Defaults to 768.
+    """
+    # 2. Initialize the class with appropriate variables
+    def __init__(self, in_channels:int=3, patch_size:int=16, embedding_dim:int=768):
+        super().__init__()
+        self.patcher = nn.Conv2d(in_channels=in_channels,
+            out_channels=embedding_dim,
+            kernel_size=patch_size,
+            stride=patch_size,
+            padding=0)
+        self.flatten = nn.Flatten(start_dim=2, end_dim=3) # only flatten the feature map dimensions into a single vector
+            
+    def forward(self, x):
+        # Create assertion to check that inputs are the correct shape
+        image_resolution = x.shape[-1]
+        # Perform the forward pass
+        x_patched = self.patcher(x)
+        x_flattened = self.flatten(x_patched)
+        return x_flattened.permute(0, 2, 1) # adjust so the embedding is on the final dimension [batch_size, P^2•C, N] -> [batch_size, N, P^2•C]
+```
+
+**TransformerEncoderBlock code**: The second main part of the code is the `TransformerEncoderBlock` class. This class is responsible for the creation of the Transformer Encoder block. It is mainly composed as Figure 1 portrays in two parts: `MultiheadSelfAttentionBlock` and `MLPBlock` blocks. The code for the `TransformerEncoderBlock` class is as follows:
+
+```python
+class TransformerEncoderBlock(nn.Module):
+    """Creates a Transformer Encoder block."""
+    def __init__(self,
+            embedding_dim:int=768, 
+            num_heads:int=12, 
+            mlp_size:int=3072, 
+            mlp_dropout:float=0.1, 
+            attn_dropout:float=0): 
+        super().__init__()
+
+        self.msa_block = MultiheadSelfAttentionBlock(embedding_dim=embedding_dim,
+            num_heads=num_heads,
+            attn_dropout=attn_dropout)
+
+        self.mlp_block = MLPBlock(embedding_dim=embedding_dim, # You can find more information for this part of the code in the repository
+            mlp_size=mlp_size,
+            dropout=mlp_dropout)
+
+    def forward(self, x):
+        x =  self.msa_block(x) + x
+        x = self.mlp_block(x) + x
+        return x
+```
 
 
 ## Training function for the ViT model
 
+Having defined already the dataset, our model and the loss function, we can directly proceed with the training of our `ViT` model. The idea is to iterate through all the epochs and batches and update the parameters of the model using backpropagation as usual. Then, we should report the loss and the accuracy of the model for the training and test sets. The code should look as follows:
+
+```python   
+train_loss, train_acc = 0    
+for epoch in tqdm(range(epochs)):
+    for batch, (X, y) in enumerate(train_dataloader):
+        X , y = X.to(device), y.to(device)
+        y_pred = model(X)
+        loss = loss_fn(y_pred, y)
+        train_loss += loss.item() 
+        optimizer.zero_grad()
+        loss.backward()
+        optimizer.step()
+
+        y_pred_class = torch.argmax(torch.softmax(y_pred, dim=1), dim=1)
+        train_acc += (y_pred_class == y).sum().item()/len(y_pred)
+
+train_loss = train_loss / len(dataloader)
+train_acc = train_acc / len(dataloader)
+```
+
+Of course, we will need to measure also the performance in the test set as usual. The code is identical to the training process and can be found in the repository.
+
 ## Measuring the performance of the ViT model
 
+After having trained the model, we should report the performance of the model in the test set. The code should look as follows:
+
+```python
+weights_path = "models/pre_trained_vit_sushi_768_v2.pth"
+
+checkpoint = torch.load(weights_path, map_location= device)
+pretrained_vit.load_state_dict(checkpoint)
+
+model = pretrained_vit.to(device)
+img = Image.open(image_path)
+
+if transform is not None:
+    image_transform = transform
+else:
+    image_transform = transforms.Compose([
+        transforms.Resize(image_size),
+        transforms.ToTensor(),
+        transforms.Normalize(mean=[0.485, 0.456, 0.406],
+                                std=[0.229, 0.224, 0.225]),])
+
+with torch.inference_mode():
+    transformed_image = image_transform(img).unsqueeze(dim=0)
+    target_image_pred = model(transformed_image.to(device))
+
+target_image_pred_probs = torch.softmax(target_image_pred, dim=1)
+target_image_pred_label = torch.argmax(target_image_pred_probs, dim=1)
+
+# Plot the results
+plt.figure()
+plt.imshow(img)
+plt.title(f"Pred: {class_names[target_image_pred_label]} | Prob: {target_image_pred_probs.max():.3f}")
+plt.axis(False)
+plt.show()
+```
+
 ## Loading a pre-trained ViT model
+
+As we saw in the previous section, it is not possible to train our model with only that small amount of data. Thus, we will try to perform instead Transfer learning to load pre-trained weights on `ImageNet` using the `ViT_B_16_Weights` model that comes with the `torchvision` package. Of course, this model is trained for a different target than our desired target 🍕🍣🥩. Thus, we will need to change the layers that relate to the class and replace the output with the desired amount of output layers. We will need also to freeze all the rest layers:
+
+```python
+# Load the pre-trained ViT model        
+retrained_vit_weights = torchvision.models.ViT_B_16_Weights.DEFAULT # requires torchvision >= 0.13, "DEFAULT" means best available
+pretrained_vit = torchvision.models.vit_b_16(weights=retrained_vit_weights).to(device)
+
+for parameter in pretrained_vit.parameters():
+    parameter.requires_grad = False
+
+pretrained_vit.heads = nn.Linear(in_features=768, out_features=len(class_names)).to(device)
+```
+
+Then, we can perform the training process as usual and report the results. Note that you can make use of the train using a couple of different pre-trained weights, however, you should be a bit careful about the parameters that need to be updated.
 
 # Explainable Vision Transformers
 
