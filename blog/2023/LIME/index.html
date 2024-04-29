@@ -407,7 +407,25 @@ conda activate my_lime
 
 <p>Now, having installed the necessary libraries we can import them. Throughout the whole tutorial, we will make use of The following libraries are used:</p>
 
-<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">import</span> <span class="n">matplotlib.pyplot</span> <span class="k">as</span> <span class="n">plt</span>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr>
+<td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+</pre></td>
+<td class="rouge-code"><pre><span class="kn">import</span> <span class="n">matplotlib.pyplot</span> <span class="k">as</span> <span class="n">plt</span>
 <span class="kn">from</span> <span class="n">PIL</span> <span class="kn">import</span> <span class="n">Image</span>
 <span class="kn">import</span> <span class="n">torch.nn</span> <span class="k">as</span> <span class="n">nn</span>
 <span class="kn">import</span> <span class="n">numpy</span> <span class="k">as</span> <span class="n">np</span>
@@ -423,7 +441,8 @@ conda activate my_lime
 <span class="kn">import</span> <span class="n">sklearn</span>
 <span class="kn">import</span> <span class="n">sklearn.metrics</span>
 <span class="kn">from</span> <span class="n">sklearn.linear_model</span> <span class="kn">import</span> <span class="n">LinearRegression</span>
-</code></pre></div></div>
+</pre></td>
+</tr></tbody></table></code></pre></div></div>
 
 <h3 id="initialization-of-a-pre-trained-vgg19-model">Initialization of a pre-trained VGG19 model</h3>
 <p>The very first thing that we will do is load a pre-trained VGG19 model. This model will be used to classify images and we will try to explain
@@ -435,7 +454,20 @@ Google colab by enabling the GPU option. The steps for that are the
 following: <mark>Edit -\&gt; Notebook settings -\&gt; Hardware accelerator -\&gt;
 GPU</mark>. The code for all these steps is the following:</p>
 
-<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># load model
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr>
+<td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+</pre></td>
+<td class="rouge-code"><pre><span class="c1"># load model
 # model_type = 'vgg19'
 </span><span class="n">model</span> <span class="o">=</span> <span class="n">models</span><span class="p">.</span><span class="nf">vgg19</span><span class="p">(</span><span class="n">pretrained</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
 
@@ -446,7 +478,8 @@ GPU</mark>. The code for all these steps is the following:</p>
 <span class="n">model</span> <span class="o">=</span> <span class="n">model</span><span class="p">.</span><span class="nf">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
 <span class="c1"># set model to evaluation
 </span><span class="n">model</span><span class="p">.</span><span class="nf">eval</span><span class="p">()</span>
-</code></pre></div></div>
+</pre></td>
+</tr></tbody></table></code></pre></div></div>
 
 <p>Ignore for now the warnings! This code should return the architecture of
 the VGG19 model. Of course, feel free to choose the model of your choice
@@ -455,7 +488,22 @@ image (for the VGG19 classifier) that we would like to test our
 <mark style="background-color:Lavender;">LIME</mark> explainer. You can
 freely choose the image that you would like to explain.</p>
 
-<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">imread_img</span><span class="p">(</span><span class="n">file_name</span><span class="p">):</span>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr>
+<td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+</pre></td>
+<td class="rouge-code"><pre><span class="k">def</span> <span class="nf">imread_img</span><span class="p">(</span><span class="n">file_name</span><span class="p">):</span>
   
   <span class="c1"># read the image and convert it - Set your pathto the image
 </span>  <span class="n">img</span> <span class="o">=</span> <span class="n">cv2</span><span class="p">.</span><span class="nf">imread</span><span class="p">(</span><span class="sh">'</span><span class="s">caretta.png</span><span class="sh">'</span><span class="p">)</span>
@@ -468,7 +516,8 @@ freely choose the image that you would like to explain.</p>
     <span class="nf">print</span><span class="p">(</span><span class="sh">'</span><span class="s">image not found - set your path to the image</span><span class="sh">'</span><span class="p">)</span>
   
   <span class="k">return</span> <span class="n">img</span>
-</code></pre></div></div>
+</pre></td>
+</tr></tbody></table></code></pre></div></div>
 <p>We do make use of the
 <mark style="background-color:Lavender;">OpenCV</mark> library to read
 the <mark style="background-color:Lavender;">caretta.png</mark> image from <mark>files/</mark>.
@@ -485,7 +534,30 @@ lab exercise at the end of this tutorial.</p>
 is done using the mean and standard deviation of the ImageNet dataset.
 The image is also transposed to the correct tensor format:</p>
 
-<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">pre_processing</span><span class="p">(</span><span class="n">obs</span><span class="p">,</span> <span class="n">cuda</span><span class="p">):</span>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr>
+<td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+</pre></td>
+<td class="rouge-code"><pre><span class="k">def</span> <span class="nf">pre_processing</span><span class="p">(</span><span class="n">obs</span><span class="p">,</span> <span class="n">cuda</span><span class="p">):</span>
     <span class="c1"># Students should transpose the image to the correct tensor format. 
 </span>    <span class="c1"># Students should ensure that gradient for input is calculated       
 </span>    <span class="c1"># set the GPU device
@@ -506,23 +578,52 @@ The image is also transposed to the correct tensor format:</p>
     <span class="n">obs</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="nf">array</span><span class="p">(</span><span class="n">obs</span><span class="p">)</span>
     <span class="n">obs_tensor</span> <span class="o">=</span> <span class="n">torch</span><span class="p">.</span><span class="nf">tensor</span><span class="p">(</span><span class="n">obs</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">torch</span><span class="p">.</span><span class="n">float32</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">torch_device</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">obs_tensor</span>
-</code></pre></div></div>
+</pre></td>
+</tr></tbody></table></code></pre></div></div>
 
 <p>We can do the same (resizing, normalization and conversion to tensor) by
 using the torchvision transform:</p>
 
-<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">transform</span> <span class="o">=</span> <span class="n">A</span><span class="p">.</span><span class="nc">Compose</span><span class="p">([</span>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr>
+<td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+</pre></td>
+<td class="rouge-code"><pre><span class="n">transform</span> <span class="o">=</span> <span class="n">A</span><span class="p">.</span><span class="nc">Compose</span><span class="p">([</span>
         <span class="n">A</span><span class="p">.</span><span class="nc">Resize</span><span class="p">(</span><span class="mi">224</span><span class="p">,</span> <span class="mi">224</span><span class="p">),</span>
         <span class="n">A</span><span class="p">.</span><span class="nc">Normalize</span><span class="p">(</span><span class="n">mean</span><span class="o">=</span><span class="p">[</span><span class="mf">0.485</span><span class="p">,</span> <span class="mf">0.456</span><span class="p">,</span> <span class="mf">0.406</span><span class="p">],</span> <span class="n">std</span><span class="o">=</span><span class="p">[</span><span class="mf">0.229</span><span class="p">,</span> <span class="mf">0.224</span><span class="p">,</span> <span class="mf">0.225</span><span class="p">]),</span>
         <span class="nc">ToTensorV2</span><span class="p">()])</span>
-</code></pre></div></div>
+</pre></td>
+</tr></tbody></table></code></pre></div></div>
 
 <p>Then, the next that we will do is load the image and preprocess it. We
 will also check the prediction of the VGG19 model. Note that the
 prediction is correct (E.g. 33 and 34 are ‘caretta-caretta’ and
 ‘turtle’). The code is the following:</p>
 
-<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">predict</span><span class="p">(</span><span class="nb">input</span><span class="p">,</span> <span class="n">model</span><span class="p">,</span> <span class="n">target_label_idx</span><span class="p">,</span> <span class="n">cuda</span><span class="p">):</span>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr>
+<td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+</pre></td>
+<td class="rouge-code"><pre><span class="k">def</span> <span class="nf">predict</span><span class="p">(</span><span class="nb">input</span><span class="p">,</span> <span class="n">model</span><span class="p">,</span> <span class="n">target_label_idx</span><span class="p">,</span> <span class="n">cuda</span><span class="p">):</span>
     <span class="c1"># Makes prediction after preprocessing image 
 </span>    <span class="c1"># Note that output should be torch.tensor on cuda
 </span>    <span class="n">output</span> <span class="o">=</span> <span class="nf">model</span><span class="p">(</span><span class="nb">input</span><span class="p">)</span>                        
@@ -541,17 +642,27 @@ prediction is correct (E.g. 33 and 34 are ‘caretta-caretta’ and
 <span class="n">label</span><span class="p">,</span> <span class="n">output</span> <span class="o">=</span> <span class="nf">predict</span><span class="p">(</span><span class="nb">input</span><span class="p">,</span> <span class="n">model</span><span class="p">,</span> <span class="bp">None</span><span class="p">,</span> <span class="n">cuda</span><span class="p">)</span>
 <span class="nf">print</span><span class="p">(</span><span class="sh">'</span><span class="s">output:</span><span class="sh">'</span><span class="p">,</span> <span class="n">output</span><span class="p">)</span>
 <span class="nf">print</span><span class="p">(</span><span class="sh">'</span><span class="s">output label:</span><span class="sh">'</span><span class="p">,</span> <span class="n">label</span><span class="p">)</span>
-</code></pre></div></div>
+</pre></td>
+</tr></tbody></table></code></pre></div></div>
 
 <p>The following code helps you to get the label of the prediction. The label is the index of the class in the ImageNet dataset. The index is used to get the class name from the <mark>.json</mark> file. The <mark>.json</mark> file is available in the repository.</p>
 
-<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">idx2label</span><span class="p">,</span> <span class="n">cls2label</span><span class="p">,</span> <span class="n">cls2idx</span> <span class="o">=</span> <span class="p">[],</span> <span class="p">{},</span> <span class="p">{}</span>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr>
+<td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+</pre></td>
+<td class="rouge-code"><pre><span class="n">idx2label</span><span class="p">,</span> <span class="n">cls2label</span><span class="p">,</span> <span class="n">cls2idx</span> <span class="o">=</span> <span class="p">[],</span> <span class="p">{},</span> <span class="p">{}</span>
 <span class="k">with</span> <span class="nf">open</span><span class="p">(</span><span class="n">os</span><span class="p">.</span><span class="n">path</span><span class="p">.</span><span class="nf">abspath</span><span class="p">(</span><span class="sh">'</span><span class="s">imagenet_class_index.json</span><span class="sh">'</span><span class="p">),</span> <span class="sh">'</span><span class="s">r</span><span class="sh">'</span><span class="p">)</span> <span class="k">as</span> <span class="n">read_file</span><span class="p">:</span>
     <span class="n">class_idx</span> <span class="o">=</span> <span class="n">json</span><span class="p">.</span><span class="nf">load</span><span class="p">(</span><span class="n">read_file</span><span class="p">)</span>
     <span class="n">idx2label</span> <span class="o">=</span> <span class="p">[</span><span class="n">class_idx</span><span class="p">[</span><span class="nf">str</span><span class="p">(</span><span class="n">k</span><span class="p">)][</span><span class="mi">1</span><span class="p">]</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nf">range</span><span class="p">(</span><span class="nf">len</span><span class="p">(</span><span class="n">class_idx</span><span class="p">))]</span>
     <span class="n">cls2label</span> <span class="o">=</span> <span class="p">{</span><span class="n">class_idx</span><span class="p">[</span><span class="nf">str</span><span class="p">(</span><span class="n">k</span><span class="p">)][</span><span class="mi">0</span><span class="p">]:</span> <span class="n">class_idx</span><span class="p">[</span><span class="nf">str</span><span class="p">(</span><span class="n">k</span><span class="p">)][</span><span class="mi">1</span><span class="p">]</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nf">range</span><span class="p">(</span><span class="nf">len</span><span class="p">(</span><span class="n">class_idx</span><span class="p">))}</span>
     <span class="n">cls2idx</span> <span class="o">=</span> <span class="p">{</span><span class="n">class_idx</span><span class="p">[</span><span class="nf">str</span><span class="p">(</span><span class="n">k</span><span class="p">)][</span><span class="mi">0</span><span class="p">]:</span> <span class="n">k</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nf">range</span><span class="p">(</span><span class="nf">len</span><span class="p">(</span><span class="n">class_idx</span><span class="p">))}</span> 
-</code></pre></div></div>
+</pre></td>
+</tr></tbody></table></code></pre></div></div>
 
 <h2 id="lime-explanation">LIME explanation</h2>
 <p>The following figure illustrates the basic idea behind LIME. The figure
@@ -611,7 +722,20 @@ generated. That of course will change if you will update the
 <mark style="background-color:Lavender;">max_dist</mark>). The code
 snippet can be found below:</p>
 
-<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">import</span> <span class="n">skimage.io</span> 
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr>
+<td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+</pre></td>
+<td class="rouge-code"><pre><span class="kn">import</span> <span class="n">skimage.io</span> 
 <span class="kn">import</span> <span class="n">skimage.segmentation</span>
 
 <span class="n">superpixels</span> <span class="o">=</span> <span class="n">skimage</span><span class="p">.</span><span class="n">segmentation</span><span class="p">.</span><span class="nf">quickshift</span><span class="p">(</span><span class="n">img</span><span class="o">/</span><span class="mi">255</span><span class="p">,</span> <span class="n">kernel_size</span><span class="o">=</span><span class="mi">6</span><span class="p">,</span> <span class="n">max_dist</span><span class="o">=</span><span class="mi">200</span><span class="p">,</span> <span class="n">ratio</span><span class="o">=</span><span class="mf">0.2</span><span class="p">)</span>
@@ -622,7 +746,8 @@ snippet can be found below:</p>
 <span class="n">plt</span><span class="p">.</span><span class="nf">axis</span><span class="p">(</span><span class="sh">'</span><span class="s">off</span><span class="sh">'</span><span class="p">)</span>
 <span class="n">plt</span><span class="p">.</span><span class="nf">show</span><span class="p">()</span>
 
-</code></pre></div></div>
+</pre></td>
+</tr></tbody></table></code></pre></div></div>
 
 <p>The generated superpixels for the input Caretta-caretta image are shown
 in the image below. Note that you can improve the result of the approach
@@ -638,37 +763,90 @@ reliable explanations.</p>
 <p>Having extracted the super-pixels, the way that perturbations are calculated is the following: Random
 zeros and ones are generated and shaped as a matrix with perturbations
 as rows and superpixels as columns. An example of a perturbation (the
-first one) is shown below. Here, <code class="language-plaintext highlighter-rouge">1</code> represents that a superpixel is on
-and <code class="language-plaintext highlighter-rouge">0</code> represents it is off. Notice that the length of the shown vector
+first one) is shown below. Here, <code class="language-plaintext highlighter-rouge"><table class="rouge-table"><tbody><tr>
+<td class="rouge-gutter gl"><pre class="lineno">1
+</pre></td>
+<td class="rouge-code"><pre>1
+</pre></td>
+</tr></tbody></table></code> represents that a superpixel is on
+and <code class="language-plaintext highlighter-rouge"><table class="rouge-table"><tbody><tr>
+<td class="rouge-gutter gl"><pre class="lineno">1
+</pre></td>
+<td class="rouge-code"><pre>0
+</pre></td>
+</tr></tbody></table></code> represents it is off. Notice that the length of the shown vector
 corresponds to the number of superpixels in the image. By running this
 code:</p>
 
-<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">num_perturb</span> <span class="o">=</span> <span class="mi">150</span>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr>
+<td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+</pre></td>
+<td class="rouge-code"><pre><span class="n">num_perturb</span> <span class="o">=</span> <span class="mi">150</span>
 <span class="n">perturbations</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">random</span><span class="p">.</span><span class="nf">binomial</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="n">num_perturb</span><span class="p">,</span> <span class="n">num_superpixels</span><span class="p">))</span>
 <span class="n">perturbations</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="c1">#Show example of perturbation
 </span>
-</code></pre></div></div>
+</pre></td>
+</tr></tbody></table></code></pre></div></div>
 
 <p>We can produce this sequence:</p>
 
-<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code> <span class="nf">array</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">])</span>
-</code></pre></div></div>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr>
+<td class="rouge-gutter gl"><pre class="lineno">1
+</pre></td>
+<td class="rouge-code"><pre> <span class="nf">array</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">])</span>
+</pre></td>
+</tr></tbody></table></code></pre></div></div>
 
-<p>The following function <code class="language-plaintext highlighter-rouge">perturb_image</code> perturbs the given image (<code class="language-plaintext highlighter-rouge">img</code>)
-based on a perturbation vector (<code class="language-plaintext highlighter-rouge">perturbation</code>) and predefined
-superpixels (<code class="language-plaintext highlighter-rouge">segments</code>).</p>
+<p>The following function <code class="language-plaintext highlighter-rouge"><table class="rouge-table"><tbody><tr>
+<td class="rouge-gutter gl"><pre class="lineno">1
+</pre></td>
+<td class="rouge-code"><pre>perturb_image
+</pre></td>
+</tr></tbody></table></code> perturbs the given image (<code class="language-plaintext highlighter-rouge"><table class="rouge-table"><tbody><tr>
+<td class="rouge-gutter gl"><pre class="lineno">1
+</pre></td>
+<td class="rouge-code"><pre>img
+</pre></td>
+</tr></tbody></table></code>)
+based on a perturbation vector (<code class="language-plaintext highlighter-rouge"><table class="rouge-table"><tbody><tr>
+<td class="rouge-gutter gl"><pre class="lineno">1
+</pre></td>
+<td class="rouge-code"><pre>perturbation
+</pre></td>
+</tr></tbody></table></code>) and predefined
+superpixels (<code class="language-plaintext highlighter-rouge"><table class="rouge-table"><tbody><tr>
+<td class="rouge-gutter gl"><pre class="lineno">1
+</pre></td>
+<td class="rouge-code"><pre>segments
+</pre></td>
+</tr></tbody></table></code>).</p>
 
-<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">perturb_image</span><span class="p">(</span><span class="n">img</span><span class="p">,</span><span class="n">perturbation</span><span class="p">,</span><span class="n">segments</span><span class="p">):</span>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr>
+<td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+</pre></td>
+<td class="rouge-code"><pre><span class="k">def</span> <span class="nf">perturb_image</span><span class="p">(</span><span class="n">img</span><span class="p">,</span><span class="n">perturbation</span><span class="p">,</span><span class="n">segments</span><span class="p">):</span>
   <span class="n">active_pixels</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="nf">where</span><span class="p">(</span><span class="n">perturbation</span> <span class="o">==</span> <span class="mi">1</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
   <span class="n">mask</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="nf">zeros</span><span class="p">(</span><span class="n">segments</span><span class="p">.</span><span class="n">shape</span><span class="p">)</span>
   <span class="c1">#Add your code here
 </span>  <span class="k">return</span> <span class="n">perturbed_image</span>
-</code></pre></div></div>
+</pre></td>
+</tr></tbody></table></code></pre></div></div>
 
 <p>Let’s use the previous function to see what a perturbed image would look like:</p>
 
-<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">skimage</span><span class="p">.</span><span class="n">io</span><span class="p">.</span><span class="nf">imshow</span><span class="p">(</span><span class="nf">perturb_image</span><span class="p">(</span><span class="n">img</span><span class="o">/</span><span class="mi">255</span><span class="p">,</span><span class="n">perturbations</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="n">superpixels</span><span class="p">))</span>
-</code></pre></div></div>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr>
+<td class="rouge-gutter gl"><pre class="lineno">1
+</pre></td>
+<td class="rouge-code"><pre><span class="n">skimage</span><span class="p">.</span><span class="n">io</span><span class="p">.</span><span class="nf">imshow</span><span class="p">(</span><span class="nf">perturb_image</span><span class="p">(</span><span class="n">img</span><span class="o">/</span><span class="mi">255</span><span class="p">,</span><span class="n">perturbations</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="n">superpixels</span><span class="p">))</span>
+</pre></td>
+</tr></tbody></table></code></pre></div></div>
 
 <p><img src="../../../assets/img/2023-05-13-LIME/caretta_3.jpg" style="width:400px;height:400px;" class="center"></p>
 
@@ -679,7 +857,25 @@ prediction for each perturbed image is computed. Our aim is to construct a label
 predictions, we can see for each of the perturbations we have the output
 probability for each of the 1000 classes.</p>
 
-<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">predictions</span> <span class="o">=</span> <span class="p">[]</span>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr>
+<td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+</pre></td>
+<td class="rouge-code"><pre><span class="n">predictions</span> <span class="o">=</span> <span class="p">[]</span>
 <span class="k">for</span> <span class="n">pert</span> <span class="ow">in</span> <span class="n">perturbations</span><span class="p">:</span>
   <span class="n">perturbed_img</span> <span class="o">=</span> <span class="nf">perturb_image</span><span class="p">(</span><span class="n">img</span><span class="p">,</span><span class="n">pert</span><span class="p">,</span><span class="n">superpixels</span><span class="p">)</span>
   <span class="nb">input</span> <span class="o">=</span> <span class="nf">pre_processing</span><span class="p">(</span><span class="n">perturbed_img</span><span class="p">,</span> <span class="n">cuda</span><span class="p">)</span>   
@@ -695,29 +891,60 @@ probability for each of the 1000 classes.</p>
 
 <span class="n">predictions</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="nf">array</span><span class="p">(</span><span class="n">predictions</span><span class="p">)</span>
 <span class="n">predictions</span><span class="p">.</span><span class="n">shape</span>
-</code></pre></div></div>
+</pre></td>
+</tr></tbody></table></code></pre></div></div>
 
 <p>Then, we will need to calculate the distances between the perturbations
 and the original image. The distances are calculated using the cosine
 distance. The smaller the distance, the more similar the vectors are.
 The distances are then converted to weights using a kernel function.</p>
 
-<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">original_image</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="nf">ones</span><span class="p">(</span><span class="n">num_superpixels</span><span class="p">)[</span><span class="n">np</span><span class="p">.</span><span class="n">newaxis</span><span class="p">,:]</span> <span class="c1">#Perturbation with all superpixels enabled 
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr>
+<td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+</pre></td>
+<td class="rouge-code"><pre><span class="n">original_image</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="nf">ones</span><span class="p">(</span><span class="n">num_superpixels</span><span class="p">)[</span><span class="n">np</span><span class="p">.</span><span class="n">newaxis</span><span class="p">,:]</span> <span class="c1">#Perturbation with all superpixels enabled 
 </span><span class="n">distances</span> <span class="o">=</span> <span class="n">sklearn</span><span class="p">.</span><span class="n">metrics</span><span class="p">.</span><span class="nf">pairwise_distances</span><span class="p">(</span><span class="n">perturbations</span><span class="p">,</span><span class="n">original_image</span><span class="p">,</span> <span class="n">metric</span><span class="o">=</span><span class="sh">'</span><span class="s">cosine</span><span class="sh">'</span><span class="p">).</span><span class="nf">ravel</span><span class="p">()</span>
 <span class="n">distances</span><span class="p">.</span><span class="n">shape</span>
-</code></pre></div></div>
+</pre></td>
+</tr></tbody></table></code></pre></div></div>
 
 <p>As we have shown before, after calculating the distances we need to apply
 kernels to use them in the loss function. The employed can is as
 follows:</p>
 
-<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">kernel_width</span> <span class="o">=</span> <span class="mf">0.25</span>	
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr>
+<td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+</pre></td>
+<td class="rouge-code"><pre><span class="n">kernel_width</span> <span class="o">=</span> <span class="mf">0.25</span>	
 <span class="n">weights</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="nf">sqrt</span><span class="p">(</span><span class="n">np</span><span class="p">.</span><span class="nf">exp</span><span class="p">(</span><span class="o">-</span><span class="p">(</span><span class="n">distances</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span><span class="o">/</span><span class="n">kernel_width</span><span class="o">**</span><span class="mi">2</span><span class="p">))</span> <span class="c1">#Kernel function 
 </span><span class="n">weights</span><span class="p">.</span><span class="n">shape</span>
-</code></pre></div></div>
+</pre></td>
+</tr></tbody></table></code></pre></div></div>
 <p>Having calculated the proximity of each perturbation from the original image, as a final step we can calculate the explanation for our predictions. To do that, we will train the explainer using the generated perturbations. Finally, we will need to keep the five highest values in our calculated weights.</p>
 
-<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">out</span> <span class="o">=</span> <span class="nf">model</span><span class="p">(</span><span class="nb">input</span><span class="p">)</span>     
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr>
+<td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+</pre></td>
+<td class="rouge-code"><pre><span class="n">out</span> <span class="o">=</span> <span class="nf">model</span><span class="p">(</span><span class="nb">input</span><span class="p">)</span>     
 <span class="nf">print </span><span class="p">(</span><span class="n">out</span><span class="p">.</span><span class="n">shape</span><span class="p">)</span>                
 <span class="n">out</span> <span class="o">=</span> <span class="n">F</span><span class="p">.</span><span class="nf">softmax</span><span class="p">(</span><span class="n">out</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>    
 
@@ -733,31 +960,51 @@ follows:</p>
 
 <span class="nf">print</span><span class="p">(</span><span class="n">topk_values</span><span class="p">)</span>
 <span class="nf">print</span><span class="p">(</span><span class="n">topk_indices</span><span class="p">)</span>
-</code></pre></div></div>
+</pre></td>
+</tr></tbody></table></code></pre></div></div>
 
 <p>We can now train the linear model using the perturbations and the
 predictions with the highest probability. The extracted coefficients (or
 the explainer model weights) of the linear model are the explanations
 for the predictions.</p>
 
-<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">simpler_model</span> <span class="o">=</span> <span class="nc">LinearRegression</span><span class="p">()</span>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr>
+<td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+</pre></td>
+<td class="rouge-code"><pre><span class="n">simpler_model</span> <span class="o">=</span> <span class="nc">LinearRegression</span><span class="p">()</span>
 <span class="c1">#simpler_model.fit()
 </span><span class="n">coeff</span> <span class="o">=</span> <span class="n">simpler_model</span><span class="p">.</span><span class="n">coef_</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
 <span class="n">coeff</span>
-</code></pre></div></div>
+</pre></td>
+</tr></tbody></table></code></pre></div></div>
 
 <p>We can now visualise the top features that the classifier used to make its prediction. The top features are the superpixels that have the highest coefficients.</p>
 
-<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">num_top_features</span> <span class="o">=</span> <span class="mi">4</span>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr>
+<td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+</pre></td>
+<td class="rouge-code"><pre><span class="n">num_top_features</span> <span class="o">=</span> <span class="mi">4</span>
 <span class="n">top_features</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="nf">argsort</span><span class="p">(</span><span class="n">coeff</span><span class="p">)[</span><span class="o">-</span><span class="n">num_top_features</span><span class="p">:]</span> 
 <span class="n">top_features</span>
-</code></pre></div></div>
+</pre></td>
+</tr></tbody></table></code></pre></div></div>
 <p>Having calculated the top features, we can now create a mask that will highlight the top superpixels in the image.</p>
 
-<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">mask</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="nf">zeros</span><span class="p">(</span><span class="n">num_superpixels</span><span class="p">)</span> 
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr>
+<td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+</pre></td>
+<td class="rouge-code"><pre><span class="n">mask</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="nf">zeros</span><span class="p">(</span><span class="n">num_superpixels</span><span class="p">)</span> 
 <span class="n">mask</span><span class="p">[</span><span class="n">top_features</span><span class="p">]</span><span class="o">=</span> <span class="bp">True</span> <span class="c1">#Activate top superpixels
 </span><span class="n">skimage</span><span class="p">.</span><span class="n">io</span><span class="p">.</span><span class="nf">imshow</span><span class="p">(</span><span class="nf">perturb_image</span><span class="p">(</span><span class="n">img</span> <span class="p">,</span><span class="n">mask</span><span class="p">,</span><span class="n">superpixels</span><span class="p">)</span> <span class="p">)</span>
-</code></pre></div></div>
+</pre></td>
+</tr></tbody></table></code></pre></div></div>
 
 <p><img src="../../../assets/img/2023-05-13-LIME/caretta_4.jpg" style="width:400px;height:400px;" class="center"></p>
 
@@ -786,7 +1033,28 @@ colab page. If you want you can use also your own husky and wolf images.</p>
 <p>Firstly, we will load the classifier and the images we want to explain.
 The following code checks the performance of the classifier in a test
 set.</p>
-<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">check_accuracy</span><span class="p">(</span><span class="n">loader</span><span class="p">,</span> <span class="n">model</span><span class="p">,</span> <span class="n">device</span><span class="p">):</span>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr>
+<td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+</pre></td>
+<td class="rouge-code"><pre><span class="k">def</span> <span class="nf">check_accuracy</span><span class="p">(</span><span class="n">loader</span><span class="p">,</span> <span class="n">model</span><span class="p">,</span> <span class="n">device</span><span class="p">):</span>
     <span class="n">num_correct</span> <span class="o">=</span> <span class="mi">0</span>
     <span class="n">num_samples</span> <span class="o">=</span> <span class="mi">0</span>
     <span class="n">model</span><span class="p">.</span><span class="nf">eval</span><span class="p">()</span>
@@ -805,12 +1073,17 @@ set.</p>
         
         <span class="nf">print</span><span class="p">(</span><span class="sa">f</span><span class="sh">'</span><span class="s">Got </span><span class="si">{</span><span class="n">num_correct</span><span class="si">}</span><span class="s"> / </span><span class="si">{</span><span class="n">num_samples</span><span class="si">}</span><span class="s"> with accuracy </span><span class="si">{</span><span class="nf">float</span><span class="p">(</span><span class="n">num_correct</span><span class="p">)</span><span class="o">/</span><span class="nf">float</span><span class="p">(</span><span class="n">num_samples</span><span class="p">)</span><span class="o">*</span><span class="mi">100</span><span class="si">:</span><span class="p">.</span><span class="mi">2</span><span class="n">f</span><span class="si">}</span><span class="sh">'</span><span class="p">)</span> 
     
-</code></pre></div></div>
+</pre></td>
+</tr></tbody></table></code></pre></div></div>
 
 <p>Now we will load the classifier, load the images and check the performance of the classifier.</p>
 
-<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">torch</span><span class="p">.</span><span class="nf">load</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="sh">'</span><span class="s">model/hus_wolf_model.pth</span><span class="sh">'</span><span class="p">)</span>
-</code></pre></div></div>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr>
+<td class="rouge-gutter gl"><pre class="lineno">1
+</pre></td>
+<td class="rouge-code"><pre><span class="n">torch</span><span class="p">.</span><span class="nf">load</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="sh">'</span><span class="s">model/hus_wolf_model.pth</span><span class="sh">'</span><span class="p">)</span>
+</pre></td>
+</tr></tbody></table></code></pre></div></div>
 
 <p>The following code loads the images and creates the dataloader. The
 dataloader is used to load the images in batches. The images are
@@ -818,7 +1091,25 @@ preprocessed using the same transformations that were used to train the
 classifier. Note that the following code is the same as the one used in
 the previous part of the tutorial for preprocessing images.</p>
 
-<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># create the transformation for all the images
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr>
+<td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+</pre></td>
+<td class="rouge-code"><pre><span class="c1"># create the transformation for all the images
 </span><span class="n">transform</span> <span class="o">=</span> <span class="n">transforms</span><span class="p">.</span><span class="nc">Compose</span><span class="p">([</span><span class="n">transforms</span><span class="p">.</span><span class="nc">Resize</span><span class="p">(</span><span class="mi">256</span><span class="p">),</span>
         <span class="n">transforms</span><span class="p">.</span><span class="nc">RandomCrop</span><span class="p">(</span><span class="mi">224</span><span class="p">),</span>
         <span class="n">transforms</span><span class="p">.</span><span class="nc">ToTensor</span><span class="p">(),</span>
@@ -834,7 +1125,8 @@ the previous part of the tutorial for preprocessing images.</p>
 
 <span class="c1"># Check the accuracy of the classifier
 </span><span class="nf">check_accuracy</span><span class="p">(</span><span class="n">test_dataloader</span><span class="p">,</span> <span class="n">model</span><span class="p">,</span> <span class="n">device</span><span class="p">)</span>
-</code></pre></div></div>
+</pre></td>
+</tr></tbody></table></code></pre></div></div>
 
 <p>The expected result should be around <mark style="background-color:Lavender;">36%</mark> accuracy.</p>
 
