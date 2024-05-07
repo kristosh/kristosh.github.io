@@ -24,9 +24,9 @@ authors:
 #   - make sure that TOC names match the actual section names
 #     for hyperlinks within the post to work correctly.
 toc:
-  - name: Vision Transformers (ViTs) Introduction
-  - name: Methodology
-  - name: Explainable VIts
+  - name: Vision Transformer ViT
+  - name: Pizza-sushi-steak 🍕🍣🥩 classifier
+  - name: Explainable ViT
   - name: TOSUBMIT
   - name: Conclusions
   - name: References
@@ -51,9 +51,9 @@ This tutorial was based on the code from the following tutorial: [https://uvadlc
 
 At the end of this tutorial a simple TODO exercise will be provided to gauge the performance of different XAI methods for our built `ViT` model.
 
-# Vision Transformers
+# Vision Transformer ViT
 
-The vanilla Transformer architecture was introduced by Vaswani et al. in 2017 [1], to tackle sequential data and particurarly textual information for the machine translation task. Given the success of the Transformer in the NLP domain, Dosovitskiy et al. [2] proposed the Vision Transformer (`ViT`) architecture for visual classification tasks. The `ViT` architecture is the standard transformer architecture but with visual information as input instead. In the `ViT` context, we need to convert the `3D` grid of pixels into a sequence of token embeddings. This could be done by splitting the image into non-overlapping patches and then, each patch should be flattened into a `1D` vector and then linearly projected into a vector of token embeddings. Finally, these token embeddings are fed into the `ViT` architecture in a similar way as the vanilla transformers. The basic blocks of the `ViT` architecture can be seen in the previous image and are:
+The vanilla Transformer architecture was introduced by Vaswani et al. in 2017 [1], to tackle sequential data and particularly textual information for the machine translation task. Given the success of the Transformer in the NLP domain, Dosovitskiy et al. [2] proposed the Vision Transformer (`ViT`) architecture for visual classification tasks. The `ViT` architecture is the standard transformer architecture but with visual information as input instead. In the `ViT` context, we need to convert the `3D` grid of pixels into a sequence of token embeddings. This could be done by splitting the image into non-overlapping patches and then, each patch should be flattened into a `1D` vector and then linearly projected into a vector of token embeddings. Finally, these token embeddings are fed into the `ViT` architecture in a similar way as the vanilla transformers. The basic blocks of the `ViT` architecture can be seen in the previous image and are:
 
 - **inputs**
 - **linear projection (embedding layer)**
@@ -97,11 +97,11 @@ The standard Transformer receives as input a 1D sequence of token embeddings. To
 <!-- - is is the same with the transformer enconder? -->
 ## Transformer enconder
 
-After having created the patches, we should proceed with the implementation of the transformer encoder that can be seen in Figure 1. It can mainly devided into: the multi-head attention (NSA) and the MLP layer. The multi-head self-attention mechanism is used to capture the dependencies between the patches. The feed-forward neural network is used to capture the non-linear interactions between the patches. The following image portrays the mechanism of the attention block. 
+After having created the patches, we should proceed with the implementation of the transformer encoder which can be seen in Figure 1. It can mainly divided into the `multi-head attention` (MSA) and the `MLP` layer. The multi-head self-attention mechanism is used to capture the dependencies between the patches. The feed-forward neural network is used to capture the non-linear interactions between the patches. The following image portrays the mechanism of the attention block. 
 
 Here we will need to decide whether the input to our model will be the full image or the image patches. To decide that we will take into account that a lot of pre-trained models have as input the full image. Thus, for now, we will use the full image as input to our model. 
 
-Moreover, note that we make use also of Layer normalization 
+Moreover, note that we make use also of `Layer normalization` ... 
 
 {% include figure.html path="assets/img/2023-06-23-Explainable-ViT/ViT_architecture.PNG" class="img-fluid" %}
 
@@ -112,7 +112,7 @@ The LayerNorm (LN) Layer Normalization (`torch.nn.LayerNorm()` or `Norm` or `Lay
 
 Layer Normalization helps improve training time and model generalization (ability to adapt to unseen data). I like to think of any kind of normalization as "getting the data into a similar format" or "getting data samples into a similar distribution". Imagine trying to walk up (or down) a set of stairs all with differing heights and lengths.
 
-It'd take some adjustment on each step, right? And what you learn for each step wouldn't necessarily help with the next one since they all differ, increasing the time it takes you to navigate the stairs. Normalization (including Layer Normalization) is the equivalent of making all the stairs the same height and length except the stairs are your data samples. So just like you can walk up (or down) stairs with similar heights and lengths much easier than those with unequal heights and widths, neural networks can optimize over data samples with similar distributions (similar mean and standard deviations) easier than those with varying distributions.
+It'd take some adjustment on each step, right? And what you learn for each step wouldn't necessarily help with the next one since they all differ, increasing the time it takes you to navigate the stairs. Normalization (including `Layer Normalization`) is the equivalent of making all the stairs the same height and length except the stairs are your data samples. So just like you can walk up (or down) stairs with similar heights and lengths much easier than those with unequal heights and widths, neural networks can optimize over data samples with similar distributions (similar mean and standard deviations) easier than those with varying distributions.
 
 # Pizza-sushi-steak 🍕🍣🥩 classifier
 
@@ -388,7 +388,7 @@ else:
         transforms.Resize(image_size),
         transforms.ToTensor(),
         transforms.Normalize(mean=[0.485, 0.456, 0.406],
-                                std=[0.229, 0.224, 0.225]),])
+            std=[0.229, 0.224, 0.225]),])
 
 with torch.inference_mode():
     transformed_image = image_transform(img).unsqueeze(dim=0)
@@ -405,6 +405,8 @@ plt.axis(False)
 plt.show()
 ```
 
+Of course, you can also measure the performance of the model using the test set and extract performance metrics such as accuracy, precision, recall, and $F_1$-score. You can make use of Tensoboard to visualize the results as well.
+
 ## Loading a pre-trained ViT model
 
 As we saw in the previous section, it is not possible to train our model with only that small amount of data. Thus, we will try to perform instead Transfer learning to load pre-trained weights on `ImageNet` using the `ViT_B_16_Weights` model that comes with the `torchvision` package. Of course, this model is trained for a different target than our desired target 🍕🍣🥩. Thus, we will need to change the layers that relate to the class and replace the output with the desired amount of output layers. We will need also to freeze all the rest layers:
@@ -420,18 +422,88 @@ for parameter in pretrained_vit.parameters():
 pretrained_vit.heads = nn.Linear(in_features=768, out_features=len(class_names)).to(device)
 ```
 
-Then, we can perform the training process as usual and report the results. Note that you can make use of the train using a couple of different pre-trained weights, however, you should be a bit careful about the parameters that need to be updated.
+Then, we can perform the training process as usual and report the results. Note that you could make use of the pre-trained weights of your preference, however, you should be a bit careful about the parameters that need to be updated. For instance, some pre-trained weights do not follow the same hyper-parameters as in the case of the original `ViT` paper. 
 
-# Explainable Vision Transformers
+# Explainable ViT
+
+Until we managed to successfully train a `ViT` using the images in our handmade dataset of 🍕🍣🥩 images using transfer learning. We measure the performance in a small test set and visualize the results. But how exactly does the model classify each specific image? Which parts of the model activated and led to a specific decision? Which layers are responsible for that decision?
+
+One simple way to investigate the inner mechanisms of the `ViT` model is to visualize the attention weights which is the easiest and most popular approach to interpret a model's decisions and to gain insights about its internals. These weights are calculated by the `Multi-Head Self-Attention` mechanism and can help us to understand which parts of the image are responsible for the decision of the model. Now, the question that pops up is: which attention maps are we going to visualize? From which layer? Which head? Remember that our model is composed of several layers and each layer (in particular we chose `12` layers).
+
+Transformer model, in each layer, self-attention combines information from attended embeddings of the previous layer to compute new embeddings for each token. Thus, across layers of the Transformer, information originating from different tokens gets increasingly mixed for a more thorough discussion on how the identity of tokens gets less and less represented in the embedding of that position as we go into deeper layers.
+
+Hence, when looking at the $i$th self-attention layer, we can not interpret the attention weights as the attention to the input tokens, i.e., embeddings in the input layer. This makes attention weights unreliable as explanation probes to answer questions like “Which part of the input is the most important when generating the output?” (except for the very first layer where the self-attention is directly applied to the input tokens.)
+
+Take home message: across layers of the Transformer, information originating from different tokens gets increasingly mixed. This makes attention weights unreliable as explanations probes.
+
+We can start by visualizing the attention maps of one of these layers. However, this approach is not class-specific and we end up ignoring most of the attention scores. Moreover, other layers are not even considered. Somehow a more sophisticated approach to take into account all the layers is needed here. 
+
+## Attention Rollout
+
+At every Transformer block, we get an attention Matrix $A_{ij}$ that defines how much attention is going to flow from image patch (token) $j$ in the previous layer to image patch (token) $i$ in the next layer. We can multiply the Matrices between every two layers, to get the total attention flow between them. Why?
+
+Attention rollout and attention flow recursively compute the token attention in each layer of a given model given the embedding attention as input.
+They differ in the assumptions they make about how attention weights in lower layers affect the flow of information to the higher layers and
+whether to compute the token attention relative to each other or independently.
+
+When we only use attention weights to approximate the flow of information in Transformers, we ignore the residual connections We can model them by adding the identity matrix $\mathbb{I{$ to the layer Attention matrices: $A_{ij}+\mathbb{I}$. We have multiple attention heads. What do we do about them? The Attention rollout paper suggests taking the average of the heads. As we will see, it can make sense using other choices: like the minimum, the maximum, or using different weights. Finally, we get a way to recursively compute the Attention Rollout matrix at layer L:
+
+$$AttentionRollout_{L}=(A_L+\mathbb{I}) AttentionRollout_{L−1}$$
+
+We also have to normalize the rows, to keep the total attention flow 1. 
+
+Regarding the implementation of this method, the main code for implementing the `Attention Rollout` method is as follows:
+
+
+```python
+
+result = torch.eye(attentions[0].shape[1])
+with torch.no_grad():
+    for attention in attentions:
+        
+        # fusion methods 
+        #TODO implementation
+
+        flat = attention_heads_fused.view(attention_heads_fused.size(0), -1) # a list with the fused attention heads for each layer
+        _, indices = flat.topk(int(flat.size(-1)*discard_ratio), -1, False)
+        indices = indices[indices != 0]
+        flat[0, indices] = 0
+
+        I = torch.eye(attention_heads_fused.size(-1)) # identity matrix
+        a = (attention_heads_fused + 1.0*I)/2 # take into account the residual connections
+        a = a / a.sum(dim=-1) # normalize the rows
+        
+        result = torch.matmul(a, attention_heads_fused) # the attention rollout matrix for each layer
+
+    mask = result[0 , 1 :]
+    # In case of 224x224 image, this brings us from 196 to 14
+    width = int(mask.size(-1)**0.5)
+    mask = mask.reshape(width, width).numpy()
+    mask = mask / np.max(mask)
+    return mask 
+```
+
+where `discard_ratio` is a hyperparameter and the variable `attention_heads_fused` represents the way that we fused the attention heads. That occurs by averaging or keeping the `max` and `min` for the attention maps.
+
+### Cons of this method
+
+- This methodology is not class-specific
+- They end up ignoring most of the attention scores, and other layers are not even considered.
+- 
+## Gradient Attention Rollout
 
 # TODO
 
 # Conclusions
 
-In this tutorial, we have analyzed LIME a posthoc XAI technique. An explanation of how this technique works but also step-by-step the code to implement it. We have also seen how we can use LIME to explain image classifiers but also how to identify the bias in a classifier. 
+In this tutorial, we have analyzed the `ViT` model and how it works. We have developed a simple `ViT` classifier for the pizza-sushi-steak dataset and trained the model. We have also analyzed two approaches for explaining the behavior of the `ViT` model. The first approach called <mark>Attention Rollout</mark> is based on the `Attention Maps` and actually a way to summarize the content of the attention maps to understand the behavior of the model. The second approach is called <mark>Gradient Attention Rollout</mark> and is based on the `Gradient-based` methods and actually a way to visualize the gradient influence over the attention maps which helps as well to understand the behavior of the model. We conclude with a simple TODO exercise that will help you to understand the behavior of the `ViT` model and the interpretability methods.
 
 # References
 [[1] A. Vaswani, N. Shazeer, N. Parmar, J. Uszkoreit, L. Jones, A. Gomez, {. Kaiser, and I. Polosukhin. Advances in Neural Information Processing Systems, page 5998--6008. (2017).](https://proceedings.neurips.cc/paper_files/paper/2017/file/3f5ee243547dee91fbd053c1c4a845aa-Paper.pdf){: style="font-size: smaller"}
 
 [[2] A. Dosovitskiy, L. Beyer, A. Kolesnikov, D. Weissenborn, X. Zhai, T. Unterthiner, M. Dehghani, M. Minderer, G. Heigold, S. Gelly, J. Uszkoreit, N, Houlsby, An Image is Worth 16x16 Words: Transformers for Image Recognition at Scale, International Conference on Learning Representations (2021).](https://openreview.net/pdf?id=YicbFdNTTy){: style="font-size: smaller"}
+
+[[3] S. Abnar, W. Zuidema, Quantifying Attention Flow in Transformers, Proceedings of the 58th Annual Meeting of the Association for Computational Linguistics, 2020.](https://arxiv.org/abs/2005.00928){: style="font-size: smaller"}
+
+[[4] H. Chefer, S. Gur, L. Wolf, Transformer Interpretability Beyond Attention Visualization, CVPR, 2021.](https://openaccess.thecvf.com/content/CVPR2021/papers/Chefer_Transformer_Interpretability_Beyond_Attention_Visualization_CVPR_2021_paper.pdf){: style="font-size: smaller"}
 
