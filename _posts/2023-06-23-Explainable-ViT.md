@@ -446,7 +446,7 @@ Attention rollout and attention flow recursively compute the token attention in 
 They differ in the assumptions they make about how attention weights in lower layers affect the flow of information to the higher layers and
 whether to compute the token attention relative to each other or independently.
 
-When we only use attention weights to approximate the flow of information in Transformers, we ignore the residual connections We can model them by adding the identity matrix $\mathbb{I{$ to the layer Attention matrices: $A_{ij}+\mathbb{I}$. We have multiple attention heads. What do we do about them? The Attention rollout paper suggests taking the average of the heads. As we will see, it can make sense using other choices: like the minimum, the maximum, or using different weights. Finally, we get a way to recursively compute the Attention Rollout matrix at layer L:
+When we only use attention weights to approximate the flow of information in Transformers, we ignore the residual connections We can model them by adding the identity matrix $\mathbb{I}$ to the layer Attention matrices: $A_{ij}+\mathbb{I}$. We have multiple attention heads. What do we do about them? The Attention rollout paper suggests taking the average of the heads. As we will see, it can make sense using other choices: like the minimum, the maximum, or using different weights. Finally, we get a way to recursively compute the Attention Rollout matrix at layer L:
 
 $$AttentionRollout_{L}=(A_L+\mathbb{I}) AttentionRollout_{L−1}$$
 
@@ -475,7 +475,7 @@ with torch.no_grad():
         
         result = torch.matmul(a, attention_heads_fused) # the attention rollout matrix for each layer
 
-    mask = result[0 , 1 :]
+    mask = result[0 , 1 :] # Look at the total attention between the class token and the image patches
     # In case of 224x224 image, this brings us from 196 to 14
     width = int(mask.size(-1)**0.5)
     mask = mask.reshape(width, width).numpy()
@@ -492,11 +492,48 @@ where `discard_ratio` is a hyperparameter and the variable `attention_heads_fuse
 - 
 ## Gradient Attention Rollout
 
+The Attention that flows in the transformer passes along information belonging to different classes. Gradient rollout lets us see what locations the network paid attention too, but it tells us nothing about if it ended up using those locations for the final classification.
+
+We can multiply the attention with the gradient of the target class output, and take the average among the attention heads (while masking out negative attentions) to keep only attention that contributes to the target category (or categories).
+
+When fusing the attention heads in every layer, we could just weight all the attentions (in the current implementation it’s the attentions after the softmax, but maybe it makes sense to change that) by the target class gradient, and then take the average among the attention heads
+
+The main code for implementing the `Gradient Attention Rollout` method is as follows:
+
+```python
+with torch.no_grad():
+        for attention, grad in zip(attentions, gradients):                
+            if counter == 0:
+                counter += 1
+                continue
+        
+            weights = grad            
+            attention_heads_fused = (attention*weights).mean(axis=2)
+            attention_heads_fused[attention_heads_fused < 0] = 0
+
+            pdb.set_trace()
+            # Drop the lowest attentions, but
+            # don't drop the class token
+            flat = attention_heads_fused.view(attention_heads_fused.size(0), -1)
+            _, indices = flat.topk(int(flat.size(-1)*discard_ratio), -1, False)
+            #indices = indices[indices != 0]
+            flat[0, indices] = 0
+
+            I = torch.eye(attention_heads_fused.size(0))
+            a1 = (attention_heads_fused + 1.0*I)/2
+            a1 = a1 / a1.sum(dim=-1)
+            #pdb.set_trace()
+            result = torch.matmul(a1, result)
+```
+
 # TODO
+So far we have presented two simple methods for explainable `ViT` based on attention maps and the gradient. We have tested these methods using single images for visualization purposes from the 🍕🍣🥩 dataset. However, we haven't yet introduced any quantified way to measure the performance of these methodologies. As a simple `TODO` you will need to come up with ways to measure the performance of these two methodologies. You will need to find a ground truth and compare both methodologies.
+
+Test also the gradCAM approach for `ViT` models and compare the results with the previous methods quantitatively and quantitatively.
 
 # Conclusions
 
-In this tutorial, we have analyzed the `ViT` model and how it works. We have developed a simple `ViT` classifier for the pizza-sushi-steak dataset and trained the model. We have also analyzed two approaches for explaining the behavior of the `ViT` model. The first approach called <mark>Attention Rollout</mark> is based on the `Attention Maps` and actually a way to summarize the content of the attention maps to understand the behavior of the model. The second approach is called <mark>Gradient Attention Rollout</mark> and is based on the `Gradient-based` methods and actually a way to visualize the gradient influence over the attention maps which helps as well to understand the behavior of the model. We conclude with a simple TODO exercise that will help you to understand the behavior of the `ViT` model and the interpretability methods.
+In this tutorial, we have analyzed the `ViT` model and how it works. We have developed a simple `ViT` classifier for the pizza-sushi-steak dataset and trained the model. We have also analyzed two approaches for explaining the behavior of the `ViT` model. The first approach called <mark>Attention Rollout</mark> is based on the `Attention Maps` and actually a way to summarize the content of the attention maps to understand the behavior of the model. The second approach is called <mark>Gradient Attention Rollout</mark> and is based on the `Gradient-based` methods and actually a way to visualize the gradient influence over the attention maps which helps as well to understand the behavior of the model. We conclude with a simple TODO exercise that will help you understand the behavior of the `ViT` model and the interpretability methods.
 
 # References
 [[1] A. Vaswani, N. Shazeer, N. Parmar, J. Uszkoreit, L. Jones, A. Gomez, {. Kaiser, and I. Polosukhin. Advances in Neural Information Processing Systems, page 5998--6008. (2017).](https://proceedings.neurips.cc/paper_files/paper/2017/file/3f5ee243547dee91fbd053c1c4a845aa-Paper.pdf){: style="font-size: smaller"}
