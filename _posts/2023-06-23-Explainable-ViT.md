@@ -1,7 +1,7 @@
 ---
 layout: distill
 title: How to explain the behavior of vision transformers?
-description: This page's goal is to present techniques that can shed light on how Vision Transformers' models (<mark>ViTs</mark>) operate. We will first have a refresher on the ViTs and how they work. We will introduce a simple example of a ViT classifier trained on a pizza-sushi-steak dataset and use a pre-trained model to efficiently classify the images. Then, we will introduce various methods to visualize the way that they function. These approaches range from visualizing the attention maps to visualizing the query/key and value, but also using the backpropagated gradient similar to <mark>gradCAM</mark> algorithm. We will make use of <mark>PyTorch</mark> implementation to demonstrate some of these techniques. At the end of the blog post, there is a simple exercise that you will need to solve to portray some understanding of the way that <mark>ViTs</mark> and the interpretability methods operate.
+description: This page's goal is to present techniques that can shed light on how Vision Transformers' models (<mark>ViTs</mark>) operate. We will first have a refresher on the ViTs and how they work. We will develop a simple ViT classifier trained on the 🍕🍣🥩 dataset and use a pre-trained model to efficiently classify the images. The next step is to introduce various methods to visualize the way that the classifier takes specific decisions. These approaches range from visualizing the attention maps to visualizing the query/key and value, but also using the backpropagated gradient similar to <mark>gradCAM</mark> algorithm. We will make use of <mark>PyTorch</mark> implementation to demonstrate some of these techniques. At the end of the blog post, there is a simple exercise that you will need to solve to portray some understanding of the way that <mark>ViTs</mark> and the interpretability methods operate.
 
 date: 2023-05-13
 htmlwidgets: true
@@ -37,19 +37,17 @@ toc:
 
 {% include figure.html path="assets/img/2023-06-23-Explainable-ViT/ViT_architecture.PNG" class="img-fluid" %}
 
-What is a Vision Transformer? What is going on with the inner mechanism of it? How do they even work? Can we poke at them and dissect them into pieces to understand them better? 
+So what is a Vision Transformer? What is going on with the inner parameters of it? How do they even work? Can we poke at these parameters and dissect them into pieces to understand them better? 
 
-These are some questions that we will try to answer in this post. Firstly, we will try to remind our reader about what is exactly a vision transformer and how it works. We will develop a simple image classifier that distinguishes between 🍕🍣🥩 images. Hence, we will try to revise methods that aim to shed light on their inner mechanisms. Our aim goal is to investigate all the current standard practices for visualizing the mechanisms that cause the `ViT` classifier to predict a specific class each time. These visualizations could be useful for:
+These are some fundamental questions that we will try to answer in this post. Firstly, we will try to remind our reader about what is exactly a vision transformer and how it works. We will develop a simple image classifier that distinguishes between 🍕🍣🥩 images. Moreover, we will try to showcase methods that aim to shed light on the inner mechanisms of the `ViT` model. These visualizations could be useful for:
 
-- **the reseracher/developer**: Which parts of the transformers are activated when we input a specific image? Being able to look at intermediate activation layers different heads and part of the architecture and investigate what led to specific model activation.
+- Figuring out which parts of the transformers are activated when we input a specific image. Being able to look at intermediate activation layers different heads and part of the architecture and investigate what led to specific model activation.
 
--  **the reseracher/developer**: What did it learn? What type of patterns did the model learn? Usually, this is in the form of the question <em>What input image maximizes the response from this activation?</em>, and you can use variants of <em>Activation Maximization</em> for that.
+-  Figuring out what did it learn? What type of patterns did the model learn? Usually, this is in the form of the question <em>What input image maximizes the response from this activation?</em>, and you can use variants of <em>Activation Maximization</em> for that.
 
-- **both the developer and the user**: What did it see in this image? Being able to Answer <em>What part of the image is responsible for the network prediction</em>, is sometimes called <em>feature or pixel attribution</em>.
+- Figuring out what did it see in this image? Being able to Answer <em>What part of the image is responsible for the network prediction</em>, is sometimes called <em>feature or pixel attribution</em>.
 
-This tutorial was based on the code from the following tutorial: [https://uvadlc-notebooks.readthedocs.io/en/latest/tutorial_notebooks/tutorial15/Vision_Transformer.html](https://uvadlc-notebooks.readthedocs.io/en/latest/tutorial_notebooks/tutorial15/Vision_Transformer.html).
-
-At the end of this tutorial a simple TODO exercise will be provided to gauge the performance of different XAI methods for our built `ViT` model.
+We will make use of `PyTorch` to implement these methods and showcase the results. Moreover, we will make use of two different XAI methods. At the end of this tutorial, a simple TODO exercise will be provided to gauge the performance of different XAI methods for our built `ViT` model.
 
 # Vision Transformer ViT
 
@@ -485,6 +483,14 @@ with torch.no_grad():
 
 where `discard_ratio` is a hyperparameter and the variable `attention_heads_fused` represents the way that we fused the attention heads. That occurs by averaging or keeping the `max` and `min` for the attention maps.
 
+### Visual Results
+
+<p align="center">
+      <img src="../../../assets/img/2023-06-23-Explainable-ViT/rollout_1.png" align="left">
+      <img src="../../../assets/img/2023-06-23-Explainable-ViT/rollout_2.png">
+      <img src="../../../assets/img/2023-06-23-Explainable-ViT/rollout_3.png" align="right">
+</p>
+
 ### Cons of this method
 
 - This methodology is not class-specific
@@ -496,7 +502,7 @@ The Attention that flows in the transformer passes along information belonging t
 
 We can multiply the attention with the gradient of the target class output, and take the average among the attention heads (while masking out negative attentions) to keep only attention that contributes to the target category (or categories).
 
-When fusing the attention heads in every layer, we could just weight all the attentions (in the current implementation it’s the attentions after the softmax, but maybe it makes sense to change that) by the target class gradient, and then take the average among the attention heads
+When fusing the attention heads in every layer, we could just weigh all the attentions (in the current implementation it’s the attentions after the softmax, but maybe it makes sense to change that) by the target class gradient, and then take the average among the attention heads
 
 The main code for implementing the `Gradient Attention Rollout` method is as follows:
 
@@ -526,6 +532,14 @@ with torch.no_grad():
             result = torch.matmul(a1, result)
 ```
 
+### Visual Results
+
+<p align="center">
+      <img src="../../../assets/img/2023-06-23-Explainable-ViT/rollout_4.png" align="left">
+      <img src="../../../assets/img/2023-06-23-Explainable-ViT/rollout_5.png">
+      <img src="../../../assets/img/2023-06-23-Explainable-ViT/rollout_6.png" align="right">
+</p>
+
 # TODO
 So far we have presented two simple methods for explainable `ViT` based on attention maps and the gradient. We have tested these methods using single images for visualization purposes from the 🍕🍣🥩 dataset. However, we haven't yet introduced any quantified way to measure the performance of these methodologies. As a simple `TODO` you will need to come up with ways to measure the performance of these two methodologies. You will need to find a ground truth and compare both methodologies.
 
@@ -533,7 +547,7 @@ Test also the gradCAM approach for `ViT` models and compare the results with the
 
 # Conclusions
 
-In this tutorial, we have analyzed the `ViT` model and how it works. We have developed a simple `ViT` classifier for the pizza-sushi-steak dataset and trained the model. We have also analyzed two approaches for explaining the behavior of the `ViT` model. The first approach called <mark>Attention Rollout</mark> is based on the `Attention Maps` and actually a way to summarize the content of the attention maps to understand the behavior of the model. The second approach is called <mark>Gradient Attention Rollout</mark> and is based on the `Gradient-based` methods and actually a way to visualize the gradient influence over the attention maps which helps as well to understand the behavior of the model. We conclude with a simple TODO exercise that will help you understand the behavior of the `ViT` model and the interpretability methods.
+In this tutorial, we have analyzed the `ViT` model and how it works. We have developed a simple `ViT` classifier for the 🍕🍣🥩 dataset and trained the model. We have also analyzed two approaches for explaining the behavior of the `ViT` model. The first approach called <mark>Attention Rollout</mark> is based on the `Attention Maps` and a way to summarize the content of the attention maps to understand the behavior of the model. The second approach is called <mark>Gradient Attention Rollout</mark> and is based on the `Gradient-based` methods and a way to visualize the gradient influence over the attention maps which helps as well to understand the behavior of the model. We conclude with a simple TODO exercise that will help you understand the behavior of the `ViT` model and the interpretability methods.
 
 # References
 [[1] A. Vaswani, N. Shazeer, N. Parmar, J. Uszkoreit, L. Jones, A. Gomez, {. Kaiser, and I. Polosukhin. Advances in Neural Information Processing Systems, page 5998--6008. (2017).](https://proceedings.neurips.cc/paper_files/paper/2017/file/3f5ee243547dee91fbd053c1c4a845aa-Paper.pdf){: style="font-size: smaller"}
