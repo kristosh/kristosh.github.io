@@ -1,7 +1,7 @@
 ---
 layout: distill
 title: How to explain the behavior of vision transformers?
-description: This page's goal is to present techniques that can shed light on how Vision Transformers' models (<mark>ViTs</mark>) operate. We will first have a refresher on the ViTs and how they work. We will develop a simple ViT classifier trained on the 🍕🍣🥩 dataset and use a pre-trained model to efficiently classify the images. The next step is to introduce various methods to visualize the way that the classifier takes specific decisions. These approaches range from visualizing the attention maps to visualizing the query/key and value, but also using the backpropagated gradient similar to <mark>gradCAM</mark> algorithm. We will make use of <mark>PyTorch</mark> implementation to demonstrate some of these techniques. At the end of the blog post, there is a simple exercise that you will need to solve to portray some understanding of the way that <mark>ViTs</mark> and the interpretability methods operate.
+description: This page's goal is to present techniques that can shed light on how Vision Transformers' models (<mark>ViTs</mark>) operate. We will first have a refresher on the ViTs and how they work. We will develop a simple ViT classifier trained on the 🐶🐱 dataset and use a pre-trained model to efficiently classify the images. The next step is to introduce various methods to visualize the way that the classifier makes specific decisions. These approaches range from visualizing the attention maps to visualizing the query/key and value, but also using the backpropagated gradient similar to <mark>gradCAM</mark> algorithm. We will make use of <mark>PyTorch</mark> implementation to demonstrate some of these techniques. At the end of the blog post, there is a simple assignment TODO that you will need to solve as homework.
 
 date: 2023-05-13
 htmlwidgets: true
@@ -25,7 +25,7 @@ authors:
 #     for hyperlinks within the post to work correctly.
 toc:
   - name: Vision Transformer ViT
-  - name: Pizza-sushi-steak 🍕🍣🥩 classifier
+  - name: Cat-dog 🐶🐱 classifier
   - name: Explainable ViT
   - name: TOSUBMIT
   - name: Conclusions
@@ -36,51 +36,36 @@ toc:
 
 
 {% include figure.html path="assets/img/2023-06-23-Explainable-ViT/ViT_architecture.PNG" class="img-fluid" %}
+*Fig 1. Vision transformer architecture. In the left part, we can see the whole framework, from the patch calculation, patch embeddings, the positional encoding, transformer encoder and the classifcation head. While in the right part we can see the Encoder architecture.*
 
-So what is a Vision Transformer? What is going on with the inner parameters of it? How do they even work? Can we poke at these parameters and dissect them into pieces to understand them better? 
-
-These are some fundamental questions that we will try to answer in this post. Firstly, we will try to remind our reader about what is exactly a vision transformer and how it works. We will develop a simple image classifier that distinguishes between 🍕🍣🥩 images. Moreover, we will try to showcase methods that aim to shed light on the inner mechanisms of the `ViT` model. These visualizations could be useful for:
-
-- Figuring out which parts of the transformers are activated when we input a specific image. Being able to look at intermediate activation layers different heads and part of the architecture and investigate what led to specific model activation.
-
--  Figuring out what did it learn? What type of patterns did the model learn? Usually, this is in the form of the question <em>What input image maximizes the response from this activation?</em>, and you can use variants of <em>Activation Maximization</em> for that.
-
-- Figuring out what did it see in this image? Being able to Answer <em>What part of the image is responsible for the network prediction</em>, is sometimes called <em>feature or pixel attribution</em>.
-
-We will make use of `PyTorch` to implement these methods and showcase the results. Moreover, we will make use of two different XAI methods. At the end of this tutorial, a simple TODO exercise will be provided to gauge the performance of different XAI methods for our built `ViT` model.
+So what is a Vision Transformer? What is going on with the inner parameters of it? How do they even work? Can we poke at these parameters and dissect them into pieces to understand them better? These are some fundamental questions that we will try to answer in this post. 
+- Firstly, we will try to remind our reader about what is exactly a vision transformer and how it works. 
+- We will develop a simple image classifier that distinguishes between 🐶🐱 images. Moreover, we will try to showcase methods that aim to shed light on the inner mechanisms of the `ViT` model. 
+- We will make use of `PyTorch` to implement these methods and showcase the results. Moreover, we will make use of two different XAI methods. 
+- Finally, a simple TODO exercise will be provided to gauge the performance of different XAI methods for our built `ViT` model.
 
 # Vision Transformer ViT
 
-The vanilla Transformer architecture was introduced by Vaswani et al. in 2017 [1], to tackle sequential data and particularly textual information for the machine translation task. Given the success of the Transformer in the NLP domain, Dosovitskiy et al. [2] proposed the Vision Transformer (`ViT`) architecture for visual classification tasks. The `ViT` architecture is the standard transformer architecture but with visual information as input instead. In the `ViT` context, we need to convert the `3D` grid of pixels into a sequence of token embeddings. This could be done by splitting the image into non-overlapping patches and then, each patch should be flattened into a `1D` vector and then linearly projected into a vector of token embeddings. Finally, these token embeddings are fed into the `ViT` architecture in a similar way as the vanilla transformers. The basic blocks of the `ViT` architecture can be seen in the previous image and are:
+The vanilla Transformer architecture was introduced by Vaswani et al. in 2017 [1], to tackle sequential data and particularly textual information for the machine translation task. Given the success of the Transformer in the NLP domain, Dosovitskiy et al. [2] proposed the Vision Transformer (`ViT`) architecture for visual classification tasks. The `ViT` architecture is the standard transformer architecture but with visual information as input instead. In the `ViT` context, we need to convert the grid of pixels into a sequence of token embeddings. This could be done by splitting the image into non-overlapping patches and then, each patch should be flattened into a `1D` vector and then linearly projected into a vector of token embeddings. Finally, these token embeddings are fed into the `ViT` architecture in a similar way as the vanilla transformers. 
 
-- **inputs**
-- **linear projection (embedding layer)**
-- **positional encoding**
-- **transformer encoder**
-    - **Layer normalization**
-    - **multi-head self-attention**
-    - **feed-forward neural network**
-- **classification token**
-- **MLP head**  
-- **output predictions**
+The basic blocks of the `ViT` architecture can be seen in the previous image and are:
+
+- **Patch + Position Embedding**: Turns the input image into a sequence of image patches and adds a position number to specify in what order the patch comes in.
+- **Embedded Patches**: The image patches are flattened and then projected into embeddings. The benefit of using embeddings rather than just the image values is that embeddings are learnable representations of the image that can improve with training.
+- **Transformer Encoder**: The Transformer Encoder, is a collection of the layers listed above. There are two skip connections inside the Transformer encoder (as they are portrayed in the Architecture image) meaning the layer's inputs are fed directly to immediate layers as well as subsequent layers. The overall `ViT` architecture is comprised of several Transformer encoders stacked on top of each other.
+    - **Layer Normalization**: This is short for `Layer Normalization` or `LayerNorm`, a technique for regularizing (reducing overfitting) a neural network, you can use LayerNorm via the `PyTorch` layer `torch.nn.LayerNorm()`.
+    - - **Multi-Head Attention**: This is a Multi-Headed Self-Attention layer or `MSA` for short. You can create an MSA layer via the PyTorch layer `torch.nn.MultiheadAttention()`.
+    - **MLP (or Multilayer perceptron)**: An MLP can often refer to any collection of feedforward layers (or in PyTorch's case, a collection of layers with a forward() method). In the `ViT` Paper, the authors refer to the MLP as "MLP block" and it contains two `torch.nn.Linear()` layers with a `torch.nn.GELU()` non-linearity activation in between them (section 3.1) and a `torch.nn.Dropout()` layer after each.
+- **Classification Token**: Similar to BERT architecture a classification token is added to the input sequence. We will use the output feature vector of the classification token (CLS token in short) for determining the classification prediction.
+-  **MLP Head**: This is the output layer of the architecture, it converts the learned features of an input to a class output. Since we're working on image classification, you could also call this the "classifier head". The structure of the `MLP` Head is similar to the MLP block.
+- **Output predictions**
 
 To help the reader comprehend all the above, we will provide a simple grouping of definitions and use the following two terms:
 
 - **layers**: are basic elements that are used to build the architecture. For example, the multi-head self-attention can be considered as a layer. It's important to mention that a Transformer is composed usually of several Encoders. Each of these Enconders can be referred to in the literature as a layer as well.
 - **blocks**: a grouping of layers (for instance the whole encoder can be seen as a block of layers).
 
-The ViTs architecture is comprised of several stages:
-
-- **Patch + Position Embedding (inputs)**: Turns the input image into a sequence of image patches and adds a position number to specify in what order the patch comes in.
-- **Linear projection of flattened patches (Embedded Patches)**: The image patches are flattened and then projected into embeddings. The benefit of using embeddings rather than just the image values is that embeddings are learnable representations of the image that can improve with training.
-- **Norm**: This is short for `Layer Normalization` or `LayerNorm`, a technique for regularizing (reducing overfitting) a neural network, you can use LayerNorm via the `PyTorch` layer `torch.nn.LayerNorm()`.
-- **Multi-Head Attention**: This is a Multi-Headed Self-Attention layer or `MSA` for short. You can create an MSA layer via the PyTorch layer `torch.nn.MultiheadAttention()`.
-- **MLP (or Multilayer perceptron)**: An MLP can often refer to any collection of feedforward layers (or in PyTorch's case, a collection of layers with a forward() method). In the `ViT` Paper, the authors refer to the MLP as "MLP block" and it contains two `torch.nn.Linear()` layers with a `torch.nn.GELU()` non-linearity activation in between them (section 3.1) and a `torch.nn.Dropout()` layer after each.
-- **Transformer Encoder**: The Transformer Encoder, is a collection of the layers listed above. There are two skip connections inside the Transformer encoder (the "+" symbols) meaning the layer's inputs are fed directly to immediate layers as well as subsequent layers. The overall `ViT` architecture is comprised of several Transformer encoders stacked on top of each other.
--  **MLP Head**: This is the output layer of the architecture, it converts the learned features of an input to a class output. Since we're working on image classification, you could also call this the "classifier head". The structure of the `MLP` Head is similar to the MLP block.
-
-
-Breaking the hyperparameters down:
+Finally, a list with all the hyperparameters that we will need to define for the `ViT` model is as follows:
 
 - **Layers**: How many Transformer Encoder blocks are there? (each of these will contain an MSA block and the MLP block)
 - **Hidden size  D**: This is the embedding dimension throughout the architecture, this will be the size of the vector that our image gets turned into when it gets patched and embedded. Generally, the larger the embedding dimension, the more information can be captured, which leads to better results. However, a larger embedding comes at the cost of more computing. One niche issue here is that we need to distinguish the <em>layers</em> as hyperparameters that refer to the number of Transformer Encoder blocks and the <em>layer</em> as a building block of the encoder.
@@ -90,42 +75,36 @@ Breaking the hyperparameters down:
 
 ## Vision Transformers (ViTs) Tokenization
 
-The standard Transformer receives as input a 1D sequence of token embeddings. To handle 3D images, we reshape the image $\mathbf{x} \in \mathbb{R}^{H \times W \times C}$ into a sequence of flattened patches with size $\mathbf{x}_P \in \mathbb{R}^{N \times CP^2}$, when $H, W$ represent the height and the width of an image while $C$ represents the number of channels, then, $N$ is the number of patches and $P$ is the patch dimensionality. The Transformer uses constant latent vector size  $D$ through all of its layers, so we flatten the patches and map to $D$ dimensions with a trainable linear projection (Equation 1 from the `ViT` paper). We refer to the output of this projection as the patch embeddings. If the input image is of size $224 \times 224 \times 3$ and the patch size is $16$ then the output should be of size $196 \times 768$, where the first dimension is the number of patches and the second dimension is the size of the patch embeddings $16\cdot 16\cdot 3 = 768$.
+The standard Transformer receives as input a 1D sequence of token embeddings. To handle 3D images, we reshape the image $\mathbf{x} \in \mathbb{R}^{H \times W \times C}$ into a sequence of flattened patches with size $\mathbf{x}_{P} \in \mathbb{R}^{N \times CP^2}$, when $H, W$ represent the height and the width of an image while $C$ represents the number of channels, then, $N$ is the number of patches and $P$ is the patch dimensionality. The Transformer uses constant latent vector size  $D$ through all of its layers, so we flatten the patches and map them to $D$ dimensions with a trainable linear projection (Equation 1 from the `ViT` paper). This projection can be referred to as `patch embeddings`. If the input image is of size $224 \times 224 \times 3$ and the patch size is $16$ then the output should be of size $196 \times 768$ ($196 = 14 \times 14$), where the first dimension is the number of patches and the second dimension is the size of the patch embeddings $16\cdot 16\cdot 3 = 768$.
+
+
+### Positional encoding    
+In the same spirit, with the vanilla Transformer architecture, we will need to ensure that the architecture is always aware of the position of the patches. This is done by adding a positional encoding. It is a learnable parameter that is added to the patch embeddings. It is represented as a matrix of size $N \times D$ where $N$ is the number of patches and $D$ is the size of the patch embeddings. Then it is added to the patch embeddings before they are fed into the Transformer Encoder blocks. Since we usually work with a fixed resolution, we can learn the positional encodings instead of having the pattern of sine and cosine functions.
+
 
 <!-- - is is the same with the transformer enconder? -->
 ## Transformer enconder
 
-After having created the patches, we should proceed with the implementation of the transformer encoder which can be seen in Figure 1. It can mainly divided into the `multi-head attention` (MSA) and the `MLP` layer. The multi-head self-attention mechanism is used to capture the dependencies between the patches. The feed-forward neural network is used to capture the non-linear interactions between the patches. The following image portrays the mechanism of the attention block. 
+After having created the patches, we should proceed with the implementation of the transformer encoder which can be seen in the above Figure. It can mainly divided into the `multi-head attention` (MSA) and the `MLP` layer. The multi-head self-attention mechanism is used to capture the dependencies between the patches. The feed-forward neural network is used to capture the non-linear interactions between the patches. The following image portrays the mechanism of the attention block. Here we will need to decide whether the input to our model will be the full image or the image patches. To decide that we will take into account that a lot of pre-trained models have as input the full image. Thus, for now, we will use the full image as input to our model. 
 
-Here we will need to decide whether the input to our model will be the full image or the image patches. To decide that we will take into account that a lot of pre-trained models have as input the full image. Thus, for now, we will use the full image as input to our model. 
-
-Moreover, note that we make use also of `Layer normalization` ... 
+More info and more details about the `transformer encoder` can be found in the original `ViT` paper.
 
 {% include figure.html path="assets/img/2023-06-23-Explainable-ViT/ViT_architecture.PNG" class="img-fluid" %}
+*Fig 2. Vision transformer architecture. In the left part, we can see the whole framework, from the patch calculation, patch embeddings, the positional encoding, transformer encoder and the classifcation head. While in the right part, we can see the Encoder architecture.*
 
 ## Layer normalization
 
+Inspired by the results of Batch Normalization, Geoffrey Hinton et al. proposed Layer Normalization which normalizes the activations along the <em>feature</em> direction instead of <em>mini-batch</em> direction. This overcomes the cons of BN by removing the dependency on batches and makes it easier to apply for RNNs as well. In essence, Layer Normalization normalizes each feature of the activations to zero mean and unit variance. This helps in reducing the internal covariate shift and speeds up the training process. The `LayerNorm` layer is used in the `ViT` architecture to normalize the output of the `MSA` and `MLP` layers. It enables smoother gradients, faster training, and better generalization accuracy. Implementation wise PyTorch's `torch.nn.LayerNorm()` main parameter is `normalized_shape` which we can set to be equal to the dimension size we'd like to normalize over (in our case it'll be  $D$ or $768$ for `ViT`-Base).
 
-The LayerNorm (LN) Layer Normalization (`torch.nn.LayerNorm()` or `Norm` or `LayerNorm` or `LN`) normalizes an input over the last dimension. PyTorch's `torch.nn.LayerNorm()` main parameter is normalized_shape which we can set to be equal to the dimension size we'd like to normalize over (in our case it'll be  $D$ or $768$ for `ViT`-Base). What does it do?
 
-Layer Normalization helps improve training time and model generalization (ability to adapt to unseen data). I like to think of any kind of normalization as "getting the data into a similar format" or "getting data samples into a similar distribution". Imagine trying to walk up (or down) a set of stairs all with differing heights and lengths.
+# Cat-dog 🐶🐱 classifier
 
-It'd take some adjustment on each step, right? And what you learn for each step wouldn't necessarily help with the next one since they all differ, increasing the time it takes you to navigate the stairs. Normalization (including `Layer Normalization`) is the equivalent of making all the stairs the same height and length except the stairs are your data samples. So just like you can walk up (or down) stairs with similar heights and lengths much easier than those with unequal heights and widths, neural networks can optimize over data samples with similar distributions (similar mean and standard deviations) easier than those with varying distributions.
+Now it's time to code all the above into a classifier. We will implement a simple `ViT` classifier for the Cat-dog dataset. The dataset contains train and test folders with $450$ images for training and 150 images for testing. We will start by providing some code for setting up our data. Firstly, we should download the dataset and place it in `/data` folder. The dataset can be found [here](https://www.kaggle.com/c/dogs-vs-cats/data). The following code will help you to set up the data:
 
-# Pizza-sushi-steak 🍕🍣🥩 classifier
-
-Now it's time to code all the above into a classifier. We will implement a simple `ViT` classifier for the pizza-sushi-steak dataset. The dataset contains train and test folders with $450$ images for training and 150 images for testing. We will start by providing some code for setting up our data. Firstly, we should download the dataset:
-
-```python
-image_path = download_data(source="https://github.com/mrdbourke/pytorch-deep-learning/raw/main/data/pizza_steak_sushi.zip",
-    destination="pizza_steak_sushi")
-```
-
-Set up the paths for the training and testing data:
 
 ```python
 data_path = Path("data/")
-image_path = data_path / "pizza_steak_sushi"
+image_path = data_path / "catDogs"
 
 # Setup directory paths to train and test images
 train_dir = image_path / "train"
@@ -138,23 +117,21 @@ Then, we would like to perform some basic transformations to our data:
 # Create image size (from Table 3 in the ViT paper)
 IMG_SIZE = 224
 
-# Create transform pipeline manually
+# Create transform pipeline manually. You can add your data augmention techniques here as well if you wish
 manual_transforms = transforms.Compose([
     transforms.Resize((IMG_SIZE, IMG_SIZE)),
     transforms.ToTensor(),
 ])
 ```
 
-Then you will need to create the necessary dataloaders for train and test sets:
+Then you will need to create the necessary `dataloaders` for train and test sets:
 
 ```python
-# Use ImageFolder to create dataset(s)
+  # Use ImageFolder to create dataset(s)
   train_data = datasets.ImageFolder(train_dir, transform=transform)
   test_data = datasets.ImageFolder(test_dir, transform=transform)
-
   # Get class names
   class_names = train_data.classes
-
   # Turn images into data loaders
   train_dataloader = DataLoader(
       train_data,
@@ -163,7 +140,6 @@ Then you will need to create the necessary dataloaders for train and test sets:
       num_workers=num_workers,
       pin_memory=True,
   )
-  
   test_dataloader = DataLoader(
       test_data,
       batch_size=batch_size,
@@ -173,7 +149,7 @@ Then you will need to create the necessary dataloaders for train and test sets:
   )
 ```
 
-Check the repository (here) for the implementations for the Dataloaders. As a follow-up step, we should return a batch of images and labels with the following code:
+Check the repository (here) for the implementations for the `Dataloaders`. As a follow-up step, we should return a batch of images and labels with the following code:
 
 ```python
 image_batch, label_batch = next(iter(train_dataloader))
@@ -185,15 +161,13 @@ Having loaded the data, now it's time to introduce a simple `ViT` model and fit 
 ```python
 device = "cuda" if torch.cuda.is_available() else "cpu"
 set_seeds()
-# Create an instance of ViT with the number of classes we're working with (pizza, steak, sushi)
+# Create an instance of ViT with the number of classes we're working with
 vit = ViT(num_classes=len(cls_names))
-
 # Setup the optimizer to optimize our ViT model parameters using hyperparameters from the ViT paper
 optimizer = torch.optim.Adam(params=vit.parameters(),
     lr=3e-3, # Base LR from Table 3 for ViT-* ImageNet-1k
     betas=(0.9, 0.999), # default values but also mentioned in ViT paper section 4.1 (Training & Fine-tuning)
     weight_decay=0.3) # from the ViT paper section 4.1 (Training & Fine-tuning) and Table 3 for ViT-* ImageNet-1k
-
 # Setup the loss function for multi-class classification
 loss_fn = torch.nn.CrossEntropyLoss()
 # Train the model and save the training results to a dictionary
@@ -208,7 +182,7 @@ results = train_function(model=vit,
 
 ## Building the ViT model 
 
-Of course, we will need to develop the code for the `ViT` model as well. That is a bit more complicated. At first, we will illustrate the whole code and then, we will analyze it step by step. The code looks as follows:
+Of course, we will need to implement the code for the `ViT` model as well. That is a bit more complicated. At first, we will illustrate the whole code and then, we will analyze it step by step. The code looks as follows:
 
 ```python
 # 1. Create a ViT class that inherits from nn.Module
@@ -277,11 +251,9 @@ class ViT(nn.Module):
 
 Firstly, as mentioned in the code block comments we follow the details of the ViT paper such as `batch size`, `number of patches`, `number of layers`, the `dimensionality of the embeddings`, `number of heads`, etc. More details can be found in the paper's Table 1 and Table 3.
 
-The first thing that our code tries to emulate is the creation of patches. Given, an image we create patches of size $16 \times 16$ ($P \times P$). Thus, if the input image has size $H \times W \times C$  and is $224 \times 224 \times 3$, the total amount of patches is $N = 196$, and can be calculated by the following formula $N = HW/P^{2}$. Then, these image patches are turned into embeddings, by using the `PatchEmbedding` functionality. The benefit of turning the raw images into embeddings is that we can learn a representation of the image that can improve with training.
+The first thing that our code tries to emulate is the creation of `patches`. Given, an image we create patches of size $16 \times 16$ ($P \times P$). Thus, if the input image has size $H \times W \times C$  and is $224 \times 224 \times 3$, the total amount of patches is $N = 196$, and can be calculated by the following formula $N = HW/P^{2}$. Then, these image patches are turned into embeddings, by using the `PatchEmbedding` code that is portrayed below. The benefit of turning the raw images into embeddings is that we can learn a representation of the image that can improve with training.
 
-Different values for the size of the embeddings can be found in Table 1, but throughout this tutorial, we will make use of $D = 768$. The idea is to first split the image into patches and then apply a learnable 2d convolutional layer to each patch. If we set the proper values for the kernel_size and stride parameters of a `torch.nn.Conv2d()` then we can have the desired output embedding, for instance, $D = 768$ in our case. To facilitate the dimensions of output smoothly we will need to make use of a `flatten()` function to flatten the output of the convolutional layer.
-
-The next step is to stack $m$ Transformer Encoders together using the following code: `nn.Sequential(*[TransformerEncoderBlock(.)` and finally add a linear layer that will output the desired amount of classes `nn.Linear(in_features=embedding_dim, out_features=num_classes)`.
+Different values for the size of the embeddings can be found in Table 1, but throughout this tutorial, we will make use of $D = 768$. The idea is to first split the image into patches and then apply a learnable 2d convolutional layer to each patch. If we set the proper values for the `kernel_size` and `stride` parameters of a `torch.nn.Conv2d()` then we can have the desired output embedding, for instance, $D = 768$ in our case. To facilitate the dimensions of output smoothly we will need to make use of a `flatten()` function to flatten the output of the convolutional layer.
 
 **PatchEmbedding code**: After having created the patches in the main `ViT` class, the next step is to calculate the embeddings of the patches. This is done by the `PatchEmbedding` class. The code for the `PatchEmbedding` class is as follows:
 
@@ -339,7 +311,7 @@ class TransformerEncoderBlock(nn.Module):
         x = self.mlp_block(x) + x
         return x
 ```
-
+We do call instances of this class by stacking multiple `TransformerEncoderBlock` encoders using the following code in the `ViT` class: `nn.Sequential(*[TransformerEncoderBlock(...)`. Finally, we add a linear layer that will output the desired amount of classes `nn.Linear(in_features=embedding_dim, out_features=num_classes)`.
 
 ## Training function for the ViT model
 
@@ -366,27 +338,20 @@ train_acc = train_acc / len(dataloader)
 
 Of course, we will need to measure also the performance in the test set as usual. The code is identical to the training process and can be found in the repository.
 
-## Measuring the performance of the ViT model
+## Visualizing the results for a single image
 
-After having trained the model, we should report the performance of the model in the test set. The code should look as follows:
+After having trained the model, and reporting the train/test accuracy we can test a sample to Figure out how the model performs. The code for testing the model is as follows:
 
 ```python
-weights_path = "models/pre_trained_vit_sushi_768_v2.pth"
-
+weights_path = "models/......pth"
 checkpoint = torch.load(weights_path, map_location= device)
-pretrained_vit.load_state_dict(checkpoint)
-
-model = pretrained_vit.to(device)
+model.load_state_dict(checkpoint)
 img = Image.open(image_path)
 
-if transform is not None:
-    image_transform = transform
-else:
-    image_transform = transforms.Compose([
-        transforms.Resize(image_size),
-        transforms.ToTensor(),
-        transforms.Normalize(mean=[0.485, 0.456, 0.406],
-            std=[0.229, 0.224, 0.225]),])
+image_transform = transforms.Compose([
+    transforms.Resize(image_size),
+    transforms.ToTensor(),
+    transforms.Normalize(mean=[0.485, 0.456, 0.406],std=[0.229, 0.224, 0.225]),])
 
 with torch.inference_mode():
     transformed_image = image_transform(img).unsqueeze(dim=0)
@@ -407,7 +372,7 @@ Of course, you can also measure the performance of the model using the test set 
 
 ## Loading a pre-trained ViT model
 
-As we saw in the previous section, it is not possible to train our model with only that small amount of data. Thus, we will try to perform instead Transfer learning to load pre-trained weights on `ImageNet` using the `ViT_B_16_Weights` model that comes with the `torchvision` package. Of course, this model is trained for a different target than our desired target 🍕🍣🥩. Thus, we will need to change the layers that relate to the class and replace the output with the desired amount of output layers. We will need also to freeze all the rest layers:
+As we saw in the previous section, it is not possible to train our model with only that small amount of data. Thus, we will employ `Transfer learning` and load pre-trained weights on `ImageNet` using the `ViT_B_16_Weights` or `vit-base-patch16-224` model that comes with the `Torchvision` package. Of course, this model is trained for a different target than our desired target 🐶🐱. Thus, we will need to change the layers that relate to the class and replace the output with the desired amount of output layers. We will need also to freeze all the rest layers:
 
 ```python
 # Load the pre-trained ViT model        
@@ -424,7 +389,7 @@ Then, we can perform the training process as usual and report the results. Note 
 
 # Explainable ViT
 
-Until we managed to successfully train a `ViT` using the images in our handmade dataset of 🍕🍣🥩 images using transfer learning. We measure the performance in a small test set and visualize the results. But how exactly does the model classify each specific image? Which parts of the model activated and led to a specific decision? Which layers are responsible for that decision?
+Until we managed to successfully train a `ViT` using the images in our handmade dataset of 🐶🐱 images using transfer learning. We measure the performance in a small test set and visualize the results. But how exactly does the model classify each specific image? Which parts of the model activated and led to a specific decision? Which layers are responsible for that decision?
 
 One simple way to investigate the inner mechanisms of the `ViT` model is to visualize the attention weights which is the easiest and most popular approach to interpret a model's decisions and to gain insights about its internals. These weights are calculated by the `Multi-Head Self-Attention` mechanism and can help us to understand which parts of the image are responsible for the decision of the model. Now, the question that pops up is: which attention maps are we going to visualize? From which layer? Which head? Remember that our model is composed of several layers and each layer (in particular we chose `12` layers).
 
@@ -498,11 +463,11 @@ where `discard_ratio` is a hyperparameter and the variable `attention_heads_fuse
 - 
 ## Gradient Attention Rollout
 
-The Attention that flows in the transformer passes along information belonging to different classes. Gradient rollout lets us see what locations the network paid attention too, but it tells us nothing about if it ended up using those locations for the final classification.
+The Attention that flows in the transformer passes along information belonging to different classes. Gradient rollout lets us see what locations the network paid attention to, but it tells us nothing about whether it ended up using those locations for the final classification.
 
-We can multiply the attention with the gradient of the target class output, and take the average among the attention heads (while masking out negative attentions) to keep only attention that contributes to the target category (or categories).
+We can multiply the attention with the gradient of the target class output, and take the average among the attention heads (while masking out negative attention) to keep only attention that contributes to the target category (or categories).
 
-When fusing the attention heads in every layer, we could just weigh all the attentions (in the current implementation it’s the attentions after the softmax, but maybe it makes sense to change that) by the target class gradient, and then take the average among the attention heads
+When fusing the attention heads in every layer, we could just weigh all the attentions (in the current implementation it’s the attention after the softmax, but maybe it makes sense to change that) by the target class gradient, and then take the average among the attention heads
 
 The main code for implementing the `Gradient Attention Rollout` method is as follows:
 
@@ -541,13 +506,13 @@ with torch.no_grad():
 </p>
 
 # TODO
-So far we have presented two simple methods for explainable `ViT` based on attention maps and the gradient. We have tested these methods using single images for visualization purposes from the 🍕🍣🥩 dataset. However, we haven't yet introduced any quantified way to measure the performance of these methodologies. As a simple `TODO` you will need to come up with ways to measure the performance of these two methodologies. You will need to find a ground truth and compare both methodologies.
+So far we have presented two simple methods for explainable `ViT` based on attention maps and the gradient. We have tested these methods using single images for visualization purposes from the 🐶🐱 dataset. However, we haven't yet introduced any quantified way to measure the performance of these methodologies. As a simple `TODO` you will need to come up with ways to measure the performance of these two methodologies. You will need to find a ground truth and compare both methodologies.
 
 Test also the gradCAM approach for `ViT` models and compare the results with the previous methods quantitatively and quantitatively.
 
 # Conclusions
 
-In this tutorial, we have analyzed the `ViT` model and how it works. We have developed a simple `ViT` classifier for the 🍕🍣🥩 dataset and trained the model. We have also analyzed two approaches for explaining the behavior of the `ViT` model. The first approach called <mark>Attention Rollout</mark> is based on the `Attention Maps` and a way to summarize the content of the attention maps to understand the behavior of the model. The second approach is called <mark>Gradient Attention Rollout</mark> and is based on the `Gradient-based` methods and a way to visualize the gradient influence over the attention maps which helps as well to understand the behavior of the model. We conclude with a simple TODO exercise that will help you understand the behavior of the `ViT` model and the interpretability methods.
+In this tutorial, we have analyzed the `ViT` model and how it works. We have developed a simple `ViT` classifier for the 🐶🐱 dataset and trained the model. We have also analyzed two approaches for explaining the behavior of the `ViT` model. The first approach called <mark>Attention Rollout</mark> is based on the `Attention Maps` and a way to summarize the content of the attention maps to understand the behavior of the model. The second approach is called <mark>Gradient Attention Rollout</mark> and is based on the `Gradient-based` methods and a way to visualize the gradient influence over the attention maps which helps as well to understand the behavior of the model. We conclude with a simple TODO exercise that will help you understand the behavior of the `ViT` model and the interpretability methods.
 
 # References
 [[1] A. Vaswani, N. Shazeer, N. Parmar, J. Uszkoreit, L. Jones, A. Gomez, {. Kaiser, and I. Polosukhin. Advances in Neural Information Processing Systems, page 5998--6008. (2017).](https://proceedings.neurips.cc/paper_files/paper/2017/file/3f5ee243547dee91fbd053c1c4a845aa-Paper.pdf){: style="font-size: smaller"}
