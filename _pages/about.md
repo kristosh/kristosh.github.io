@@ -2,7 +2,7 @@
 layout: about
 title: about
 permalink: /
-subtitle: <a href='#'>Affiliations</a>. University of Amsterdam (UvA)
+subtitle: <a href='#'>Affiliations</a>. Leiden University (LIACS)
 
 profile:
   align: right
