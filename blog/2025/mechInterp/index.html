@@ -10,10 +10,9 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <title>cv | Christos  Athanasiadis</title>
+    <title>Mechanistic interpretability | Christos  Athanasiadis</title>
     <meta name="author" content="Christos  Athanasiadis">
-    <meta name="description" content="A simple, whitespace theme for academics.
-">
+    <meta name="description" content="A post on mechanistic interpretability and tranformerLens. This post is giving a basic introduction to mechanistic interpretability and ways to understand the inner mechanisms of transformer-style models like 'GPT-2'. We will try to locate responsible attention maps for specific biases in several prompts and validate the causal connection by removing parts of the network. We will make use of different datasets to validate the behavior and visualize the results. Finally we will talk about circuits and attention heads.">
 
 
     <link rel="stylesheet" href="/assets/css/codeblock.scss">
@@ -43,7 +42,7 @@
     
 
     <link rel="stylesheet" href="/assets/css/main.css">
-    <link rel="canonical" href="https://kristosh.github.io//cv/">
+    <link rel="canonical" href="https://kristosh.github.io//blog/2025/mechInterp/">
 
     <!-- Dark Mode -->
     
@@ -83,16 +82,16 @@
               </li>
               
               <!-- Blog -->
-              <li class="nav-item ">
-                <a class="nav-link" href="/blog/">blog</a>
+              <li class="nav-item active">
+                <a class="nav-link" href="/blog/">blog<span class="sr-only">(current)</span></a>
               </li>
 
               <!-- Other pages -->
               <li class="nav-item ">
                 <a class="nav-link" href="/publications/">publications</a>
               </li>
-              <li class="nav-item active">
-                <a class="nav-link" href="/cv/">cv<span class="sr-only">(current)</span></a>
+              <li class="nav-item ">
+                <a class="nav-link" href="/cv/">cv</a>
               </li>
 
               <!-- Toogle theme mode -->
@@ -119,260 +118,107 @@
     <!-- Content -->
     <div class="container mt-5">
       
-        <!-- _layouts/cv.html -->
-        <div class="post">
+        <!-- _layouts/post.html -->
 
-          <header class="post-header">
-            <h1 class="post-title">cv <a href="/assets/pdf/chrathan_CV.pdf" target="_blank" rel="noopener noreferrer" class="float-right"><i class="fas fa-file-pdf"></i></a>
-</h1>
-            <p class="post-description"></p>
-          </header>
+<div class="post">
 
-          <article>
-            <div class="cv">
-              
-                <div class="card mt-3 p-3">
-                  <h3 class="card-title font-weight-medium">General Information</h3>
-                  <div>
-                  
-                    <table class="table table-sm table-borderless table-responsive">
-    
-      <tr>
-        <td class="p-1 pr-2 font-weight-bold"><b>Full Name</b></td>
-        <td class="p-1 pl-2 font-weight-light text">Christos Athanasiadis</td>
-      </tr>
-    
-      <tr>
-        <td class="p-1 pr-2 font-weight-bold"><b>Date of Birth</b></td>
-        <td class="p-1 pl-2 font-weight-light text">29th February 1988</td>
-      </tr>
-    
-      <tr>
-        <td class="p-1 pr-2 font-weight-bold"><b>Languages</b></td>
-        <td class="p-1 pl-2 font-weight-light text">English, Greek</td>
-      </tr>
-    
-</table>
-                  
-                  </div>
-                </div>
-              
-                <div class="card mt-3 p-3">
-                  <h3 class="card-title font-weight-medium">Education</h3>
-                  <div>
-                  
-                   <ul class="card-text font-weight-light list-group list-group-flush">
-    
-      <li class="list-group-item">
-        <div class="row">
+  <header class="post-header">
+    <h1 class="post-title">Mechanistic interpretability</h1>
+    <p class="post-meta">March 15, 2025</p>
+    <p class="post-tags">
+      <a href="/blog/2025"> <i class="fas fa-calendar fa-sm"></i> 2025 </a>
+        ·  
+        <a href="/blog/tag/xai">
+          <i class="fas fa-hashtag fa-sm"></i> xAI,</a>  
+          <a href="/blog/tag/interpretability">
+          <i class="fas fa-hashtag fa-sm"></i> Interpretability</a>  
           
-            <div class="col-xs-2 cl-sm-2 col-md-2 text-center" style="width: 75px;">
-              <span class="badge font-weight-bold danger-color-dark text-uppercase align-middle" style="min-width: 75px;">
-                2020
-              </span>
-            </div>
+        ·  
+        <a href="/blog/category/sample-posts">
+          <i class="fas fa-tag fa-sm"></i> sample-posts</a>  
           
-          <div class="col-xs-10 cl-sm-10 col-md-10 mt-2 mt-md-0">
-            
-            <h6 class="title font-weight-bold ml-1 ml-md-4">PhD</h6>
-            
-            
-            <h6 class="ml-1 ml-md-4" style="font-size: 0.95rem;">University of Maastricht, Maastricht, the Netherlands</h6>
-            
-            
-              <ul class="items">
-                
-                  <li>
-                    
-                      <span class="item">{"Emotion-aware cross-modal domain adaptation in video sequences"=&gt;"Study of transfer learning for cross-modal applications of emotion recognition."}</span>
-                    
-                  </li>
-                
-                  <li>
-                    
-                      <span class="item">MaTHiSis european project Horizon2020 project</span>
-                    
-                  </li>
-                
-                  <li>
-                    
-                      <span class="item-title">Description 3.</span>
-                      <ul class="subitems">
-                      
-                        <li><span class="subitem">Sub-description 1.</span></li>
-                      
-                        <li><span class="subitem">Sub-description 2.</span></li>
-                      
-                      </ul>
-                    
-                  </li>
-                
-              </ul>
-            
-            
-          </div>
-        </div>
-      </li>
+
+    </p>
+  </header>
+
+  <article class="post-content">
     
-      <li class="list-group-item">
-        <div class="row">
-          
-            <div class="col-xs-2 cl-sm-2 col-md-2 text-center" style="width: 75px;">
-              <span class="badge font-weight-bold danger-color-dark text-uppercase align-middle" style="min-width: 75px;">
-                2012
-              </span>
-            </div>
-          
-          <div class="col-xs-10 cl-sm-10 col-md-10 mt-2 mt-md-0">
-            
-            <h6 class="title font-weight-bold ml-1 ml-md-4">MSc on Artificial Intelligence and Digitial media at Aristotle University of Thessaloniki</h6>
-            
-            
-            <h6 class="ml-1 ml-md-4" style="font-size: 0.95rem;">Aristotle University of Thessaloniki, Thessaloniki, Greece</h6>
-            
-            
-            
-          </div>
-        </div>
-      </li>
-    
+    <div id="markdown-content">
+      <p>post on mechanistic interpretability and tranformerLens. This post is giving a basic introduction to mechanistic interpretability and ways to understand the inner mechanisms of transformer-style models like ‘GPT-2’. We will try to locate responsible attention maps for specific biases in several prompts and validate the causal connection by removing parts of the network. We will make use of different datasets to validate the behavior and visualize the results. Finally we will talk about circuits and attention heads.</p>
+
+<h4 id="content-of-the-post">Content of the post</h4>
+
+<ul>
+  <li>Introduction</li>
+  <li>Loading models</li>
+  <li>tranformerLens</li>
+  <li>Circuits</li>
+</ul>
+
+<h4 id="check-list">Check List</h4>
+
+<ul class="task-list">
+  <li class="task-list-item">
+<input type="checkbox" class="task-list-item-checkbox" disabled checked>Brush Teeth</li>
+  <li class="task-list-item">
+<input type="checkbox" class="task-list-item-checkbox" disabled>Put on socks
+    <ul class="task-list">
+      <li class="task-list-item">
+<input type="checkbox" class="task-list-item-checkbox" disabled checked>Put on left sock</li>
+      <li class="task-list-item">
+<input type="checkbox" class="task-list-item-checkbox" disabled>Put on right sock</li>
     </ul>
-                  
-                  </div>
-                </div>
-              
-                <div class="card mt-3 p-3">
-                  <h3 class="card-title font-weight-medium">Experience</h3>
-                  <div>
-                  
-                   <ul class="card-text font-weight-light list-group list-group-flush">
-    
-      <li class="list-group-item">
-        <div class="row">
-          
-            <div class="col-xs-2 cl-sm-2 col-md-2 text-center" style="width: 75px;">
-              <span class="badge font-weight-bold danger-color-dark text-uppercase align-middle" style="min-width: 75px;">
-                2020 - 2023
-              </span>
-            </div>
-          
-          <div class="col-xs-10 cl-sm-10 col-md-10 mt-2 mt-md-0">
-            
-            <h6 class="title font-weight-bold ml-1 ml-md-4">Junior Lecturer at UvA masters AI program</h6>
-            
-            
-            <h6 class="ml-1 ml-md-4" style="font-size: 0.95rem;">University of Amsterdam</h6>
-            
-            
-              <ul class="items">
-                
-                  <li>
-                    
-                      <span class="item">Working as a junior lecturer in several courses such as Machine learning, Deep learning, Computer vision, Natural language processing, Exaplainable AI, and Fairness Accountability Confidentiality and Transparency in AI.</span>
-                    
-                  </li>
-                
-                  <li>
-                    
-                      <span class="item">Design courses, assignments and materials.</span>
-                    
-                  </li>
-                
-                  <li>
-                    
-                      <span class="item">Supervision of student projects in several courses.</span>
-                    
-                  </li>
-                
-                  <li>
-                    
-                      <span class="item-title">Description 3.</span>
-                      <ul class="subitems">
-                      
-                        <li><span class="subitem">Sub-description 1.</span></li>
-                      
-                        <li><span class="subitem">Sub-description 2.</span></li>
-                      
-                      </ul>
-                    
-                  </li>
-                
-              </ul>
-            
-            
-          </div>
-        </div>
-      </li>
-    
-      <li class="list-group-item">
-        <div class="row">
-          
-            <div class="col-xs-2 cl-sm-2 col-md-2 text-center" style="width: 75px;">
-              <span class="badge font-weight-bold danger-color-dark text-uppercase align-middle" style="min-width: 75px;">
-                2013
-              </span>
-            </div>
-          
-          <div class="col-xs-10 cl-sm-10 col-md-10 mt-2 mt-md-0">
-            
-            <h6 class="title font-weight-bold ml-1 ml-md-4">Working as a research assistant in Greece Certh.</h6>
-            
-            
-            <h6 class="ml-1 ml-md-4" style="font-size: 0.95rem;">Center of research and technology Hellas</h6>
-            
-            
-              <ul class="items">
-                
-                  <li>
-                    
-                      <span class="item">Description 1.</span>
-                    
-                  </li>
-                
-                  <li>
-                    
-                      <span class="item">Description 2.</span>
-                    
-                  </li>
-                
-              </ul>
-            
-            
-          </div>
-        </div>
-      </li>
-    
-      <li class="list-group-item">
-        <div class="row">
-          
-            <div class="col-xs-2 cl-sm-2 col-md-2 text-center" style="width: 75px;">
-              <span class="badge font-weight-bold danger-color-dark text-uppercase align-middle" style="min-width: 75px;">
-                2016-2020
-              </span>
-            </div>
-          
-          <div class="col-xs-10 cl-sm-10 col-md-10 mt-2 mt-md-0">
-            
-            <h6 class="title font-weight-bold ml-1 ml-md-4">Working as a Ph.D. employee for Maastricht University</h6>
-            
-            
-            <h6 class="ml-1 ml-md-4" style="font-size: 0.95rem;">Maastricht University, the Netherlands</h6>
-            
-            
-            
-          </div>
-        </div>
-      </li>
-    
-    </ul>
-                  
-                  </div>
-                </div>
-              
-              </div>
-          </article>
+  </li>
+  <li class="task-list-item">
+<input type="checkbox" class="task-list-item-checkbox" disabled checked>Go to school</li>
+</ul>
 
-        </div>
+<p>Hoodie Thundercats retro, tote bag 8-bit Godard craft beer gastropub. Truffaut Tumblr taxidermy, raw denim Kickstarter sartorial dreamcatcher. Quinoa chambray slow-carb salvia readymade, bicycle rights 90’s yr typewriter selfies letterpress cardigan vegan.</p>
+
+<hr>
+
+<p>Pug heirloom High Life vinyl swag, single-origin coffee four dollar toast taxidermy reprehenderit fap distillery master cleanse locavore. Est anim sapiente leggings Brooklyn ea. Thundercats locavore excepteur veniam eiusmod. Raw denim Truffaut Schlitz, migas sapiente Portland VHS twee Bushwick Marfa typewriter retro id keytar.</p>
+
+<blockquote>
+  <p>We do not grow absolutely, chronologically. We grow sometimes in one dimension, and not in another, unevenly. We grow partially. We are relative. We are mature in one realm, childish in another.
+—Anais Nin</p>
+</blockquote>
+
+<p>Fap aliqua qui, scenester pug Echo Park polaroid irony shabby chic ex cardigan church-key Odd Future accusamus. Blog stumptown sartorial squid, gastropub duis aesthetic Truffaut vero. Pinterest tilde twee, odio mumblecore jean shorts lumbersexual.</p>
+
+    </div>
+  </article>
+
+
+  
+    
+    <br>
+    <hr>
+    <br>
+    <ul class="list-disc pl-8"></ul>
+
+    <!-- Adds related posts to the end of an article -->
+    <h2 class="text-3xl font-semibold mb-4 mt-12">Enjoy Reading This Article?</h2>
+    <p class="mb-2">Here are some more articles you might like to read next:</p>
+  
+
+  <li class="my-2">
+    <a class="text-pink-700 underline font-semibold hover:text-pink-800" href="/blog/2023/Explainable-ViT/">How to explain the behavior of vision transformers?</a>
+  </li>
+
+  
+
+  <li class="my-2">
+    <a class="text-pink-700 underline font-semibold hover:text-pink-800" href="/blog/2023/gradient_based_feature_attribution/">Gradient-based feature attribution</a>
+  </li>
+
+  
+
+  <li class="my-2">
+    <a class="text-pink-700 underline font-semibold hover:text-pink-800" href="/blog/2023/LIME/">Why should I trust you? Local Interpretable Model-agnostic Explanations</a>
+  </li>
+
+</div>
 
       
     </div>

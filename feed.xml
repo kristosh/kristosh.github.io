@@ -1,5 +1,40 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" xml:lang="en"><generator uri="https://jekyllrb.com/" version="4.3.3">Jekyll</generator><link href="https://kristosh.github.io//feed.xml" rel="self" type="application/atom+xml" /><link href="https://kristosh.github.io//" rel="alternate" type="text/html" hreflang="en" /><updated>2024-06-04T11:36:26+00:00</updated><id>https://kristosh.github.io//feed.xml</id><title type="html">blank</title><subtitle>A simple, whitespace theme for academics.
-</subtitle><entry><title type="html">Why should I trust you? Local Interpretable Model-agnostic Explanations</title><link href="https://kristosh.github.io//blog/2023/LIME/" rel="alternate" type="text/html" title="Why should I trust you? Local Interpretable Model-agnostic Explanations" /><published>2023-05-13T00:00:00+00:00</published><updated>2023-05-13T00:00:00+00:00</updated><id>https://kristosh.github.io//blog/2023/LIME</id><content type="html" xml:base="https://kristosh.github.io//blog/2023/LIME/"><![CDATA[<h1 id="local-interpretable-model-agnostic-explanations">Local Interpretable Model-agnostic Explanations</h1>
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" xml:lang="en"><generator uri="https://jekyllrb.com/" version="4.4.1">Jekyll</generator><link href="https://kristosh.github.io//feed.xml" rel="self" type="application/atom+xml" /><link href="https://kristosh.github.io//" rel="alternate" type="text/html" hreflang="en" /><updated>2025-04-02T15:00:59+00:00</updated><id>https://kristosh.github.io//feed.xml</id><title type="html">blank</title><subtitle>A simple, whitespace theme for academics.
+</subtitle><entry><title type="html">Mechanistic interpretability</title><link href="https://kristosh.github.io//blog/2025/mechInterp/" rel="alternate" type="text/html" title="Mechanistic interpretability" /><published>2025-03-15T16:40:16+00:00</published><updated>2025-03-15T16:40:16+00:00</updated><id>https://kristosh.github.io//blog/2025/mechInterp</id><content type="html" xml:base="https://kristosh.github.io//blog/2025/mechInterp/"><![CDATA[<p>post on mechanistic interpretability and tranformerLens. This post is giving a basic introduction to mechanistic interpretability and ways to understand the inner mechanisms of transformer-style models like ‘GPT-2’. We will try to locate responsible attention maps for specific biases in several prompts and validate the causal connection by removing parts of the network. We will make use of different datasets to validate the behavior and visualize the results. Finally we will talk about circuits and attention heads.</p>
+
+<h4 id="content-of-the-post">Content of the post</h4>
+
+<ul>
+  <li>Introduction</li>
+  <li>Loading models</li>
+  <li>tranformerLens</li>
+  <li>Circuits</li>
+</ul>
+
+<h4 id="check-list">Check List</h4>
+
+<ul class="task-list">
+  <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" checked="checked" />Brush Teeth</li>
+  <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" />Put on socks
+    <ul class="task-list">
+      <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" checked="checked" />Put on left sock</li>
+      <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" />Put on right sock</li>
+    </ul>
+  </li>
+  <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" checked="checked" />Go to school</li>
+</ul>
+
+<p>Hoodie Thundercats retro, tote bag 8-bit Godard craft beer gastropub. Truffaut Tumblr taxidermy, raw denim Kickstarter sartorial dreamcatcher. Quinoa chambray slow-carb salvia readymade, bicycle rights 90’s yr typewriter selfies letterpress cardigan vegan.</p>
+
+<hr />
+
+<p>Pug heirloom High Life vinyl swag, single-origin coffee four dollar toast taxidermy reprehenderit fap distillery master cleanse locavore. Est anim sapiente leggings Brooklyn ea. Thundercats locavore excepteur veniam eiusmod. Raw denim Truffaut Schlitz, migas sapiente Portland VHS twee Bushwick Marfa typewriter retro id keytar.</p>
+
+<blockquote>
+  <p>We do not grow absolutely, chronologically. We grow sometimes in one dimension, and not in another, unevenly. We grow partially. We are relative. We are mature in one realm, childish in another.
+—Anais Nin</p>
+</blockquote>
+
+<p>Fap aliqua qui, scenester pug Echo Park polaroid irony shabby chic ex cardigan church-key Odd Future accusamus. Blog stumptown sartorial squid, gastropub duis aesthetic Truffaut vero. Pinterest tilde twee, odio mumblecore jean shorts lumbersexual.</p>]]></content><author><name></name></author><category term="sample-posts" /><category term="xAI," /><category term="Interpretability" /><summary type="html"><![CDATA[A post on mechanistic interpretability and tranformerLens. This post is giving a basic introduction to mechanistic interpretability and ways to understand the inner mechanisms of transformer-style models like 'GPT-2'. We will try to locate responsible attention maps for specific biases in several prompts and validate the causal connection by removing parts of the network. We will make use of different datasets to validate the behavior and visualize the results. Finally we will talk about circuits and attention heads.]]></summary></entry><entry><title type="html">Why should I trust you? Local Interpretable Model-agnostic Explanations</title><link href="https://kristosh.github.io//blog/2023/LIME/" rel="alternate" type="text/html" title="Why should I trust you? Local Interpretable Model-agnostic Explanations" /><published>2023-05-13T00:00:00+00:00</published><updated>2023-05-13T00:00:00+00:00</updated><id>https://kristosh.github.io//blog/2023/LIME</id><content type="html" xml:base="https://kristosh.github.io//blog/2023/LIME/"><![CDATA[<h1 id="local-interpretable-model-agnostic-explanations">Local Interpretable Model-agnostic Explanations</h1>
 
 <center>
 <video autoplay="" muted="" loop="" controls="" src="https://kristosh.github.io//assets/video/2023-05-13-LIME/caretta.mp4" style="width:600px" type="video/mp4">
