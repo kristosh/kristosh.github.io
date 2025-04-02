@@ -15,6 +15,7 @@ selected_papers: true # includes a list of papers marked as "selected={true}"
 social: true  # includes social icons at the bottom of the page
 ---
 
+
 Christos Athanasiadis was born in Drama, Greece. He completed his bachelor's degree in the Department of computer science at Aristotle University in Greece, where he also earned his master's degree as well in the <em>Digital Media, Computational Intelligence</em> program. In his master's thesis, he studied machine learning methods for developing intelligent agents in the strategy video game <em>StarCraft</em>.
 
 I have acquired my Ph.D. in data science and knowledge engineering (DKE) at Maastricht University on cross-modal emotion recognition based on domain adaptation. My work utilized methods to bridge expressivity features from the audio and visual modalities and ways to elicit both to improve emotion recognition performance.
@@ -23,12 +24,16 @@ Between August 2020-2024 I worked as a <em>junior lecturer</em> in the Artificia
 
 Currently, I am working as a lecturer at the LIACS institute in Leiden University. The courses that I am involved are: machine learning, probability theory, Essentials of programming and explainable AI.
 
-My research interests convey the following topics: explainable AI, affective computing and AI alignment.
+My research interests include explainable AI, affective computing, large language models and AI alignment.
 
 
 
 
 
+
+
+
+ 
 
 
 
