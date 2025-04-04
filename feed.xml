@@ -1,5 +1,5 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" xml:lang="en"><generator uri="https://jekyllrb.com/" version="4.4.1">Jekyll</generator><link href="https://kristosh.github.io//feed.xml" rel="self" type="application/atom+xml" /><link href="https://kristosh.github.io//" rel="alternate" type="text/html" hreflang="en" /><updated>2025-04-02T15:09:31+00:00</updated><id>https://kristosh.github.io//feed.xml</id><title type="html">blank</title><subtitle>A simple, whitespace theme for academics.
-</subtitle><entry><title type="html">Mechanistic interpretability</title><link href="https://kristosh.github.io//blog/2025/mechInterp/" rel="alternate" type="text/html" title="Mechanistic interpretability" /><published>2025-03-15T16:40:16+00:00</published><updated>2025-03-15T16:40:16+00:00</updated><id>https://kristosh.github.io//blog/2025/mechInterp</id><content type="html" xml:base="https://kristosh.github.io//blog/2025/mechInterp/"><![CDATA[<p>post on mechanistic interpretability and tranformerLens. This post is giving a basic introduction to mechanistic interpretability and ways to understand the inner mechanisms of transformer-style models like ‘GPT-2’. We will try to locate responsible attention maps for specific biases in several prompts and validate the causal connection by removing parts of the network. We will make use of different datasets to validate the behavior and visualize the results. Finally we will talk about circuits and attention heads.</p>
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" xml:lang="en"><generator uri="https://jekyllrb.com/" version="4.4.1">Jekyll</generator><link href="https://kristosh.github.io//feed.xml" rel="self" type="application/atom+xml" /><link href="https://kristosh.github.io//" rel="alternate" type="text/html" hreflang="en" /><updated>2025-04-04T15:23:24+00:00</updated><id>https://kristosh.github.io//feed.xml</id><title type="html">blank</title><subtitle>A simple, whitespace theme for academics.
+</subtitle><entry><title type="html">Mechanistic interpretability (to be filled soon)</title><link href="https://kristosh.github.io//blog/2025/mechInterp/" rel="alternate" type="text/html" title="Mechanistic interpretability (to be filled soon)" /><published>2025-03-15T16:40:16+00:00</published><updated>2025-03-15T16:40:16+00:00</updated><id>https://kristosh.github.io//blog/2025/mechInterp</id><content type="html" xml:base="https://kristosh.github.io//blog/2025/mechInterp/"><![CDATA[<p>post on mechanistic interpretability and tranformerLens. This post is giving a basic introduction to mechanistic interpretability and ways to understand the inner mechanisms of transformer-style models like <code class="language-plaintext highlighter-rouge">GPT-2</code>. We will try to locate responsible attention maps for specific biases in several prompts and validate the causal connection by removing parts of the network. We will make use of different datasets to validate the behavior and visualize the results. Finally we will talk about circuits and attention heads.</p>
 
 <h4 id="content-of-the-post">Content of the post</h4>
 
@@ -23,18 +23,121 @@
   <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" checked="checked" />Go to school</li>
 </ul>
 
-<p>Hoodie Thundercats retro, tote bag 8-bit Godard craft beer gastropub. Truffaut Tumblr taxidermy, raw denim Kickstarter sartorial dreamcatcher. Quinoa chambray slow-carb salvia readymade, bicycle rights 90’s yr typewriter selfies letterpress cardigan vegan.</p>
+<p>Firstly, we would load several packages and libraries that will be really useful for us during the whole tutorial.</p>
 
-<hr />
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+</pre></td><td class="rouge-code"><pre><span class="kn">import</span> <span class="n">circuitsvis</span> <span class="k">as</span> <span class="n">cv</span>
+<span class="c1"># Testing that the library works
+</span><span class="n">cv</span><span class="p">.</span><span class="n">examples</span><span class="p">.</span><span class="nf">hello</span><span class="p">(</span><span class="sh">"</span><span class="s">Neel</span><span class="sh">"</span><span class="p">)</span>
 
-<p>Pug heirloom High Life vinyl swag, single-origin coffee four dollar toast taxidermy reprehenderit fap distillery master cleanse locavore. Est anim sapiente leggings Brooklyn ea. Thundercats locavore excepteur veniam eiusmod. Raw denim Truffaut Schlitz, migas sapiente Portland VHS twee Bushwick Marfa typewriter retro id keytar.</p>
+<span class="c1"># Import stuff
+</span><span class="kn">import</span> <span class="n">torch</span>
+<span class="kn">import</span> <span class="n">torch.nn</span> <span class="k">as</span> <span class="n">nn</span>
+<span class="kn">import</span> <span class="n">einops</span>
+<span class="kn">from</span> <span class="n">fancy_einsum</span> <span class="kn">import</span> <span class="n">einsum</span>
+<span class="kn">import</span> <span class="n">tqdm.auto</span> <span class="k">as</span> <span class="n">tqdm</span>
+<span class="kn">import</span> <span class="n">plotly.express</span> <span class="k">as</span> <span class="n">px</span>
 
-<blockquote>
-  <p>We do not grow absolutely, chronologically. We grow sometimes in one dimension, and not in another, unevenly. We grow partially. We are relative. We are mature in one realm, childish in another.
-—Anais Nin</p>
-</blockquote>
+<span class="kn">from</span> <span class="n">jaxtyping</span> <span class="kn">import</span> <span class="n">Float</span>
+<span class="kn">from</span> <span class="n">functools</span> <span class="kn">import</span> <span class="n">partial</span>
 
-<p>Fap aliqua qui, scenester pug Echo Park polaroid irony shabby chic ex cardigan church-key Odd Future accusamus. Blog stumptown sartorial squid, gastropub duis aesthetic Truffaut vero. Pinterest tilde twee, odio mumblecore jean shorts lumbersexual.</p>]]></content><author><name></name></author><category term="sample-posts" /><category term="xAI," /><category term="Interpretability" /><summary type="html"><![CDATA[A post on mechanistic interpretability and tranformerLens. This post is giving a basic introduction to mechanistic interpretability and ways to understand the inner mechanisms of transformer-style models like 'GPT-2'. We will try to locate responsible attention maps for specific biases in several prompts and validate the causal connection by removing parts of the network. We will make use of different datasets to validate the behavior and visualize the results. Finally we will talk about circuits and attention heads.]]></summary></entry><entry><title type="html">Why should I trust you? Local Interpretable Model-agnostic Explanations</title><link href="https://kristosh.github.io//blog/2023/LIME/" rel="alternate" type="text/html" title="Why should I trust you? Local Interpretable Model-agnostic Explanations" /><published>2023-05-13T00:00:00+00:00</published><updated>2023-05-13T00:00:00+00:00</updated><id>https://kristosh.github.io//blog/2023/LIME</id><content type="html" xml:base="https://kristosh.github.io//blog/2023/LIME/"><![CDATA[<h1 id="local-interpretable-model-agnostic-explanations">Local Interpretable Model-agnostic Explanations</h1>
+<span class="c1"># import transformer_lens
+</span><span class="kn">import</span> <span class="n">transformer_lens.utils</span> <span class="k">as</span> <span class="n">utils</span>
+<span class="kn">from</span> <span class="n">transformer_lens.hook_points</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">HookPoint</span><span class="p">,</span>
+<span class="p">)</span>  <span class="c1"># Hooking utilities
+</span><span class="kn">from</span> <span class="n">transformer_lens</span> <span class="kn">import</span> <span class="n">HookedTransformer</span><span class="p">,</span> <span class="n">FactoredMatrix</span>
+
+<span class="n">torch</span><span class="p">.</span><span class="nf">set_grad_enabled</span><span class="p">(</span><span class="bp">False</span><span class="p">)</span>
+</pre></td></tr></tbody></table></code></pre></div></div>
+
+<p>We can make use of the <code class="language-plaintext highlighter-rouge">HookedTransformer</code> functionality to load our model. In this tutorial we will nake use of <code class="language-plaintext highlighter-rouge">GPT-2</code>.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+</pre></td><td class="rouge-code"><pre><span class="n">device</span> <span class="o">=</span> <span class="n">utils</span><span class="p">.</span><span class="nf">get_device</span><span class="p">()</span>
+<span class="c1"># NBVAL_IGNORE_OUTPUT
+</span><span class="n">model</span> <span class="o">=</span> <span class="n">HookedTransformer</span><span class="p">.</span><span class="nf">from_pretrained</span><span class="p">(</span><span class="sh">"</span><span class="s">gpt2-small</span><span class="sh">"</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">)</span>
+</pre></td></tr></tbody></table></code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+</pre></td><td class="rouge-code"><pre><span class="n">model_description_text</span> <span class="o">=</span> <span class="sh">"""</span><span class="s">## Loading Models
+
+HookedTransformer comes loaded with &gt;40 open source GPT-style models. You can load any of them in with `HookedTransformer.from_pretrained(MODEL_NAME)`. See my explainer for documentation of all supported models, and this table for hyper-parameters and the name used to load them. Each model is loaded into the consistent HookedTransformer architecture, designed to be clean, consistent and interpretability-friendly. 
+
+For this demo notebook we</span><span class="sh">'</span><span class="s">ll look at GPT-2 Small, an 80M parameter model. To try the model the model out, let</span><span class="sh">'</span><span class="s">s find the loss on this paragraph!</span><span class="sh">"""</span>
+<span class="n">loss</span> <span class="o">=</span> <span class="nf">model</span><span class="p">(</span><span class="n">model_description_text</span><span class="p">,</span> <span class="n">return_type</span><span class="o">=</span><span class="sh">"</span><span class="s">loss</span><span class="sh">"</span><span class="p">)</span>
+<span class="nf">print</span><span class="p">(</span><span class="sh">"</span><span class="s">Model loss:</span><span class="sh">"</span><span class="p">,</span> <span class="n">loss</span><span class="p">)</span>
+
+<span class="n">gpt2_text</span> <span class="o">=</span> <span class="sh">"</span><span class="s">Whats is the co-capital of Greece according to the country</span><span class="sh">'</span><span class="s">s public opinion?</span><span class="sh">"</span>
+<span class="n">gpt2_tokens</span> <span class="o">=</span> <span class="n">model</span><span class="p">.</span><span class="nf">to_tokens</span><span class="p">(</span><span class="n">gpt2_text</span><span class="p">)</span>
+<span class="nf">print</span><span class="p">(</span><span class="n">gpt2_tokens</span><span class="p">.</span><span class="n">device</span><span class="p">)</span>
+<span class="n">gpt2_logits</span><span class="p">,</span> <span class="n">gpt2_cache</span> <span class="o">=</span> <span class="n">model</span><span class="p">.</span><span class="nf">run_with_cache</span><span class="p">(</span><span class="n">gpt2_tokens</span><span class="p">,</span> <span class="n">remove_batch_dim</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+
+<span class="nf">print</span><span class="p">(</span><span class="nf">type</span><span class="p">(</span><span class="n">gpt2_cache</span><span class="p">))</span>
+<span class="n">attention_pattern</span> <span class="o">=</span> <span class="n">gpt2_cache</span><span class="p">[</span><span class="sh">"</span><span class="s">pattern</span><span class="sh">"</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="sh">"</span><span class="s">attn</span><span class="sh">"</span><span class="p">]</span>
+<span class="nf">print</span><span class="p">(</span><span class="n">attention_pattern</span><span class="p">.</span><span class="n">shape</span><span class="p">)</span>
+<span class="n">gpt2_str_tokens</span> <span class="o">=</span> <span class="n">model</span><span class="p">.</span><span class="nf">to_str_tokens</span><span class="p">(</span><span class="n">gpt2_text</span><span class="p">)</span>
+
+<span class="nf">print</span><span class="p">(</span><span class="sh">"</span><span class="s">Layer 0 Head Attention Patterns:</span><span class="sh">"</span><span class="p">)</span>
+
+<span class="n">cv</span><span class="p">.</span><span class="n">attention</span><span class="p">.</span><span class="nf">attention_patterns</span><span class="p">(</span><span class="n">tokens</span><span class="o">=</span><span class="n">gpt2_str_tokens</span><span class="p">,</span> <span class="n">attention</span><span class="o">=</span><span class="n">attention_pattern</span><span class="p">)</span>
+
+<span class="n">attn_hook_name</span> <span class="o">=</span> <span class="sh">"</span><span class="s">blocks.0.attn.hook_pattern</span><span class="sh">"</span>
+<span class="n">attn_layer</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="n">_</span><span class="p">,</span> <span class="n">gpt2_attn_cache</span> <span class="o">=</span> <span class="n">model</span><span class="p">.</span><span class="nf">run_with_cache</span><span class="p">(</span><span class="n">gpt2_tokens</span><span class="p">,</span> <span class="n">remove_batch_dim</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">stop_at_layer</span><span class="o">=</span><span class="n">attn_layer</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">names_filter</span><span class="o">=</span><span class="p">[</span><span class="n">attn_hook_name</span><span class="p">])</span>
+<span class="n">gpt2_attn</span> <span class="o">=</span> <span class="n">gpt2_attn_cache</span><span class="p">[</span><span class="n">attn_hook_name</span><span class="p">]</span>
+<span class="k">assert</span> <span class="n">torch</span><span class="p">.</span><span class="nf">equal</span><span class="p">(</span><span class="n">gpt2_attn</span><span class="p">,</span> <span class="n">attention_pattern</span><span class="p">)</span>
+</pre></td></tr></tbody></table></code></pre></div></div>]]></content><author><name></name></author><category term="sample-posts" /><category term="xAI," /><category term="Interpretability" /><summary type="html"><![CDATA[A post on mechanistic interpretability and tranformerLens. This post is giving a basic introduction to mechanistic interpretability and ways to understand the inner mechanisms of transformer-style models like `GPT-2`. We will try to locate responsible attention maps for specific biases in several prompts and validate the causal connection by removing parts of the network. We will make use of different datasets to validate the behavior and visualize the results. Finally we will talk about circuits and attention heads.]]></summary></entry><entry><title type="html">Why should I trust you? Local Interpretable Model-agnostic Explanations</title><link href="https://kristosh.github.io//blog/2023/LIME/" rel="alternate" type="text/html" title="Why should I trust you? Local Interpretable Model-agnostic Explanations" /><published>2023-05-13T00:00:00+00:00</published><updated>2023-05-13T00:00:00+00:00</updated><id>https://kristosh.github.io//blog/2023/LIME</id><content type="html" xml:base="https://kristosh.github.io//blog/2023/LIME/"><![CDATA[<h1 id="local-interpretable-model-agnostic-explanations">Local Interpretable Model-agnostic Explanations</h1>
 
 <center>
 <video autoplay="" muted="" loop="" controls="" src="https://kristosh.github.io//assets/video/2023-05-13-LIME/caretta.mp4" style="width:600px" type="video/mp4">
