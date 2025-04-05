@@ -91,3 +91,9 @@ _, gpt2_attn_cache = model.run_with_cache(gpt2_tokens, remove_batch_dim=True, st
 gpt2_attn = gpt2_attn_cache[attn_hook_name]
 assert torch.equal(gpt2_attn, attention_pattern)
 ```
+
+One of the most convenient things in the Neural Networks is that we do have a full control of all the parameters of our model. We know all the exact inner mechanisms that lead from the input to the output. In the case of the `GPT2` model we know all the operations: `positional-embeddings`, `positional-encoding`, `self-attention`, `feed-forward mechanisms` etc. We can intervene and make edits to parts of our model and investigate how these changes influence the output of the model.
+
+Accordingly, being able to do this is a pretty core operation, and this is one of the main things TransformerLens supports! The key feature here is hook points. Every activation inside the transformer is surrounded by a hook point, which allows us to edit or intervene on it.
+
+We do this by adding a hook function to that activation. The hook function maps current_activation_value, hook_point to new_activation_value. As the model is run, it computes that activation as normal, and then the hook function is applied to compute a replacement, and that is substituted in for the activation. The hook function can be an arbitrary Python function, so long as it returns a tensor of the correct shape
