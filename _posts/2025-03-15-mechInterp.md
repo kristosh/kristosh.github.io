@@ -158,7 +158,6 @@ def logits_to_logit_diff(logits, correct_answer=" John", incorrect_answer="Mary"
 clean_logits, clean_cache = model.run_with_cache(clean_tokens)
 clean_logit_diff = logits_to_logit_diff(clean_logits)
 print(f"Clean logit difference: {clean_logit_diff.item():.3f}")
-
 # We don't need to cache on the corrupted prompt.
 corrupted_logits = model(corrupted_tokens)
 corrupted_logit_diff = logits_to_logit_diff(corrupted_logits)
