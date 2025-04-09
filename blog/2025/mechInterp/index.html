@@ -393,7 +393,6 @@ For this demo notebook we</span><span class="sh">'</span><span class="s">ll look
 19
 20
 21
-22
 </pre></td>
 <td class="rouge-code"><pre><span class="n">clean_prompt</span> <span class="o">=</span> <span class="sh">"</span><span class="s">After John and Mary went to the store, Mary gave a bottle of milk to</span><span class="sh">"</span>
 <span class="n">corrupted_prompt</span> <span class="o">=</span> <span class="sh">"</span><span class="s">After John and Mary went to the store, John gave a bottle of milk to</span><span class="sh">"</span>
@@ -412,7 +411,6 @@ For this demo notebook we</span><span class="sh">'</span><span class="s">ll look
 </span><span class="n">clean_logits</span><span class="p">,</span> <span class="n">clean_cache</span> <span class="o">=</span> <span class="n">model</span><span class="p">.</span><span class="nf">run_with_cache</span><span class="p">(</span><span class="n">clean_tokens</span><span class="p">)</span>
 <span class="n">clean_logit_diff</span> <span class="o">=</span> <span class="nf">logits_to_logit_diff</span><span class="p">(</span><span class="n">clean_logits</span><span class="p">)</span>
 <span class="nf">print</span><span class="p">(</span><span class="sa">f</span><span class="sh">"</span><span class="s">Clean logit difference: </span><span class="si">{</span><span class="n">clean_logit_diff</span><span class="p">.</span><span class="nf">item</span><span class="p">()</span><span class="si">:</span><span class="p">.</span><span class="mi">3</span><span class="n">f</span><span class="si">}</span><span class="sh">"</span><span class="p">)</span>
-
 <span class="c1"># We don't need to cache on the corrupted prompt.
 </span><span class="n">corrupted_logits</span> <span class="o">=</span> <span class="nf">model</span><span class="p">(</span><span class="n">corrupted_tokens</span><span class="p">)</span>
 <span class="n">corrupted_logit_diff</span> <span class="o">=</span> <span class="nf">logits_to_logit_diff</span><span class="p">(</span><span class="n">corrupted_logits</span><span class="p">)</span>
